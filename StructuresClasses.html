@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structures, Classes & Inheritance in C++ | OOP Foundations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0f1a;
+            --bg-card: #16162a;
+            --bg-code: #1a1a2e;
+            --bg-elevated: #1e1e38;
+            --accent-blue: #3b82f6;
+            --accent-violet: #8b5cf6;
+            --accent-fuchsia: #d946ef;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-sky: #0ea5e9;
+            --text-bright: #f8fafc;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #2d2d4a;
+            --glow-blue: 0 0 40px rgba(59, 130, 246, 0.3);
+            --glow-violet: 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse 80% 50% at 20% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 70%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 30% at 50% 90%, rgba(217, 70, 239, 0.1) 0%, transparent 50%);
+            animation: gradientShift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes gradientShift {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(30deg); }
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 15, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.875rem 2rem;
+        }
+
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet), var(--accent-fuchsia));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: '{ }';
+            font-size: 1.4rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-link {
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-bright);
+            background: rgba(139, 92, 246, 0.15);
+        }
+
+        .progress-track {
+            position: fixed;
+            top: 57px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border);
+            z-index: 999;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-violet), var(--accent-fuchsia));
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 950px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.25rem;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--accent-violet);
+            margin-bottom: 2rem;
+            animation: fadeSlideUp 0.8s ease-out;
+        }
+
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2.5rem, 7vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: fadeSlideUp 0.8s ease-out 0.1s both;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet), var(--accent-fuchsia));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeSlideUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            animation: fadeSlideUp 0.8s ease-out 0.3s both;
+        }
+
+        .hero-feature {
+            text-align: center;
+        }
+
+        .hero-feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 0.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+        }
+
+        .hero-feature-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-violet);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .section-tag::before, .section-tag::after {
+            content: '//';
+            color: var(--text-muted);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-title .highlight {
+            color: var(--accent-blue);
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-violet));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-violet);
+            box-shadow: var(--glow-violet);
+        }
+
+        .card:hover::before { opacity: 1; }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-icon.blue { background: rgba(59, 130, 246, 0.15); }
+        .card-icon.violet { background: rgba(139, 92, 246, 0.15); }
+        .card-icon.emerald { background: rgba(16, 185, 129, 0.15); }
+        .card-icon.amber { background: rgba(245, 158, 11, 0.15); }
+        .card-icon.rose { background: rgba(244, 63, 94, 0.15); }
+        .card-icon.fuchsia { background: rgba(217, 70, 239, 0.15); }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-bright);
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Subsection */
+        .subsection {
+            margin: 4rem 0;
+        }
+
+        .subsection-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-bright);
+        }
+
+        .subsection-title::before {
+            content: '';
+            width: 5px;
+            height: 28px;
+            background: linear-gradient(to bottom, var(--accent-blue), var(--accent-violet));
+            border-radius: 3px;
+        }
+
+        .subsection p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 1.25rem;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .code-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-dot.red { background: #ff5f57; }
+        .code-dot.yellow { background: #febc2e; }
+        .code-dot.green { background: #28c840; }
+
+        .code-filename {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-copy {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-copy:hover {
+            background: var(--bg-elevated);
+            color: var(--text-bright);
+        }
+
+        .btn-copy.copied {
+            background: var(--accent-emerald);
+            color: white;
+            border-color: var(--accent-emerald);
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+            color: white;
+        }
+
+        .btn-run:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .code-body {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .code-body pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.75;
+            tab-size: 4;
+        }
+
+        /* Syntax highlighting */
+        .kw { color: var(--accent-violet); font-weight: 500; }
+        .type { color: var(--accent-blue); }
+        .str { color: var(--accent-emerald); }
+        .num { color: var(--accent-amber); }
+        .cmt { color: var(--text-muted); font-style: italic; }
+        .fn { color: var(--accent-amber); }
+        .op { color: var(--accent-fuchsia); }
+        .pp { color: var(--accent-rose); }
+
+        /* Info boxes */
+        .info-box {
+            padding: 1.5rem;
+            border-radius: 14px;
+            margin: 2rem 0;
+            border-left: 4px solid;
+            background: var(--bg-card);
+        }
+
+        .info-box.tip { border-color: var(--accent-emerald); }
+        .info-box.warning { border-color: var(--accent-amber); }
+        .info-box.note { border-color: var(--accent-blue); }
+        .info-box.important { border-color: var(--accent-fuchsia); }
+
+        .info-box-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .info-box.tip .info-box-title { color: var(--accent-emerald); }
+        .info-box.warning .info-box-title { color: var(--accent-amber); }
+        .info-box.note .info-box-title { color: var(--accent-blue); }
+        .info-box.important .info-box-title { color: var(--accent-fuchsia); }
+
+        .info-box p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-elevated);
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(139, 92, 246, 0.05); }
+
+        code.inline {
+            font-family: 'Fira Code', monospace;
+            background: var(--bg-elevated);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--accent-sky);
+        }
+
+        /* Diagrams */
+        .diagram {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .diagram-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-violet);
+        }
+
+        .class-box {
+            display: inline-block;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            min-width: 200px;
+            text-align: left;
+            margin: 0.5rem;
+            overflow: hidden;
+        }
+
+        .class-box-header {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+            padding: 0.75rem 1rem;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .class-box-section {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid var(--border);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+        }
+
+        .class-box-section:first-of-type {
+            border-top: none;
+        }
+
+        .class-box-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+
+        .inheritance-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            margin: 1rem 0;
+            color: var(--accent-emerald);
+        }
+
+        .inheritance-arrow .line {
+            width: 2px;
+            height: 30px;
+            background: var(--accent-emerald);
+        }
+
+        .inheritance-arrow .arrow {
+            font-size: 1.5rem;
+        }
+
+        .inheritance-arrow .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Comparison boxes */
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .compare-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem;
+        }
+
+        .compare-box h4 {
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .compare-box.struct h4 { color: var(--accent-blue); }
+        .compare-box.class h4 { color: var(--accent-violet); }
+
+        .compare-box ul {
+            list-style: none;
+        }
+
+        .compare-box li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .compare-box li::before {
+            content: '→';
+            color: var(--accent-emerald);
+            flex-shrink: 0;
+        }
+
+        /* Animation classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Chatbot */
+        .chat-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .chat-toggle svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        .chat-container {
+            position: fixed;
+            bottom: 7rem;
+            right: 2rem;
+            width: 420px;
+            max-width: calc(100vw - 2rem);
+            height: 580px;
+            max-height: calc(100vh - 10rem);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            z-index: 1001;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+        }
+
+        .chat-container.active {
+            display: flex;
+            animation: chatSlideIn 0.3s ease-out;
+        }
+
+        @keyframes chatSlideIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .chat-header {
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chat-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            color: var(--text-bright);
+        }
+
+        .chat-status {
+            font-size: 0.75rem;
+            color: var(--accent-emerald);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .chat-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-emerald);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-close:hover {
+            background: var(--bg-card);
+            color: var(--text-bright);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            max-width: 85%;
+            padding: 1rem 1.25rem;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .chat-message.bot {
+            background: var(--bg-elevated);
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+            color: var(--text-primary);
+        }
+
+        .chat-message.user {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+        }
+
+        .chat-input-area {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            background: var(--bg-elevated);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: var(--accent-violet);
+        }
+
+        .chat-send {
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+            border: none;
+            border-radius: 14px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send:hover {
+            transform: scale(1.05);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-card); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero-features { gap: 1.5rem; }
+            .card-grid { grid-template-columns: 1fr; }
+            .chat-container {
+                width: calc(100vw - 1rem);
+                right: 0.5rem;
+                bottom: 6rem;
+                height: calc(100vh - 8rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+
+    <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="#" class="logo">C++ OOP</a>
+            <div class="nav-links">
+                <a href="#structures" class="nav-link">Structures</a>
+                <a href="#classes" class="nav-link">Classes</a>
+                <a href="#encapsulation" class="nav-link">Encapsulation</a>
+                <a href="#inheritance" class="nav-link">Inheritance</a>
+                <a href="#polymorphism" class="nav-link">Polymorphism</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">🎯 Object-Oriented Programming in C++</span><br>
+            <span class="hero-badge">🎯 MAC125 Prof Khalid Kassou</span>
+            <h1 class="hero-title">
+                Structures, Classes &<br>
+                <span class="gradient-text">Inheritance</span>
+            </h1>
+            <p class="hero-subtitle">
+                Master the foundations of Object-Oriented Programming in C++. Learn how to create custom types, 
+                encapsulate data, and build class hierarchies through inheritance.
+            </p>
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <div class="hero-feature-icon">📦</div>
+                    <div class="hero-feature-label">Structures</div>
+                </div>
+                <div class="hero-feature">
+                    <div class="hero-feature-icon">🏛️</div>
+                    <div class="hero-feature-label">Classes</div>
+                </div>
+                <div class="hero-feature">
+                    <div class="hero-feature-icon">🔒</div>
+                    <div class="hero-feature-label">Encapsulation</div>
+                </div>
+                <div class="hero-feature">
+                    <div class="hero-feature-icon">🧬</div>
+                    <div class="hero-feature-label">Inheritance</div>
+                </div>
+                <div class="hero-feature">
+                    <div class="hero-feature-icon">🔄</div>
+                    <div class="hero-feature-label">Polymorphism</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 1: Structures -->
+    <section class="section fade-in" id="structures">
+        <div class="section-header">
+            <div class="section-tag">Section 01</div>
+            <h2 class="section-title">Understanding <span class="highlight">Structures</span></h2>
+            <p class="section-desc">Structures allow you to group related variables of different types under a single name</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon blue">📦</div>
+                <h3 class="card-title">What is a Struct?</h3>
+                <p class="card-text">A structure is a user-defined data type that groups related variables (called members) together. Each member can have a different data type.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon violet">🔓</div>
+                <h3 class="card-title">Public by Default</h3>
+                <p class="card-text">All members in a struct are public by default, meaning they can be accessed directly from outside the structure.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon emerald">🎯</div>
+                <h3 class="card-title">Use Cases</h3>
+                <p class="card-text">Ideal for simple data containers like points, rectangles, or records where you just need to group data without complex behavior.</p>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Basic Structure Definition</h3>
+            <p>Define a structure using the <code class="inline">struct</code> keyword, then create instances (objects) of that type:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">basic_struct.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cmt">// Define a structure</span>
+<span class="kw">struct</span> <span class="type">Point</span> {
+    <span class="type">double</span> x;
+    <span class="type">double</span> y;
+};
+
+<span class="cmt">// Structure with more members</span>
+<span class="kw">struct</span> <span class="type">Student</span> {
+    <span class="type">string</span> name;
+    <span class="type">int</span> age;
+    <span class="type">double</span> gpa;
+    <span class="type">string</span> major;
+};
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="cmt">// Create and initialize a Point</span>
+    <span class="type">Point</span> p1;
+    p1.x <span class="op">=</span> <span class="num">3.5</span>;
+    p1.y <span class="op">=</span> <span class="num">7.2</span>;
+    
+    <span class="cmt">// Aggregate initialization</span>
+    <span class="type">Point</span> p2 <span class="op">=</span> {<span class="num">1.0</span>, <span class="num">2.0</span>};
+    
+    <span class="cmt">// Create a Student</span>
+    <span class="type">Student</span> s1 <span class="op">=</span> {<span class="str">"Alice"</span>, <span class="num">20</span>, <span class="num">3.85</span>, <span class="str">"Computer Science"</span>};
+    
+    <span class="cmt">// Access members with dot operator</span>
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Point 1: ("</span> <span class="op">&lt;&lt;</span> p1.x <span class="op">&lt;&lt;</span> <span class="str">", "</span> <span class="op">&lt;&lt;</span> p1.y <span class="op">&lt;&lt;</span> <span class="str">")"</span> <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Point 2: ("</span> <span class="op">&lt;&lt;</span> p2.x <span class="op">&lt;&lt;</span> <span class="str">", "</span> <span class="op">&lt;&lt;</span> p2.y <span class="op">&lt;&lt;</span> <span class="str">")"</span> <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\nStudent: "</span> <span class="op">&lt;&lt;</span> s1.name <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Age: "</span> <span class="op">&lt;&lt;</span> s1.age <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"GPA: "</span> <span class="op">&lt;&lt;</span> s1.gpa <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Major: "</span> <span class="op">&lt;&lt;</span> s1.major <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Structures with Functions</h3>
+            <p>Structures can be passed to functions and can also contain member functions:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">struct_functions.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="str">&lt;cmath&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">struct</span> <span class="type">Rectangle</span> {
+    <span class="type">double</span> width;
+    <span class="type">double</span> height;
+    
+    <span class="cmt">// Member function inside struct</span>
+    <span class="type">double</span> <span class="fn">area</span>() {
+        <span class="kw">return</span> width <span class="op">*</span> height;
+    }
+    
+    <span class="type">double</span> <span class="fn">perimeter</span>() {
+        <span class="kw">return</span> <span class="num">2</span> <span class="op">*</span> (width <span class="op">+</span> height);
+    }
+};
+
+<span class="cmt">// Function that takes a struct by value</span>
+<span class="type">void</span> <span class="fn">printRect</span>(<span class="type">Rectangle</span> r) {
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Width: "</span> <span class="op">&lt;&lt;</span> r.width <span class="op">&lt;&lt;</span> <span class="str">", Height: "</span> <span class="op">&lt;&lt;</span> r.height <span class="op">&lt;&lt;</span> endl;
+}
+
+<span class="cmt">// Function that takes a struct by reference (efficient!)</span>
+<span class="type">void</span> <span class="fn">scale</span>(<span class="type">Rectangle</span> <span class="op">&amp;</span>r, <span class="type">double</span> factor) {
+    r.width <span class="op">*=</span> factor;
+    r.height <span class="op">*=</span> factor;
+}
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">Rectangle</span> rect <span class="op">=</span> {<span class="num">10.0</span>, <span class="num">5.0</span>};
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Original rectangle:"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="fn">printRect</span>(rect);
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Area: "</span> <span class="op">&lt;&lt;</span> rect.<span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Perimeter: "</span> <span class="op">&lt;&lt;</span> rect.<span class="fn">perimeter</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cmt">// Scale the rectangle</span>
+    <span class="fn">scale</span>(rect, <span class="num">2.0</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\nAfter scaling by 2:"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="fn">printRect</span>(rect);
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Area: "</span> <span class="op">&lt;&lt;</span> rect.<span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Nested Structures</h3>
+            <p>Structures can contain other structures as members:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">nested_struct.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">struct</span> <span class="type">Date</span> {
+    <span class="type">int</span> day;
+    <span class="type">int</span> month;
+    <span class="type">int</span> year;
+};
+
+<span class="kw">struct</span> <span class="type">Address</span> {
+    <span class="type">string</span> street;
+    <span class="type">string</span> city;
+    <span class="type">string</span> zipCode;
+};
+
+<span class="kw">struct</span> <span class="type">Employee</span> {
+    <span class="type">string</span> name;
+    <span class="type">int</span> id;
+    <span class="type">Date</span> hireDate;      <span class="cmt">// Nested structure</span>
+    <span class="type">Address</span> homeAddress; <span class="cmt">// Nested structure</span>
+    <span class="type">double</span> salary;
+};
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">Employee</span> emp <span class="op">=</span> {
+        <span class="str">"John Smith"</span>,
+        <span class="num">12345</span>,
+        {<span class="num">15</span>, <span class="num">6</span>, <span class="num">2020</span>},  <span class="cmt">// hireDate</span>
+        {<span class="str">"123 Main St"</span>, <span class="str">"New York"</span>, <span class="str">"10001"</span>},  <span class="cmt">// address</span>
+        <span class="num">75000.00</span>
+    };
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Employee: "</span> <span class="op">&lt;&lt;</span> emp.name <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"ID: "</span> <span class="op">&lt;&lt;</span> emp.id <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Hire Date: "</span> <span class="op">&lt;&lt;</span> emp.hireDate.month <span class="op">&lt;&lt;</span> <span class="str">"/"</span> 
+         <span class="op">&lt;&lt;</span> emp.hireDate.day <span class="op">&lt;&lt;</span> <span class="str">"/"</span> <span class="op">&lt;&lt;</span> emp.hireDate.year <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Address: "</span> <span class="op">&lt;&lt;</span> emp.homeAddress.street <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"         "</span> <span class="op">&lt;&lt;</span> emp.homeAddress.city <span class="op">&lt;&lt;</span> <span class="str">", "</span> 
+         <span class="op">&lt;&lt;</span> emp.homeAddress.zipCode <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Salary: $"</span> <span class="op">&lt;&lt;</span> emp.salary <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Classes -->
+    <section class="section fade-in" id="classes">
+        <div class="section-header">
+            <div class="section-tag">Section 02</div>
+            <h2 class="section-title">Introduction to <span class="highlight">Classes</span></h2>
+            <p class="section-desc">Classes are the foundation of Object-Oriented Programming, combining data and behavior with access control</p>
+        </div>
+
+        <div class="comparison">
+            <div class="compare-box struct">
+                <h4>struct</h4>
+                <ul>
+                    <li>Members are <strong>public</strong> by default</li>
+                    <li>Simple data containers</li>
+                    <li>C-compatible</li>
+                    <li>Good for POD (Plain Old Data)</li>
+                    <li>Typically no complex behavior</li>
+                </ul>
+            </div>
+            <div class="compare-box class">
+                <h4>class</h4>
+                <ul>
+                    <li>Members are <strong>private</strong> by default</li>
+                    <li>Encapsulates data + behavior</li>
+                    <li>Full OOP support</li>
+                    <li>Constructors/Destructors</li>
+                    <li>Access control (private/public/protected)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Basic Class Definition</h3>
+            <p>A class combines data (attributes) and functions (methods) with access control:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">basic_class.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="type">Circle</span> {
+<span class="kw">private</span>:
+    <span class="type">double</span> radius;  <span class="cmt">// Private member - only accessible inside class</span>
+
+<span class="kw">public</span>:
+    <span class="cmt">// Constructor - initializes the object</span>
+    <span class="fn">Circle</span>(<span class="type">double</span> r) {
+        radius <span class="op">=</span> r;
+    }
+    
+    <span class="cmt">// Getter - provides read access to private member</span>
+    <span class="type">double</span> <span class="fn">getRadius</span>() {
+        <span class="kw">return</span> radius;
+    }
+    
+    <span class="cmt">// Setter - provides write access with validation</span>
+    <span class="type">void</span> <span class="fn">setRadius</span>(<span class="type">double</span> r) {
+        <span class="kw">if</span> (r <span class="op">&gt;</span> <span class="num">0</span>) {
+            radius <span class="op">=</span> r;
+        }
+    }
+    
+    <span class="cmt">// Member functions (methods)</span>
+    <span class="type">double</span> <span class="fn">area</span>() {
+        <span class="kw">return</span> <span class="num">3.14159</span> <span class="op">*</span> radius <span class="op">*</span> radius;
+    }
+    
+    <span class="type">double</span> <span class="fn">circumference</span>() {
+        <span class="kw">return</span> <span class="num">2</span> <span class="op">*</span> <span class="num">3.14159</span> <span class="op">*</span> radius;
+    }
+    
+    <span class="type">void</span> <span class="fn">display</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Circle with radius: "</span> <span class="op">&lt;&lt;</span> radius <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Area: "</span> <span class="op">&lt;&lt;</span> <span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Circumference: "</span> <span class="op">&lt;&lt;</span> <span class="fn">circumference</span>() <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="cmt">// Create Circle objects</span>
+    <span class="type">Circle</span> c1(<span class="num">5.0</span>);
+    <span class="type">Circle</span> c2(<span class="num">3.0</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"=== Circle 1 ==="</span> <span class="op">&lt;&lt;</span> endl;
+    c1.<span class="fn">display</span>();
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\n=== Circle 2 ==="</span> <span class="op">&lt;&lt;</span> endl;
+    c2.<span class="fn">display</span>();
+    
+    <span class="cmt">// Modify using setter</span>
+    c2.<span class="fn">setRadius</span>(<span class="num">7.5</span>);
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\n=== Circle 2 (modified) ==="</span> <span class="op">&lt;&lt;</span> endl;
+    c2.<span class="fn">display</span>();
+    
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Constructors and Destructors</h3>
+            <p>Constructors initialize objects; destructors clean up when objects are destroyed:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">constructors.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="type">Book</span> {
+<span class="kw">private</span>:
+    <span class="type">string</span> title;
+    <span class="type">string</span> author;
+    <span class="type">int</span> pages;
+
+<span class="kw">public</span>:
+    <span class="cmt">// Default constructor</span>
+    <span class="fn">Book</span>() {
+        title <span class="op">=</span> <span class="str">"Unknown"</span>;
+        author <span class="op">=</span> <span class="str">"Unknown"</span>;
+        pages <span class="op">=</span> <span class="num">0</span>;
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Default constructor called"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cmt">// Parameterized constructor</span>
+    <span class="fn">Book</span>(<span class="type">string</span> t, <span class="type">string</span> a, <span class="type">int</span> p) {
+        title <span class="op">=</span> t;
+        author <span class="op">=</span> a;
+        pages <span class="op">=</span> p;
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Parameterized constructor called for: "</span> <span class="op">&lt;&lt;</span> title <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cmt">// Constructor with initializer list (more efficient!)</span>
+    <span class="fn">Book</span>(<span class="type">string</span> t, <span class="type">string</span> a) <span class="op">:</span> title(t), author(a), pages(<span class="num">100</span>) {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Initializer list constructor for: "</span> <span class="op">&lt;&lt;</span> title <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cmt">// Destructor - called when object is destroyed</span>
+    <span class="op">~</span><span class="fn">Book</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Destructor called for: "</span> <span class="op">&lt;&lt;</span> title <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">display</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"\"" </span><span class="op">&lt;&lt;</span> title <span class="op">&lt;&lt;</span> <span class="str">"\" by "</span> <span class="op">&lt;&lt;</span> author 
+             <span class="op">&lt;&lt;</span> <span class="str">" ("</span> <span class="op">&lt;&lt;</span> pages <span class="op">&lt;&lt;</span> <span class="str">" pages)"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Creating books..."</span> <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="type">Book</span> b1;  <span class="cmt">// Default constructor</span>
+    <span class="type">Book</span> b2(<span class="str">"1984"</span>, <span class="str">"George Orwell"</span>, <span class="num">328</span>);  <span class="cmt">// Parameterized</span>
+    <span class="type">Book</span> b3(<span class="str">"Dune"</span>, <span class="str">"Frank Herbert"</span>);  <span class="cmt">// Initializer list</span>
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\nBook information:"</span> <span class="op">&lt;&lt;</span> endl;
+    b1.<span class="fn">display</span>();
+    b2.<span class="fn">display</span>();
+    b3.<span class="fn">display</span>();
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\nEnd of main - destructors will be called..."</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">💡 Best Practice</div>
+                <p>Use <strong>initializer lists</strong> in constructors for better performance, especially with complex objects. They initialize members directly rather than default-constructing then assigning.</p>
+            </div>
+        </div>
+
+        <div class="diagram">
+            <div class="diagram-title">Class Structure Visualization</div>
+            <div class="class-box">
+                <div class="class-box-header">Circle</div>
+                <div class="class-box-section">
+                    <div class="class-box-label">Private</div>
+                    - radius: double
+                </div>
+                <div class="class-box-section">
+                    <div class="class-box-label">Public</div>
+                    + Circle(r: double)<br>
+                    + getRadius(): double<br>
+                    + setRadius(r: double)<br>
+                    + area(): double<br>
+                    + circumference(): double
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Encapsulation -->
+    <section class="section fade-in" id="encapsulation">
+        <div class="section-header">
+            <div class="section-tag">Section 03</div>
+            <h2 class="section-title">The Power of <span class="highlight">Encapsulation</span></h2>
+            <p class="section-desc">Encapsulation bundles data with methods that operate on it, while restricting direct access to the internal state</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon rose">🔒</div>
+                <h3 class="card-title">Data Hiding</h3>
+                <p class="card-text">Private members can't be accessed directly from outside the class, protecting the internal state from invalid modifications.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon amber">✅</div>
+                <h3 class="card-title">Validation</h3>
+                <p class="card-text">Setters can validate data before assignment, ensuring the object always remains in a valid state.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon fuchsia">🔄</div>
+                <h3 class="card-title">Flexibility</h3>
+                <p class="card-text">Internal implementation can change without affecting code that uses the class, as long as the public interface stays the same.</p>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Access Specifier</th>
+                        <th>Within Class</th>
+                        <th>Derived Class</th>
+                        <th>Outside Class</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code class="inline">public</code></td>
+                        <td>✅ Yes</td>
+                        <td>✅ Yes</td>
+                        <td>✅ Yes</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline">protected</code></td>
+                        <td>✅ Yes</td>
+                        <td>✅ Yes</td>
+                        <td>❌ No</td>
+                    </tr>
+                    <tr>
+                        <td><code class="inline">private</code></td>
+                        <td>✅ Yes</td>
+                        <td>❌ No</td>
+                        <td>❌ No</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Encapsulation in Practice</h3>
+            <p>A well-encapsulated class protects its data and provides controlled access:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">bank_account.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="type">BankAccount</span> {
+<span class="kw">private</span>:
+    <span class="type">string</span> accountHolder;
+    <span class="type">string</span> accountNumber;
+    <span class="type">double</span> balance;
+    <span class="type">int</span> transactionCount;
+
+<span class="kw">public</span>:
+    <span class="cmt">// Constructor</span>
+    <span class="fn">BankAccount</span>(<span class="type">string</span> holder, <span class="type">string</span> accNum, <span class="type">double</span> initial)
+        <span class="op">:</span> accountHolder(holder), accountNumber(accNum), 
+          balance(initial), transactionCount(<span class="num">0</span>) {}
+    
+    <span class="cmt">// Getters - provide read-only access</span>
+    <span class="type">string</span> <span class="fn">getHolder</span>() <span class="kw">const</span> { <span class="kw">return</span> accountHolder; }
+    <span class="type">double</span> <span class="fn">getBalance</span>() <span class="kw">const</span> { <span class="kw">return</span> balance; }
+    <span class="type">int</span> <span class="fn">getTransactions</span>() <span class="kw">const</span> { <span class="kw">return</span> transactionCount; }
+    
+    <span class="cmt">// Deposit with validation</span>
+    <span class="type">bool</span> <span class="fn">deposit</span>(<span class="type">double</span> amount) {
+        <span class="kw">if</span> (amount <span class="op">&lt;=</span> <span class="num">0</span>) {
+            cout <span class="op">&lt;&lt;</span> <span class="str">"Error: Invalid deposit amount"</span> <span class="op">&lt;&lt;</span> endl;
+            <span class="kw">return</span> <span class="kw">false</span>;
+        }
+        balance <span class="op">+=</span> amount;
+        transactionCount<span class="op">++</span>;
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Deposited: $"</span> <span class="op">&lt;&lt;</span> amount <span class="op">&lt;&lt;</span> endl;
+        <span class="kw">return</span> <span class="kw">true</span>;
+    }
+    
+    <span class="cmt">// Withdraw with validation</span>
+    <span class="type">bool</span> <span class="fn">withdraw</span>(<span class="type">double</span> amount) {
+        <span class="kw">if</span> (amount <span class="op">&lt;=</span> <span class="num">0</span>) {
+            cout <span class="op">&lt;&lt;</span> <span class="str">"Error: Invalid withdrawal amount"</span> <span class="op">&lt;&lt;</span> endl;
+            <span class="kw">return</span> <span class="kw">false</span>;
+        }
+        <span class="kw">if</span> (amount <span class="op">&gt;</span> balance) {
+            cout <span class="op">&lt;&lt;</span> <span class="str">"Error: Insufficient funds"</span> <span class="op">&lt;&lt;</span> endl;
+            <span class="kw">return</span> <span class="kw">false</span>;
+        }
+        balance <span class="op">-=</span> amount;
+        transactionCount<span class="op">++</span>;
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Withdrew: $"</span> <span class="op">&lt;&lt;</span> amount <span class="op">&lt;&lt;</span> endl;
+        <span class="kw">return</span> <span class="kw">true</span>;
+    }
+    
+    <span class="type">void</span> <span class="fn">displayInfo</span>() <span class="kw">const</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Account Holder: "</span> <span class="op">&lt;&lt;</span> accountHolder <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Account Number: "</span> <span class="op">&lt;&lt;</span> accountNumber <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Balance: $"</span> <span class="op">&lt;&lt;</span> balance <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Transactions: "</span> <span class="op">&lt;&lt;</span> transactionCount <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">BankAccount</span> account(<span class="str">"Alice Johnson"</span>, <span class="str">"ACC-12345"</span>, <span class="num">1000.0</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"=== Initial State ==="</span> <span class="op">&lt;&lt;</span> endl;
+    account.<span class="fn">displayInfo</span>();
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\n=== Transactions ==="</span> <span class="op">&lt;&lt;</span> endl;
+    account.<span class="fn">deposit</span>(<span class="num">500</span>);
+    account.<span class="fn">withdraw</span>(<span class="num">200</span>);
+    account.<span class="fn">withdraw</span>(<span class="num">5000</span>);  <span class="cmt">// Should fail</span>
+    account.<span class="fn">deposit</span>(<span class="op">-</span><span class="num">100</span>);   <span class="cmt">// Should fail</span>
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\n=== Final State ==="</span> <span class="op">&lt;&lt;</span> endl;
+    account.<span class="fn">displayInfo</span>();
+    
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box note">
+                <div class="info-box-title">📘 The <code class="inline">const</code> Keyword</div>
+                <p>Methods marked <code class="inline">const</code> promise not to modify the object's state. This allows them to be called on const objects and helps catch bugs at compile time.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Inheritance -->
+    <section class="section fade-in" id="inheritance">
+        <div class="section-header">
+            <div class="section-tag">Section 04</div>
+            <h2 class="section-title">Understanding <span class="highlight">Inheritance</span></h2>
+            <p class="section-desc">Inheritance allows a class to inherit properties and behaviors from another class, promoting code reuse</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon blue">👆</div>
+                <h3 class="card-title">Base Class (Parent)</h3>
+                <p class="card-text">The class being inherited from. Contains common attributes and methods that will be shared with derived classes.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon violet">👇</div>
+                <h3 class="card-title">Derived Class (Child)</h3>
+                <p class="card-text">The class that inherits. Gets all public/protected members from the base class and can add its own unique members.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon emerald">♻️</div>
+                <h3 class="card-title">Code Reuse</h3>
+                <p class="card-text">Write common functionality once in the base class. All derived classes automatically get this functionality.</p>
+            </div>
+        </div>
+
+        <div class="diagram">
+            <div class="diagram-title">Inheritance Hierarchy</div>
+            <div class="class-box">
+                <div class="class-box-header">Animal (Base)</div>
+                <div class="class-box-section">
+                    <div class="class-box-label">Protected</div>
+                    # name: string<br>
+                    # age: int
+                </div>
+                <div class="class-box-section">
+                    <div class="class-box-label">Public</div>
+                    + eat(): void<br>
+                    + sleep(): void
+                </div>
+            </div>
+            <div class="inheritance-arrow">
+                <div class="arrow">▲</div>
+                <div class="line"></div>
+                <div class="label">inherits from</div>
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <div class="class-box">
+                    <div class="class-box-header">Dog (Derived)</div>
+                    <div class="class-box-section">
+                        <div class="class-box-label">Private</div>
+                        - breed: string
+                    </div>
+                    <div class="class-box-section">
+                        <div class="class-box-label">Public</div>
+                        + bark(): void<br>
+                        + fetch(): void
+                    </div>
+                </div>
+                <div class="class-box">
+                    <div class="class-box-header">Cat (Derived)</div>
+                    <div class="class-box-section">
+                        <div class="class-box-label">Private</div>
+                        - indoor: bool
+                    </div>
+                    <div class="class-box-section">
+                        <div class="class-box-label">Public</div>
+                        + meow(): void<br>
+                        + climb(): void
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Basic Inheritance Syntax</h3>
+            <p>Use a colon followed by the access specifier and base class name:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">inheritance_basics.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cmt">// Base class</span>
+<span class="kw">class</span> <span class="type">Animal</span> {
+<span class="kw">protected</span>:
+    <span class="type">string</span> name;
+    <span class="type">int</span> age;
+
+<span class="kw">public</span>:
+    <span class="fn">Animal</span>(<span class="type">string</span> n, <span class="type">int</span> a) <span class="op">:</span> name(n), age(a) {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Animal constructor called"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">eat</span>() {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="str">" is eating."</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">sleep</span>() {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="str">" is sleeping."</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">displayInfo</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Name: "</span> <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="str">", Age: "</span> <span class="op">&lt;&lt;</span> age <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="cmt">// Derived class - inherits from Animal</span>
+<span class="kw">class</span> <span class="type">Dog</span> <span class="op">:</span> <span class="kw">public</span> <span class="type">Animal</span> {
+<span class="kw">private</span>:
+    <span class="type">string</span> breed;
+
+<span class="kw">public</span>:
+    <span class="cmt">// Constructor calls base class constructor</span>
+    <span class="fn">Dog</span>(<span class="type">string</span> n, <span class="type">int</span> a, <span class="type">string</span> b) <span class="op">:</span> <span class="type">Animal</span>(n, a), breed(b) {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Dog constructor called"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cmt">// Dog-specific methods</span>
+    <span class="type">void</span> <span class="fn">bark</span>() {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="str">" says: Woof! Woof!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">fetch</span>() {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="str">" is fetching the ball!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">showBreed</span>() {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="str">" is a "</span> <span class="op">&lt;&lt;</span> breed <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="cmt">// Another derived class</span>
+<span class="kw">class</span> <span class="type">Cat</span> <span class="op">:</span> <span class="kw">public</span> <span class="type">Animal</span> {
+<span class="kw">private</span>:
+    <span class="type">bool</span> isIndoor;
+
+<span class="kw">public</span>:
+    <span class="fn">Cat</span>(<span class="type">string</span> n, <span class="type">int</span> a, <span class="type">bool</span> indoor) <span class="op">:</span> <span class="type">Animal</span>(n, a), isIndoor(indoor) {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Cat constructor called"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">meow</span>() {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="str">" says: Meow!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">climb</span>() {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="str">" is climbing!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    cout <span class="op">&lt;&lt;</span> <span class="str">"=== Creating a Dog ==="</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="type">Dog</span> dog(<span class="str">"Buddy"</span>, <span class="num">3</span>, <span class="str">"Golden Retriever"</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\n=== Dog Actions ==="</span> <span class="op">&lt;&lt;</span> endl;
+    dog.<span class="fn">displayInfo</span>();  <span class="cmt">// Inherited from Animal</span>
+    dog.<span class="fn">showBreed</span>();     <span class="cmt">// Dog-specific</span>
+    dog.<span class="fn">eat</span>();           <span class="cmt">// Inherited from Animal</span>
+    dog.<span class="fn">bark</span>();          <span class="cmt">// Dog-specific</span>
+    dog.<span class="fn">fetch</span>();         <span class="cmt">// Dog-specific</span>
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\n=== Creating a Cat ==="</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="type">Cat</span> cat(<span class="str">"Whiskers"</span>, <span class="num">5</span>, <span class="kw">true</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\n=== Cat Actions ==="</span> <span class="op">&lt;&lt;</span> endl;
+    cat.<span class="fn">displayInfo</span>();   <span class="cmt">// Inherited from Animal</span>
+    cat.<span class="fn">sleep</span>();         <span class="cmt">// Inherited from Animal</span>
+    cat.<span class="fn">meow</span>();          <span class="cmt">// Cat-specific</span>
+    cat.<span class="fn">climb</span>();         <span class="cmt">// Cat-specific</span>
+    
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Types of Inheritance</h3>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Inheritance Type</th>
+                            <th>Base public</th>
+                            <th>Base protected</th>
+                            <th>Base private</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="inline">public</code></td>
+                            <td>→ public</td>
+                            <td>→ protected</td>
+                            <td>Not inherited</td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">protected</code></td>
+                            <td>→ protected</td>
+                            <td>→ protected</td>
+                            <td>Not inherited</td>
+                        </tr>
+                        <tr>
+                            <td><code class="inline">private</code></td>
+                            <td>→ private</td>
+                            <td>→ private</td>
+                            <td>Not inherited</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-box important">
+                <div class="info-box-title">🔑 Key Point</div>
+                <p><strong>Public inheritance</strong> is most common and represents an "is-a" relationship (a Dog <em>is an</em> Animal). Protected and private inheritance are rarer and represent "is-implemented-in-terms-of" relationships.</p>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Method Overriding</h3>
+            <p>Derived classes can override base class methods to provide specialized behavior:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">method_overriding.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="type">Shape</span> {
+<span class="kw">protected</span>:
+    <span class="type">string</span> name;
+
+<span class="kw">public</span>:
+    <span class="fn">Shape</span>(<span class="type">string</span> n) <span class="op">:</span> name(n) {}
+    
+    <span class="type">void</span> <span class="fn">describe</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"This is a "</span> <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cmt">// Base implementation - will be overridden</span>
+    <span class="type">double</span> <span class="fn">area</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Area not defined for generic shape"</span> <span class="op">&lt;&lt;</span> endl;
+        <span class="kw">return</span> <span class="num">0</span>;
+    }
+};
+
+<span class="kw">class</span> <span class="type">Rectangle</span> <span class="op">:</span> <span class="kw">public</span> <span class="type">Shape</span> {
+<span class="kw">private</span>:
+    <span class="type">double</span> width, height;
+
+<span class="kw">public</span>:
+    <span class="fn">Rectangle</span>(<span class="type">double</span> w, <span class="type">double</span> h) <span class="op">:</span> <span class="type">Shape</span>(<span class="str">"Rectangle"</span>), width(w), height(h) {}
+    
+    <span class="cmt">// Override area method</span>
+    <span class="type">double</span> <span class="fn">area</span>() {
+        <span class="kw">return</span> width <span class="op">*</span> height;
+    }
+};
+
+<span class="kw">class</span> <span class="type">Circle</span> <span class="op">:</span> <span class="kw">public</span> <span class="type">Shape</span> {
+<span class="kw">private</span>:
+    <span class="type">double</span> radius;
+
+<span class="kw">public</span>:
+    <span class="fn">Circle</span>(<span class="type">double</span> r) <span class="op">:</span> <span class="type">Shape</span>(<span class="str">"Circle"</span>), radius(r) {}
+    
+    <span class="cmt">// Override area method</span>
+    <span class="type">double</span> <span class="fn">area</span>() {
+        <span class="kw">return</span> <span class="num">3.14159</span> <span class="op">*</span> radius <span class="op">*</span> radius;
+    }
+};
+
+<span class="kw">class</span> <span class="type">Triangle</span> <span class="op">:</span> <span class="kw">public</span> <span class="type">Shape</span> {
+<span class="kw">private</span>:
+    <span class="type">double</span> base, height;
+
+<span class="kw">public</span>:
+    <span class="fn">Triangle</span>(<span class="type">double</span> b, <span class="type">double</span> h) <span class="op">:</span> <span class="type">Shape</span>(<span class="str">"Triangle"</span>), base(b), height(h) {}
+    
+    <span class="cmt">// Override area method</span>
+    <span class="type">double</span> <span class="fn">area</span>() {
+        <span class="kw">return</span> <span class="num">0.5</span> <span class="op">*</span> base <span class="op">*</span> height;
+    }
+};
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="type">Rectangle</span> rect(<span class="num">10</span>, <span class="num">5</span>);
+    <span class="type">Circle</span> circle(<span class="num">7</span>);
+    <span class="type">Triangle</span> tri(<span class="num">8</span>, <span class="num">6</span>);
+    
+    rect.<span class="fn">describe</span>();
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Area: "</span> <span class="op">&lt;&lt;</span> rect.<span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    cout <span class="op">&lt;&lt;</span> endl;
+    circle.<span class="fn">describe</span>();
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Area: "</span> <span class="op">&lt;&lt;</span> circle.<span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    cout <span class="op">&lt;&lt;</span> endl;
+    tri.<span class="fn">describe</span>();
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Area: "</span> <span class="op">&lt;&lt;</span> tri.<span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Polymorphism -->
+    <section class="section fade-in" id="polymorphism">
+        <div class="section-header">
+            <div class="section-tag">Section 05</div>
+            <h2 class="section-title">Introduction to <span class="highlight">Polymorphism</span></h2>
+            <p class="section-desc">Polymorphism allows objects of different classes to be treated through a common interface</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon fuchsia">🎭</div>
+                <h3 class="card-title">Virtual Functions</h3>
+                <p class="card-text">Functions declared with <code class="inline">virtual</code> enable runtime polymorphism. The correct version is called based on the actual object type.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon blue">📍</div>
+                <h3 class="card-title">Base Pointers</h3>
+                <p class="card-text">A pointer to a base class can point to any derived class object, enabling flexible and extensible code.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon amber">🔀</div>
+                <h3 class="card-title">Dynamic Binding</h3>
+                <p class="card-text">The decision of which function to call is made at runtime, not compile time, based on the actual object type.</p>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Virtual Functions and Polymorphism</h3>
+            <p>Virtual functions enable true polymorphic behavior with base class pointers:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">polymorphism.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="type">Shape</span> {
+<span class="kw">protected</span>:
+    <span class="type">string</span> name;
+
+<span class="kw">public</span>:
+    <span class="fn">Shape</span>(<span class="type">string</span> n) <span class="op">:</span> name(n) {}
+    
+    <span class="cmt">// Virtual function - enables polymorphism!</span>
+    <span class="kw">virtual</span> <span class="type">double</span> <span class="fn">area</span>() {
+        <span class="kw">return</span> <span class="num">0</span>;
+    }
+    
+    <span class="kw">virtual</span> <span class="type">void</span> <span class="fn">draw</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Drawing a "</span> <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">string</span> <span class="fn">getName</span>() { <span class="kw">return</span> name; }
+    
+    <span class="cmt">// Virtual destructor - important for polymorphism!</span>
+    <span class="kw">virtual</span> <span class="op">~</span><span class="fn">Shape</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Shape destructor for "</span> <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="kw">class</span> <span class="type">Rectangle</span> <span class="op">:</span> <span class="kw">public</span> <span class="type">Shape</span> {
+<span class="kw">private</span>:
+    <span class="type">double</span> width, height;
+
+<span class="kw">public</span>:
+    <span class="fn">Rectangle</span>(<span class="type">double</span> w, <span class="type">double</span> h) <span class="op">:</span> <span class="type">Shape</span>(<span class="str">"Rectangle"</span>), width(w), height(h) {}
+    
+    <span class="cmt">// Override with 'override' keyword (C++11)</span>
+    <span class="type">double</span> <span class="fn">area</span>() <span class="kw">override</span> {
+        <span class="kw">return</span> width <span class="op">*</span> height;
+    }
+    
+    <span class="type">void</span> <span class="fn">draw</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Drawing rectangle: "</span> <span class="op">&lt;&lt;</span> width <span class="op">&lt;&lt;</span> <span class="str">" x "</span> <span class="op">&lt;&lt;</span> height <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="op">~</span><span class="fn">Rectangle</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Rectangle destructor"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="kw">class</span> <span class="type">Circle</span> <span class="op">:</span> <span class="kw">public</span> <span class="type">Shape</span> {
+<span class="kw">private</span>:
+    <span class="type">double</span> radius;
+
+<span class="kw">public</span>:
+    <span class="fn">Circle</span>(<span class="type">double</span> r) <span class="op">:</span> <span class="type">Shape</span>(<span class="str">"Circle"</span>), radius(r) {}
+    
+    <span class="type">double</span> <span class="fn">area</span>() <span class="kw">override</span> {
+        <span class="kw">return</span> <span class="num">3.14159</span> <span class="op">*</span> radius <span class="op">*</span> radius;
+    }
+    
+    <span class="type">void</span> <span class="fn">draw</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Drawing circle with radius: "</span> <span class="op">&lt;&lt;</span> radius <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="op">~</span><span class="fn">Circle</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Circle destructor"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="cmt">// Function that works with ANY shape!</span>
+<span class="type">void</span> <span class="fn">printShapeInfo</span>(<span class="type">Shape</span><span class="op">*</span> shape) {
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Shape: "</span> <span class="op">&lt;&lt;</span> shape<span class="op">-&gt;</span><span class="fn">getName</span>() <span class="op">&lt;&lt;</span> endl;
+    shape<span class="op">-&gt;</span><span class="fn">draw</span>();
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Area: "</span> <span class="op">&lt;&lt;</span> shape<span class="op">-&gt;</span><span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> endl;
+}
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="cmt">// Create shapes</span>
+    <span class="type">Shape</span><span class="op">*</span> shapes[<span class="num">3</span>];
+    shapes[<span class="num">0</span>] <span class="op">=</span> <span class="kw">new</span> <span class="type">Rectangle</span>(<span class="num">10</span>, <span class="num">5</span>);
+    shapes[<span class="num">1</span>] <span class="op">=</span> <span class="kw">new</span> <span class="type">Circle</span>(<span class="num">7</span>);
+    shapes[<span class="num">2</span>] <span class="op">=</span> <span class="kw">new</span> <span class="type">Rectangle</span>(<span class="num">3</span>, <span class="num">4</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="str">"=== Polymorphism in Action ==="</span> <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cmt">// Same function call, different behavior!</span>
+    <span class="kw">for</span> (<span class="type">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> <span class="num">3</span>; i<span class="op">++</span>) {
+        <span class="fn">printShapeInfo</span>(shapes[i]);
+    }
+    
+    <span class="cmt">// Calculate total area</span>
+    <span class="type">double</span> totalArea <span class="op">=</span> <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="type">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> <span class="num">3</span>; i<span class="op">++</span>) {
+        totalArea <span class="op">+=</span> shapes[i]<span class="op">-&gt;</span><span class="fn">area</span>();
+    }
+    cout <span class="op">&lt;&lt;</span> <span class="str">"Total area of all shapes: "</span> <span class="op">&lt;&lt;</span> totalArea <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cmt">// Clean up</span>
+    cout <span class="op">&lt;&lt;</span> <span class="str">"\n=== Cleaning up ==="</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">for</span> (<span class="type">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> <span class="num">3</span>; i<span class="op">++</span>) {
+        <span class="kw">delete</span> shapes[i];
+    }
+    
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box warning">
+                <div class="info-box-title">⚠️ Virtual Destructor</div>
+                <p>Always declare the destructor as <code class="inline">virtual</code> in base classes when using polymorphism. Without it, derived class destructors won't be called when deleting through a base pointer, causing memory leaks!</p>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Pure Virtual Functions and Abstract Classes</h3>
+            <p>Abstract classes define interfaces that derived classes must implement:</p>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">
+                        <div class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></div>
+                        <span class="code-filename">abstract_class.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cmt">// Abstract class - cannot be instantiated</span>
+<span class="kw">class</span> <span class="type">Vehicle</span> {
+<span class="kw">protected</span>:
+    <span class="type">string</span> brand;
+    <span class="type">int</span> year;
+
+<span class="kw">public</span>:
+    <span class="fn">Vehicle</span>(<span class="type">string</span> b, <span class="type">int</span> y) <span class="op">:</span> brand(b), year(y) {}
+    
+    <span class="cmt">// Pure virtual functions - MUST be implemented by derived classes</span>
+    <span class="kw">virtual</span> <span class="type">void</span> <span class="fn">start</span>() <span class="op">=</span> <span class="num">0</span>;
+    <span class="kw">virtual</span> <span class="type">void</span> <span class="fn">stop</span>() <span class="op">=</span> <span class="num">0</span>;
+    <span class="kw">virtual</span> <span class="type">int</span> <span class="fn">getWheels</span>() <span class="op">=</span> <span class="num">0</span>;
+    
+    <span class="cmt">// Non-pure virtual - has default implementation</span>
+    <span class="kw">virtual</span> <span class="type">void</span> <span class="fn">honk</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Beep beep!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">showInfo</span>() {
+        cout <span class="op">&lt;&lt;</span> year <span class="op">&lt;&lt;</span> <span class="str">" "</span> <span class="op">&lt;&lt;</span> brand <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="kw">virtual</span> <span class="op">~</span><span class="fn">Vehicle</span>() {}
+};
+
+<span class="kw">class</span> <span class="type">Car</span> <span class="op">:</span> <span class="kw">public</span> <span class="type">Vehicle</span> {
+<span class="kw">public</span>:
+    <span class="fn">Car</span>(<span class="type">string</span> b, <span class="type">int</span> y) <span class="op">:</span> <span class="type">Vehicle</span>(b, y) {}
+    
+    <span class="type">void</span> <span class="fn">start</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> brand <span class="op">&lt;&lt;</span> <span class="str">" car: Engine starting... Vroom!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">stop</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> brand <span class="op">&lt;&lt;</span> <span class="str">" car: Braking... Stopped."</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">int</span> <span class="fn">getWheels</span>() <span class="kw">override</span> { <span class="kw">return</span> <span class="num">4</span>; }
+};
+
+<span class="kw">class</span> <span class="type">Motorcycle</span> <span class="op">:</span> <span class="kw">public</span> <span class="type">Vehicle</span> {
+<span class="kw">public</span>:
+    <span class="fn">Motorcycle</span>(<span class="type">string</span> b, <span class="type">int</span> y) <span class="op">:</span> <span class="type">Vehicle</span>(b, y) {}
+    
+    <span class="type">void</span> <span class="fn">start</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> brand <span class="op">&lt;&lt;</span> <span class="str">" motorcycle: Kick start... Vrrrm!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">void</span> <span class="fn">stop</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> brand <span class="op">&lt;&lt;</span> <span class="str">" motorcycle: Stopping..."</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="type">int</span> <span class="fn">getWheels</span>() <span class="kw">override</span> { <span class="kw">return</span> <span class="num">2</span>; }
+    
+    <span class="type">void</span> <span class="fn">honk</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Honk honk!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="type">int</span> <span class="fn">main</span>() {
+    <span class="cmt">// Vehicle v("Generic", 2020);  // ERROR! Cannot instantiate abstract class</span>
+    
+    <span class="type">Car</span> car(<span class="str">"Toyota"</span>, <span class="num">2022</span>);
+    <span class="type">Motorcycle</span> bike(<span class="str">"Harley"</span>, <span class="num">2021</span>);
+    
+    <span class="type">Vehicle</span><span class="op">*</span> vehicles[] <span class="op">=</span> {<span class="op">&amp;</span>car, <span class="op">&amp;</span>bike};
+    
+    <span class="kw">for</span> (<span class="type">Vehicle</span><span class="op">*</span> v <span class="op">:</span> vehicles) {
+        v<span class="op">-&gt;</span><span class="fn">showInfo</span>();
+        cout <span class="op">&lt;&lt;</span> <span class="str">"Wheels: "</span> <span class="op">&lt;&lt;</span> v<span class="op">-&gt;</span><span class="fn">getWheels</span>() <span class="op">&lt;&lt;</span> endl;
+        v<span class="op">-&gt;</span><span class="fn">start</span>();
+        v<span class="op">-&gt;</span><span class="fn">honk</span>();
+        v<span class="op">-&gt;</span><span class="fn">stop</span>();
+        cout <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box note">
+                <div class="info-box-title">📘 Abstract vs Concrete Classes</div>
+                <p>A class with at least one <strong>pure virtual function</strong> (<code class="inline">= 0</code>) is abstract and cannot be instantiated. Derived classes must implement all pure virtual functions to become concrete (instantiable).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Structures, Classes & Inheritance in C++<br>Object-Oriented Programming Foundations</p>
+    </footer>
+
+    <!-- Chatbot -->
+    <button class="chat-toggle" id="chatToggle">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+    </button>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <div class="chat-title">
+                <div class="chat-avatar">🤖</div>
+                <div>
+                    <div class="chat-name">C++ OOP Assistant</div>
+                    <div class="chat-status">Powered by Claude AI</div>
+                </div>
+            </div>
+            <button class="chat-close" id="chatClose">✕</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message bot">👋 Hi! I'm your C++ OOP learning assistant. Ask me anything about structures, classes, encapsulation, inheritance, or polymorphism!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask about OOP..." autocomplete="off">
+            <button class="chat-send" id="chatSend">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('progressFill').style.width = scrolled + '%';
+        });
+
+        // Fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Copy code
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.classList.add('copied');
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.textContent = '📋 Copy';
+                }, 2000);
+            });
+        }
+
+        // Run code
+        function runCode(btn) {
+            const code = btn.closest('.code-block').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied! Paste it in the online compiler.');
+                window.open('https://www.programiz.com/cpp-programming/online-compiler/', '_blank');
+            });
+        }
+
+        // Chatbot
+        const chatToggle = document.getElementById('chatToggle');
+        const chatContainer = document.getElementById('chatContainer');
+        const chatClose = document.getElementById('chatClose');
+        const chatInput = document.getElementById('chatInput');
+        const chatSend = document.getElementById('chatSend');
+        const chatMessages = document.getElementById('chatMessages');
+
+        chatToggle.onclick = () => chatContainer.classList.toggle('active');
+        chatClose.onclick = () => chatContainer.classList.remove('active');
+
+        function addMessage(text, isUser = false) {
+            const div = document.createElement('div');
+            div.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+            div.textContent = text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+            
+            addMessage(msg, true);
+            chatInput.value = '';
+            
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        system: 'You are a C++ OOP tutor. Topics: structures, classes, encapsulation, access specifiers (public/private/protected), constructors, destructors, inheritance, method overriding, polymorphism, virtual functions, abstract classes. Keep answers concise and beginner-friendly with code examples when helpful.',
+                        messages: [{ role: 'user', content: msg }]
+                    })
+                });
+                const data = await response.json();
+                addMessage(data.content?.[0]?.text || getLocalResponse(msg));
+            } catch {
+                addMessage(getLocalResponse(msg));
+            }
+        }
+
+        function getLocalResponse(msg) {
+            const m = msg.toLowerCase();
+            if (m.includes('struct')) return "Structures group related data together. Members are PUBLIC by default. Syntax: struct Point { double x, y; }; Create with: Point p = {3.5, 7.2};";
+            if (m.includes('class')) return "Classes combine data + behavior with access control. Members are PRIVATE by default. Use public: for interface, private: for implementation. Classes support constructors, destructors, and inheritance.";
+            if (m.includes('encapsulation')) return "Encapsulation = hiding internal state + providing controlled access. Make data private, provide public getters/setters. Benefits: validation, flexibility, data protection.";
+            if (m.includes('inherit')) return "Inheritance lets a derived class reuse base class code. Syntax: class Dog : public Animal { }. The derived class gets all public/protected members and can add its own.";
+            if (m.includes('virtual')) return "Virtual functions enable polymorphism. Declare with 'virtual' in base class. Override in derived classes. The correct version is called based on actual object type, not pointer type.";
+            if (m.includes('polymorph')) return "Polymorphism = same interface, different behavior. Use base class pointers to derived objects. Virtual functions enable runtime binding. Example: Shape* s = new Circle(); s->area();";
+            if (m.includes('construct')) return "Constructors initialize objects. Same name as class, no return type. Types: default (no params), parameterized, copy. Use initializer lists for efficiency: Circle(double r) : radius(r) {}";
+            if (m.includes('destruct')) return "Destructors clean up when objects are destroyed. Syntax: ~ClassName() {}. Make virtual in base classes when using polymorphism to ensure proper cleanup!";
+            if (m.includes('abstract') || m.includes('pure virtual')) return "Pure virtual functions (= 0) make a class abstract - can't be instantiated. Syntax: virtual void draw() = 0; Derived classes MUST implement all pure virtual functions.";
+            if (m.includes('protected')) return "Protected members: accessible within class AND derived classes, but not outside. Use for data that derived classes need to access directly.";
+            return "I can help with: structures, classes, encapsulation, access specifiers, constructors/destructors, inheritance, virtual functions, polymorphism, and abstract classes. What would you like to know?";
+        }
+
+        chatSend.onclick = sendMessage;
+        chatInput.onkeypress = e => { if (e.key === 'Enter') sendMessage(); };
+
+        // Smooth scroll
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.onclick = e => {
+                e.preventDefault();
+                document.querySelector(link.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+            };
+        });
+    </script>
+</body>
+</html>
