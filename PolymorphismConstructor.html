@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced C++ OOP | Polymorphism, Constructors & Nested Classes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050816;
+            --bg-surface: #0c1222;
+            --bg-elevated: #131a2e;
+            --bg-code: #0a0f1c;
+            --accent-primary: #6366f1;
+            --accent-secondary: #22d3ee;
+            --accent-tertiary: #f472b6;
+            --accent-success: #34d399;
+            --accent-warning: #fbbf24;
+            --accent-danger: #f87171;
+            --accent-orange: #fb923c;
+            --text-white: #ffffff;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #1e293b;
+            --gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+            --gradient-secondary: linear-gradient(135deg, #22d3ee, #3b82f6);
+            --gradient-accent: linear-gradient(135deg, #f472b6, #ec4899);
+            --shadow-glow: 0 0 60px rgba(99, 102, 241, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        .mesh-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse 100% 80% at 10% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 80% 60% at 90% 30%, rgba(34, 211, 238, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 50% at 50% 80%, rgba(244, 114, 182, 0.08) 0%, transparent 50%);
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .orb-1 { width: 400px; height: 400px; background: var(--accent-primary); top: 10%; left: 5%; }
+        .orb-2 { width: 300px; height: 300px; background: var(--accent-secondary); top: 60%; right: 10%; animation-delay: -7s; }
+        .orb-3 { width: 250px; height: 250px; background: var(--accent-tertiary); bottom: 10%; left: 30%; animation-delay: -14s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(20px, 30px) scale(1.02); }
+        }
+
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            background: rgba(5, 8, 22, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem 2rem;
+        }
+
+        .nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-brand::before { content: '◆ '; }
+
+        .nav-menu { display: flex; gap: 0.25rem; }
+
+        .nav-item {
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover { color: var(--text-white); background: rgba(99, 102, 241, 0.15); }
+
+        .progress-container {
+            position: fixed;
+            top: 60px; left: 0; right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 999;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            width: 0%;
+            transition: width 0.15s ease;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .hero-content { text-align: center; max-width: 1000px; }
+
+        .hero-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem 2.50rem;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50px;
+            font-size: 1.50rem;
+            color: var(--accent-primary);
+            margin-bottom: 2rem;
+            animation: slideUp 0.8s ease;
+        }
+
+        .hero-title {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.8s ease 0.1s both;
+        }
+
+        .hero-title .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: slideUp 0.8s ease 0.2s both;
+        }
+
+        .hero-cards {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            animation: slideUp 0.8s ease 0.3s both;
+        }
+
+        .hero-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            min-width: 160px;
+            transition: all 0.3s ease;
+        }
+
+        .hero-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .hero-card-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .hero-card-label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header { text-align: center; margin-bottom: 4rem; }
+
+        .section-label {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-secondary);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-title .hl { color: var(--accent-primary); }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .card:hover::after { opacity: 1; }
+
+        .card-icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-icon.purple { background: rgba(99, 102, 241, 0.15); }
+        .card-icon.cyan { background: rgba(34, 211, 238, 0.15); }
+        .card-icon.pink { background: rgba(244, 114, 182, 0.15); }
+        .card-icon.green { background: rgba(52, 211, 153, 0.15); }
+        .card-icon.orange { background: rgba(251, 146, 60, 0.15); }
+        .card-icon.yellow { background: rgba(251, 191, 36, 0.15); }
+
+        .card-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-white);
+        }
+
+        .card-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .subsection { margin: 4rem 0; }
+
+        .subsection-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .subsection-title::before {
+            content: '';
+            width: 5px; height: 28px;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+        }
+
+        .subsection p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .code-wrapper {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 1.25rem;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-info { display: flex; align-items: center; gap: 0.75rem; }
+
+        .code-circles { display: flex; gap: 6px; }
+
+        .code-circle { width: 12px; height: 12px; border-radius: 50%; }
+        .code-circle.r { background: #ff5f57; }
+        .code-circle.y { background: #febc2e; }
+        .code-circle.g { background: #28c840; }
+
+        .code-name {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .code-btns { display: flex; gap: 0.5rem; }
+
+        .code-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-copy {
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-copy:hover { background: var(--bg-elevated); color: var(--text-white); }
+        .btn-copy.copied { background: var(--accent-success); color: white; border-color: var(--accent-success); }
+
+        .btn-run { background: var(--gradient-primary); color: white; }
+        .btn-run:hover { transform: scale(1.03); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+
+        .code-body { padding: 1.5rem; overflow-x: auto; }
+
+        .code-body pre {
+            margin: 0;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            tab-size: 4;
+        }
+
+        .kw { color: #c792ea; font-weight: 500; }
+        .tp { color: #89ddff; }
+        .st { color: #c3e88d; }
+        .nm { color: #f78c6c; }
+        .cm { color: #546e7a; font-style: italic; }
+        .fn { color: #82aaff; }
+        .op { color: #89ddff; }
+        .pp { color: #f07178; }
+
+        .info-box {
+            padding: 1.5rem;
+            border-radius: 14px;
+            margin: 2rem 0;
+            border-left: 4px solid;
+            background: var(--bg-surface);
+        }
+
+        .info-box.tip { border-color: var(--accent-success); }
+        .info-box.warn { border-color: var(--accent-warning); }
+        .info-box.note { border-color: var(--accent-secondary); }
+        .info-box.important { border-color: var(--accent-tertiary); }
+
+        .info-box-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-box.tip .info-box-title { color: var(--accent-success); }
+        .info-box.warn .info-box-title { color: var(--accent-warning); }
+        .info-box.note .info-box-title { color: var(--accent-secondary); }
+        .info-box.important .info-box-title { color: var(--accent-tertiary); }
+
+        .info-box p { color: var(--text-secondary); margin: 0; font-size: 0.95rem; }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            background: var(--bg-elevated);
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent-secondary);
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(99, 102, 241, 0.05); }
+
+        code.il {
+            font-family: 'Source Code Pro', monospace;
+            background: var(--bg-elevated);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--accent-secondary);
+        }
+
+        /* Enhanced Visual Components for Polymorphism Section */
+        .poly-showcase {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .poly-type {
+            background: var(--bg-surface);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .poly-type::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+        }
+
+        .poly-type.compile::before {
+            background: linear-gradient(90deg, #22d3ee, #3b82f6);
+        }
+
+        .poly-type.runtime::before {
+            background: linear-gradient(90deg, #f472b6, #ec4899);
+        }
+
+        .poly-type:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .poly-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .poly-type.compile .poly-badge {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        .poly-type.runtime .poly-badge {
+            background: rgba(244, 114, 182, 0.15);
+            color: var(--accent-tertiary);
+        }
+
+        .poly-type h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-white);
+        }
+
+        .poly-type p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .poly-features {
+            list-style: none;
+        }
+
+        .poly-features li {
+            padding: 0.6rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .poly-features li::before {
+            content: '✓';
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .poly-type.compile .poly-features li::before {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        .poly-type.runtime .poly-features li::before {
+            background: rgba(244, 114, 182, 0.15);
+            color: var(--accent-tertiary);
+        }
+
+        /* Visual Diagram */
+        .diagram-container {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+        }
+
+        .diagram-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--accent-primary);
+        }
+
+        .vtable-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .vtable-box {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            min-width: 200px;
+            overflow: hidden;
+        }
+
+        .vtable-header {
+            padding: 1rem;
+            text-align: center;
+            font-family: 'Source Code Pro', monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .vtable-box.base .vtable-header {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+        }
+
+        .vtable-box.derived .vtable-header {
+            background: linear-gradient(135deg, #22d3ee, #3b82f6);
+            color: white;
+        }
+
+        .vtable-row {
+            padding: 0.75rem 1rem;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vtable-row .ptr {
+            color: var(--accent-tertiary);
+            font-size: 0.7rem;
+        }
+
+        .vtable-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-success);
+        }
+
+        .vtable-arrow .line {
+            width: 60px;
+            height: 2px;
+            background: var(--accent-success);
+            position: relative;
+        }
+
+        .vtable-arrow .line::after {
+            content: '▶';
+            position: absolute;
+            right: -8px;
+            top: -8px;
+            font-size: 0.8rem;
+        }
+
+        .vtable-arrow .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Comparison Visual */
+        .compare-visual {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .compare-side {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .compare-side h4 {
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .compare-side.left h4 { color: var(--accent-secondary); }
+        .compare-side.right h4 { color: var(--accent-tertiary); }
+
+        .compare-vs {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .flow-box {
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: var(--accent-success);
+            font-size: 1.2rem;
+        }
+
+        /* Class UML boxes */
+        .class-uml {
+            display: inline-block;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            min-width: 220px;
+            text-align: left;
+            margin: 0.5rem;
+            overflow: hidden;
+        }
+
+        .class-uml-header {
+            background: var(--gradient-primary);
+            padding: 0.75rem 1rem;
+            font-family: 'Source Code Pro', monospace;
+            font-weight: 600;
+            color: white;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .class-uml-section {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid var(--border);
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .class-uml-section:first-of-type { border-top: none; }
+
+        .class-uml-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+
+        .arrow-down {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 1rem 0;
+            color: var(--accent-success);
+        }
+
+        .arrow-down .shaft {
+            width: 2px;
+            height: 30px;
+            background: var(--accent-success);
+        }
+
+        .arrow-down .head { font-size: 1.2rem; }
+        .arrow-down .text { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+        .reveal {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+        
+        @media (prefers-reduced-motion: no-preference) {
+            .reveal {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+
+        /* Chatbot styles */
+        .chat-btn {
+            position: fixed;
+            bottom: 2rem; right: 2rem;
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .chat-btn:hover { transform: scale(1.1) rotate(10deg); }
+        .chat-btn svg { width: 28px; height: 28px; fill: white; }
+
+        .chat-panel {
+            position: fixed;
+            bottom: 7rem; right: 2rem;
+            width: 420px;
+            max-width: calc(100vw - 2rem);
+            height: 580px;
+            max-height: calc(100vh - 10rem);
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            z-index: 1001;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+        }
+
+        .chat-panel.open {
+            display: flex;
+            animation: chatIn 0.3s ease-out;
+        }
+
+        @keyframes chatIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .chat-head {
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-info { display: flex; align-items: center; gap: 0.75rem; }
+
+        .chat-avatar {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .chat-name { font-weight: 600; color: var(--text-white); }
+
+        .chat-status {
+            font-size: 0.75rem;
+            color: var(--accent-success);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .chat-status::before {
+            content: '';
+            width: 8px; height: 8px;
+            background: var(--accent-success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-close:hover { background: var(--bg-surface); color: var(--text-white); }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-msg {
+            max-width: 85%;
+            padding: 1rem 1.25rem;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .chat-msg.bot {
+            background: var(--bg-elevated);
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+            color: var(--text-primary);
+        }
+
+        .chat-msg.user {
+            background: var(--gradient-primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+        }
+
+        .chat-input-area {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            background: var(--bg-elevated);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus { border-color: var(--accent-primary); }
+
+        .chat-send {
+            padding: 0.875rem 1.5rem;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send:hover { transform: scale(1.05); }
+
+        .footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+        }
+
+        .footer p { color: var(--text-muted); font-size: 0.9rem; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-surface); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .hero-cards { gap: 1rem; }
+            .hero-card { min-width: 140px; padding: 1rem 1.25rem; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .poly-showcase { grid-template-columns: 1fr; }
+            .compare-visual { grid-template-columns: 1fr; }
+            .compare-vs { margin: 1rem auto; }
+            .vtable-diagram { flex-direction: column; align-items: center; }
+            .chat-panel {
+                width: calc(100vw - 1rem);
+                right: 0.5rem;
+                bottom: 6rem;
+                height: calc(100vh - 8rem);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#" class="nav-brand">Advanced C++ OOP</a>
+            <div class="nav-menu">
+                <a href="#polymorphism" class="nav-item">Polymorphism</a>
+                <a href="#constructors" class="nav-item">Constructors</a>
+                <a href="#inline" class="nav-item">Inline</a>
+                <a href="#static" class="nav-item">Static</a>
+                <a href="#nested" class="nav-item">Nested Classes</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-chip">🚀 Advanced Object-Oriented Programming</span><br>
+            <span class="hero-chip">🚀 MAC125 Prof. Khalid Kassou</span>
+            <h1 class="hero-title">
+                Polymorphism, Constructors<br>
+                <span class="text-gradient">& Advanced Class Features</span>
+            </h1>
+            <p class="hero-desc">
+                Deep dive into advanced C++ OOP concepts including runtime polymorphism, constructor types, 
+                inline optimization, static members, and nested class design patterns.
+            </p>
+            <div class="hero-cards">
+                <div class="hero-card">
+                    <div class="hero-card-icon">🎭</div>
+                    <div class="hero-card-label">Polymorphism</div>
+                </div>
+                <div class="hero-card">
+                    <div class="hero-card-icon">🏗️</div>
+                    <div class="hero-card-label">Constructors</div>
+                </div>
+                <div class="hero-card">
+                    <div class="hero-card-icon">⚡</div>
+                    <div class="hero-card-label">Inline Functions</div>
+                </div>
+                <div class="hero-card">
+                    <div class="hero-card-icon">📊</div>
+                    <div class="hero-card-label">Static Members</div>
+                </div>
+                <div class="hero-card">
+                    <div class="hero-card-icon">🪆</div>
+                    <div class="hero-card-label">Nested Classes</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 1: POLYMORPHISM (ENHANCED) ==================== -->
+    <section class="section reveal" id="polymorphism">
+        <div class="section-header">
+            <div class="section-label">Section 01</div>
+            <h2 class="section-title">Understanding <span class="hl">Polymorphism</span></h2>
+            <p class="section-subtitle">"Many forms" — the ability of objects to take on different behaviors while sharing a common interface</p>
+        </div>
+
+        <!-- Visual Showcase: Two Types of Polymorphism -->
+        <div class="poly-showcase">
+            <div class="poly-type compile">
+                <span class="poly-badge">⚡ Static Binding</span>
+                <h3>Compile-Time Polymorphism</h3>
+                <p>Resolved during compilation. The compiler determines which function to call based on the function signature.</p>
+                <ul class="poly-features">
+                    <li>Function Overloading</li>
+                    <li>Operator Overloading</li>
+                    <li>Templates (Generic Programming)</li>
+                    <li>Faster execution (no runtime overhead)</li>
+                    <li>Type-safe at compile time</li>
+                </ul>
+            </div>
+            <div class="poly-type runtime">
+                <span class="poly-badge">🎯 Dynamic Binding</span>
+                <h3>Runtime Polymorphism</h3>
+                <p>Resolved during program execution. Uses virtual functions and the vtable mechanism for dynamic dispatch.</p>
+                <ul class="poly-features">
+                    <li>Virtual Functions</li>
+                    <li>Function Overriding</li>
+                    <li>Abstract Classes & Interfaces</li>
+                    <li>Flexible & extensible design</li>
+                    <li>Enables plugin architectures</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Compile-Time</th>
+                        <th>Runtime</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>When Resolved</strong></td>
+                        <td>During compilation</td>
+                        <td>During program execution</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mechanism</strong></td>
+                        <td>Function signatures, templates</td>
+                        <td>Virtual table (vtable)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Keywords</strong></td>
+                        <td>None (implicit)</td>
+                        <td><code class="il">virtual</code>, <code class="il">override</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance</strong></td>
+                        <td>✅ Faster (no lookup)</td>
+                        <td>⚠️ Slight overhead (vtable lookup)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flexibility</strong></td>
+                        <td>Less flexible</td>
+                        <td>✅ Highly flexible</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Subsection: Function Overloading -->
+        <div class="subsection">
+            <h3 class="subsection-title">Compile-Time: Function Overloading</h3>
+            <p>Multiple functions share the same name but have different parameter lists. The compiler selects the correct version based on the arguments provided.</p>
+
+            <div class="code-wrapper">
+                <div class="code-top">
+                    <div class="code-info">
+                        <div class="code-circles"><span class="code-circle r"></span><span class="code-circle y"></span><span class="code-circle g"></span></div>
+                        <span class="code-name">function_overloading.cpp</span>
+                    </div>
+                    <div class="code-btns">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="tp">Calculator</span> {
+<span class="kw">public</span>:
+    <span class="cm">// Overloaded add() - different parameter types and counts</span>
+    <span class="tp">int</span> <span class="fn">add</span>(<span class="tp">int</span> a, <span class="tp">int</span> b) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"int + int: "</span>;
+        <span class="kw">return</span> a <span class="op">+</span> b;
+    }
+    
+    <span class="tp">double</span> <span class="fn">add</span>(<span class="tp">double</span> a, <span class="tp">double</span> b) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"double + double: "</span>;
+        <span class="kw">return</span> a <span class="op">+</span> b;
+    }
+    
+    <span class="tp">int</span> <span class="fn">add</span>(<span class="tp">int</span> a, <span class="tp">int</span> b, <span class="tp">int</span> c) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"int + int + int: "</span>;
+        <span class="kw">return</span> a <span class="op">+</span> b <span class="op">+</span> c;
+    }
+    
+    <span class="tp">string</span> <span class="fn">add</span>(<span class="tp">string</span> a, <span class="tp">string</span> b) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"string + string: "</span>;
+        <span class="kw">return</span> a <span class="op">+</span> b;
+    }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">Calculator</span> calc;
+    
+    <span class="cm">// Compiler chooses correct version at compile time</span>
+    cout <span class="op">&lt;&lt;</span> calc.<span class="fn">add</span>(<span class="nm">5</span>, <span class="nm">3</span>) <span class="op">&lt;&lt;</span> endl;           <span class="cm">// int version</span>
+    cout <span class="op">&lt;&lt;</span> calc.<span class="fn">add</span>(<span class="nm">2.5</span>, <span class="nm">3.7</span>) <span class="op">&lt;&lt;</span> endl;       <span class="cm">// double version</span>
+    cout <span class="op">&lt;&lt;</span> calc.<span class="fn">add</span>(<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>) <span class="op">&lt;&lt;</span> endl;        <span class="cm">// three-int version</span>
+    cout <span class="op">&lt;&lt;</span> calc.<span class="fn">add</span>(<span class="st">"Hello "</span>, <span class="st">"World"</span>) <span class="op">&lt;&lt;</span> endl; <span class="cm">// string version</span>
+    
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subsection: Operator Overloading -->
+        <div class="subsection">
+            <h3 class="subsection-title">Compile-Time: Operator Overloading</h3>
+            <p>Define custom behavior for C++ operators when used with your classes. Makes user-defined types feel natural to use.</p>
+
+            <div class="code-wrapper">
+                <div class="code-top">
+                    <div class="code-info">
+                        <div class="code-circles"><span class="code-circle r"></span><span class="code-circle y"></span><span class="code-circle g"></span></div>
+                        <span class="code-name">operator_overloading.cpp</span>
+                    </div>
+                    <div class="code-btns">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="tp">Vector2D</span> {
+<span class="kw">private</span>:
+    <span class="tp">double</span> x, y;
+
+<span class="kw">public</span>:
+    <span class="fn">Vector2D</span>(<span class="tp">double</span> x <span class="op">=</span> <span class="nm">0</span>, <span class="tp">double</span> y <span class="op">=</span> <span class="nm">0</span>) <span class="op">:</span> x(x), y(y) {}
+    
+    <span class="cm">// Overload + operator</span>
+    <span class="tp">Vector2D</span> <span class="kw">operator</span><span class="op">+</span>(<span class="kw">const</span> <span class="tp">Vector2D</span><span class="op">&amp;</span> other) <span class="kw">const</span> {
+        <span class="kw">return</span> <span class="tp">Vector2D</span>(x <span class="op">+</span> other.x, y <span class="op">+</span> other.y);
+    }
+    
+    <span class="cm">// Overload - operator</span>
+    <span class="tp">Vector2D</span> <span class="kw">operator</span><span class="op">-</span>(<span class="kw">const</span> <span class="tp">Vector2D</span><span class="op">&amp;</span> other) <span class="kw">const</span> {
+        <span class="kw">return</span> <span class="tp">Vector2D</span>(x <span class="op">-</span> other.x, y <span class="op">-</span> other.y);
+    }
+    
+    <span class="cm">// Overload * for scalar multiplication</span>
+    <span class="tp">Vector2D</span> <span class="kw">operator</span><span class="op">*</span>(<span class="tp">double</span> scalar) <span class="kw">const</span> {
+        <span class="kw">return</span> <span class="tp">Vector2D</span>(x <span class="op">*</span> scalar, y <span class="op">*</span> scalar);
+    }
+    
+    <span class="cm">// Overload == for comparison</span>
+    <span class="tp">bool</span> <span class="kw">operator</span><span class="op">==</span>(<span class="kw">const</span> <span class="tp">Vector2D</span><span class="op">&amp;</span> other) <span class="kw">const</span> {
+        <span class="kw">return</span> (x <span class="op">==</span> other.x) <span class="op">&amp;&amp;</span> (y <span class="op">==</span> other.y);
+    }
+    
+    <span class="cm">// Overload &lt;&lt; for output (friend function)</span>
+    <span class="kw">friend</span> ostream<span class="op">&amp;</span> <span class="kw">operator</span><span class="op">&lt;&lt;</span>(ostream<span class="op">&amp;</span> os, <span class="kw">const</span> <span class="tp">Vector2D</span><span class="op">&amp;</span> v) {
+        os <span class="op">&lt;&lt;</span> <span class="st">"("</span> <span class="op">&lt;&lt;</span> v.x <span class="op">&lt;&lt;</span> <span class="st">", "</span> <span class="op">&lt;&lt;</span> v.y <span class="op">&lt;&lt;</span> <span class="st">")"</span>;
+        <span class="kw">return</span> os;
+    }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">Vector2D</span> v1(<span class="nm">3</span>, <span class="nm">4</span>);
+    <span class="tp">Vector2D</span> v2(<span class="nm">1</span>, <span class="nm">2</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"v1 = "</span> <span class="op">&lt;&lt;</span> v1 <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"v2 = "</span> <span class="op">&lt;&lt;</span> v2 <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"v1 + v2 = "</span> <span class="op">&lt;&lt;</span> (v1 <span class="op">+</span> v2) <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"v1 - v2 = "</span> <span class="op">&lt;&lt;</span> (v1 <span class="op">-</span> v2) <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"v1 * 2 = "</span> <span class="op">&lt;&lt;</span> (v1 <span class="op">*</span> <span class="nm">2</span>) <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"v1 == v2: "</span> <span class="op">&lt;&lt;</span> (v1 <span class="op">==</span> v2 <span class="op">?</span> <span class="st">"true"</span> <span class="op">:</span> <span class="st">"false"</span>) <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box note">
+                <div class="info-box-title">📘 Operators You Can Overload</div>
+                <p><code class="il">+ - * / % ^ & | ~ ! = < > += -= *= /= %= ^= &= |= << >> >>= <<= == != <= >= && || ++ -- , ->* -> () []</code><br><br>
+                <strong>Cannot overload:</strong> <code class="il">:: . .* ?: sizeof</code></p>
+            </div>
+        </div>
+
+        <!-- Virtual Table Diagram -->
+        <div class="diagram-container">
+            <div class="diagram-title">🔍 How Virtual Functions Work: The VTable</div>
+            <div class="vtable-diagram">
+                <div class="vtable-box base">
+                    <div class="vtable-header">Base Class Object</div>
+                    <div class="vtable-row">vptr <span class="ptr">→</span></div>
+                    <div class="vtable-row">data members...</div>
+                </div>
+                
+                <div class="vtable-arrow">
+                    <div class="line"></div>
+                    <div class="label">points to</div>
+                </div>
+                
+                <div class="vtable-box base">
+                    <div class="vtable-header">Base VTable</div>
+                    <div class="vtable-row">&amp;Base::speak()</div>
+                    <div class="vtable-row">&amp;Base::move()</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin: 2rem 0; color: var(--text-muted);">⬇️ When derived class overrides...</div>
+            <div class="vtable-diagram">
+                <div class="vtable-box derived">
+                    <div class="vtable-header">Derived Class Object</div>
+                    <div class="vtable-row">vptr <span class="ptr">→</span></div>
+                    <div class="vtable-row">inherited data...</div>
+                    <div class="vtable-row">new data...</div>
+                </div>
+                
+                <div class="vtable-arrow">
+                    <div class="line"></div>
+                    <div class="label">points to</div>
+                </div>
+                
+                <div class="vtable-box derived">
+                    <div class="vtable-header">Derived VTable</div>
+                    <div class="vtable-row" style="color: var(--accent-tertiary);">&amp;Derived::speak() ✓</div>
+                    <div class="vtable-row">&amp;Base::move()</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subsection: Virtual Functions -->
+        <div class="subsection">
+            <h3 class="subsection-title">Runtime: Virtual Functions & Dynamic Dispatch</h3>
+            <p>Virtual functions enable the "magic" of runtime polymorphism. When you call a virtual function through a base class pointer, C++ looks up the correct function in the vtable at runtime.</p>
+
+            <div class="code-wrapper">
+                <div class="code-top">
+                    <div class="code-info">
+                        <div class="code-circles"><span class="code-circle r"></span><span class="code-circle y"></span><span class="code-circle g"></span></div>
+                        <span class="code-name">virtual_functions.cpp</span>
+                    </div>
+                    <div class="code-btns">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="tp">Animal</span> {
+<span class="kw">protected</span>:
+    <span class="tp">string</span> name;
+
+<span class="kw">public</span>:
+    <span class="fn">Animal</span>(<span class="tp">string</span> n) <span class="op">:</span> name(n) {}
+    
+    <span class="cm">// Virtual function - enables runtime polymorphism</span>
+    <span class="kw">virtual</span> <span class="tp">void</span> <span class="fn">speak</span>() {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="st">" makes a generic sound"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="kw">virtual</span> <span class="tp">void</span> <span class="fn">move</span>() {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="st">" moves somehow"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cm">// CRITICAL: Virtual destructor for proper cleanup!</span>
+    <span class="kw">virtual</span> <span class="op">~</span><span class="fn">Animal</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"~Animal: "</span> <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="kw">class</span> <span class="tp">Dog</span> <span class="op">:</span> <span class="kw">public</span> <span class="tp">Animal</span> {
+<span class="kw">public</span>:
+    <span class="fn">Dog</span>(<span class="tp">string</span> n) <span class="op">:</span> <span class="tp">Animal</span>(n) {}
+    
+    <span class="cm">// Override - replaces base implementation</span>
+    <span class="tp">void</span> <span class="fn">speak</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="st">" barks: Woof! Woof!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="tp">void</span> <span class="fn">move</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="st">" runs on four legs"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="op">~</span><span class="fn">Dog</span>() { cout <span class="op">&lt;&lt;</span> <span class="st">"~Dog"</span> <span class="op">&lt;&lt;</span> endl; }
+};
+
+<span class="kw">class</span> <span class="tp">Bird</span> <span class="op">:</span> <span class="kw">public</span> <span class="tp">Animal</span> {
+<span class="kw">public</span>:
+    <span class="fn">Bird</span>(<span class="tp">string</span> n) <span class="op">:</span> <span class="tp">Animal</span>(n) {}
+    
+    <span class="tp">void</span> <span class="fn">speak</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="st">" chirps: Tweet! Tweet!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="tp">void</span> <span class="fn">move</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="st">" flies through the air"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="op">~</span><span class="fn">Bird</span>() { cout <span class="op">&lt;&lt;</span> <span class="st">"~Bird"</span> <span class="op">&lt;&lt;</span> endl; }
+};
+
+<span class="cm">// This function works with ANY Animal!</span>
+<span class="tp">void</span> <span class="fn">makeAnimalAct</span>(<span class="tp">Animal</span><span class="op">*</span> animal) {
+    animal<span class="op">-&gt;</span><span class="fn">speak</span>();  <span class="cm">// Calls correct version at RUNTIME</span>
+    animal<span class="op">-&gt;</span><span class="fn">move</span>();
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    cout <span class="op">&lt;&lt;</span> <span class="st">"=== Runtime Polymorphism Demo ==="</span> <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Array of base class pointers to derived objects</span>
+    <span class="tp">Animal</span><span class="op">*</span> animals[<span class="nm">3</span>];
+    animals[<span class="nm">0</span>] <span class="op">=</span> <span class="kw">new</span> <span class="tp">Animal</span>(<span class="st">"Generic"</span>);
+    animals[<span class="nm">1</span>] <span class="op">=</span> <span class="kw">new</span> <span class="tp">Dog</span>(<span class="st">"Buddy"</span>);
+    animals[<span class="nm">2</span>] <span class="op">=</span> <span class="kw">new</span> <span class="tp">Bird</span>(<span class="st">"Tweety"</span>);
+    
+    <span class="cm">// Same code, different behavior!</span>
+    <span class="kw">for</span> (<span class="tp">int</span> i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> <span class="nm">3</span>; i<span class="op">++</span>) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"\n--- Animal "</span> <span class="op">&lt;&lt;</span> i<span class="op">+</span><span class="nm">1</span> <span class="op">&lt;&lt;</span> <span class="st">" ---"</span> <span class="op">&lt;&lt;</span> endl;
+        <span class="fn">makeAnimalAct</span>(animals[i]);
+    }
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"\n=== Cleanup ==="</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">for</span> (<span class="tp">int</span> i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> <span class="nm">3</span>; i<span class="op">++</span>) {
+        <span class="kw">delete</span> animals[i];
+    }
+    
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box warn">
+                <div class="info-box-title">⚠️ Always Use Virtual Destructors!</div>
+                <p>When deleting a derived object through a base class pointer, only the virtual destructor ensures proper cleanup. Without it, the derived class destructor won't be called, causing memory leaks!</p>
+            </div>
+        </div>
+
+        <!-- Subsection: Abstract Classes -->
+        <div class="subsection">
+            <h3 class="subsection-title">Pure Virtual Functions & Abstract Classes</h3>
+            <p>A pure virtual function (<code class="il">= 0</code>) has no implementation in the base class. Classes with at least one pure virtual function are <strong>abstract</strong> and cannot be instantiated.</p>
+
+            <div class="compare-visual">
+                <div class="compare-side left">
+                    <h4>Regular Virtual</h4>
+                    <div class="flow-box">virtual void draw() { ... }</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box">Has default implementation</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box">Override is optional</div>
+                </div>
+                <div class="compare-vs">VS</div>
+                <div class="compare-side right">
+                    <h4>Pure Virtual</h4>
+                    <div class="flow-box">virtual void draw() = 0;</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box">No implementation</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-box">Override is REQUIRED</div>
+                </div>
+            </div>
+
+            <div class="code-wrapper">
+                <div class="code-top">
+                    <div class="code-info">
+                        <div class="code-circles"><span class="code-circle r"></span><span class="code-circle y"></span><span class="code-circle g"></span></div>
+                        <span class="code-name">abstract_class.cpp</span>
+                    </div>
+                    <div class="code-btns">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// Abstract class - defines an interface</span>
+<span class="kw">class</span> <span class="tp">Shape</span> {
+<span class="kw">protected</span>:
+    <span class="tp">string</span> color;
+
+<span class="kw">public</span>:
+    <span class="fn">Shape</span>(<span class="tp">string</span> c) <span class="op">:</span> color(c) {}
+    
+    <span class="cm">// Pure virtual functions - MUST be implemented by derived classes</span>
+    <span class="kw">virtual</span> <span class="tp">double</span> <span class="fn">area</span>() <span class="op">=</span> <span class="nm">0</span>;
+    <span class="kw">virtual</span> <span class="tp">double</span> <span class="fn">perimeter</span>() <span class="op">=</span> <span class="nm">0</span>;
+    <span class="kw">virtual</span> <span class="tp">void</span> <span class="fn">draw</span>() <span class="op">=</span> <span class="nm">0</span>;
+    
+    <span class="cm">// Regular virtual function with default implementation</span>
+    <span class="kw">virtual</span> <span class="tp">void</span> <span class="fn">describe</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"A "</span> <span class="op">&lt;&lt;</span> color <span class="op">&lt;&lt;</span> <span class="st">" shape"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="kw">virtual</span> <span class="op">~</span><span class="fn">Shape</span>() {}
+};
+
+<span class="kw">class</span> <span class="tp">Circle</span> <span class="op">:</span> <span class="kw">public</span> <span class="tp">Shape</span> {
+<span class="kw">private</span>:
+    <span class="tp">double</span> radius;
+
+<span class="kw">public</span>:
+    <span class="fn">Circle</span>(<span class="tp">string</span> c, <span class="tp">double</span> r) <span class="op">:</span> <span class="tp">Shape</span>(c), radius(r) {}
+    
+    <span class="cm">// Must implement all pure virtual functions</span>
+    <span class="tp">double</span> <span class="fn">area</span>() <span class="kw">override</span> { <span class="kw">return</span> <span class="nm">3.14159</span> <span class="op">*</span> radius <span class="op">*</span> radius; }
+    <span class="tp">double</span> <span class="fn">perimeter</span>() <span class="kw">override</span> { <span class="kw">return</span> <span class="nm">2</span> <span class="op">*</span> <span class="nm">3.14159</span> <span class="op">*</span> radius; }
+    
+    <span class="tp">void</span> <span class="fn">draw</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Drawing "</span> <span class="op">&lt;&lt;</span> color <span class="op">&lt;&lt;</span> <span class="st">" circle (r="</span> <span class="op">&lt;&lt;</span> radius <span class="op">&lt;&lt;</span> <span class="st">")"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="kw">class</span> <span class="tp">Rectangle</span> <span class="op">:</span> <span class="kw">public</span> <span class="tp">Shape</span> {
+<span class="kw">private</span>:
+    <span class="tp">double</span> width, height;
+
+<span class="kw">public</span>:
+    <span class="fn">Rectangle</span>(<span class="tp">string</span> c, <span class="tp">double</span> w, <span class="tp">double</span> h) <span class="op">:</span> <span class="tp">Shape</span>(c), width(w), height(h) {}
+    
+    <span class="tp">double</span> <span class="fn">area</span>() <span class="kw">override</span> { <span class="kw">return</span> width <span class="op">*</span> height; }
+    <span class="tp">double</span> <span class="fn">perimeter</span>() <span class="kw">override</span> { <span class="kw">return</span> <span class="nm">2</span> <span class="op">*</span> (width <span class="op">+</span> height); }
+    
+    <span class="tp">void</span> <span class="fn">draw</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Drawing "</span> <span class="op">&lt;&lt;</span> color <span class="op">&lt;&lt;</span> <span class="st">" rectangle ("</span> <span class="op">&lt;&lt;</span> width <span class="op">&lt;&lt;</span> <span class="st">"x"</span> <span class="op">&lt;&lt;</span> height <span class="op">&lt;&lt;</span> <span class="st">")"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Shape s("Red");  // ERROR! Cannot instantiate abstract class</span>
+    
+    <span class="tp">Shape</span><span class="op">*</span> shapes[<span class="nm">2</span>];
+    shapes[<span class="nm">0</span>] <span class="op">=</span> <span class="kw">new</span> <span class="tp">Circle</span>(<span class="st">"Blue"</span>, <span class="nm">5</span>);
+    shapes[<span class="nm">1</span>] <span class="op">=</span> <span class="kw">new</span> <span class="tp">Rectangle</span>(<span class="st">"Green"</span>, <span class="nm">4</span>, <span class="nm">6</span>);
+    
+    <span class="kw">for</span> (<span class="tp">int</span> i <span class="op">=</span> <span class="nm">0</span>; i <span class="op">&lt;</span> <span class="nm">2</span>; i<span class="op">++</span>) {
+        shapes[i]<span class="op">-&gt;</span><span class="fn">draw</span>();
+        shapes[i]<span class="op">-&gt;</span><span class="fn">describe</span>();
+        cout <span class="op">&lt;&lt;</span> <span class="st">"  Area: "</span> <span class="op">&lt;&lt;</span> shapes[i]<span class="op">-&gt;</span><span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> <span class="st">"  Perimeter: "</span> <span class="op">&lt;&lt;</span> shapes[i]<span class="op">-&gt;</span><span class="fn">perimeter</span>() <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> endl;
+        <span class="kw">delete</span> shapes[i];
+    }
+    
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">💡 Key Polymorphism Takeaways</div>
+                <p>
+                    • Use <strong>function overloading</strong> for compile-time polymorphism with different parameter types<br>
+                    • Use <strong>virtual functions</strong> for runtime polymorphism with inheritance hierarchies<br>
+                    • Always use <code class="il">override</code> keyword when overriding virtual functions<br>
+                    • Always declare destructors as <code class="il">virtual</code> in base classes<br>
+                    • Use <strong>abstract classes</strong> to define interfaces and enforce implementation
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 2: CONSTRUCTORS ==================== -->
+    <section class="section reveal" id="constructors">
+        <div class="section-header">
+            <div class="section-label">Section 02</div>
+            <h2 class="section-title">Types of <span class="hl">Constructors</span></h2>
+            <p class="section-subtitle">Constructors are special member functions that initialize objects when they are created</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon green">🔨</div>
+                <h3 class="card-title">Default Constructor</h3>
+                <p class="card-desc">Takes no arguments. Called automatically when an object is created without arguments.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon orange">📝</div>
+                <h3 class="card-title">Parameterized Constructor</h3>
+                <p class="card-desc">Takes parameters to initialize object with specific values.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon cyan">📋</div>
+                <h3 class="card-title">Copy Constructor</h3>
+                <p class="card-desc">Creates a new object as a copy of an existing object.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon purple">🚀</div>
+                <h3 class="card-title">Move Constructor (C++11)</h3>
+                <p class="card-desc">Transfers resources from a temporary object efficiently.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon pink">🎯</div>
+                <h3 class="card-title">Delegating Constructor</h3>
+                <p class="card-desc">One constructor calls another constructor of the same class.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon yellow">⚡</div>
+                <h3 class="card-title">Explicit Constructor</h3>
+                <p class="card-desc">Prevents implicit type conversions with <code class="il">explicit</code> keyword.</p>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">All Constructor Types in Action</h3>
+
+            <div class="code-wrapper">
+                <div class="code-top">
+                    <div class="code-info">
+                        <div class="code-circles"><span class="code-circle r"></span><span class="code-circle y"></span><span class="code-circle g"></span></div>
+                        <span class="code-name">constructors.cpp</span>
+                    </div>
+                    <div class="code-btns">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;cstring&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="tp">MyString</span> {
+<span class="kw">private</span>:
+    <span class="tp">char</span><span class="op">*</span> data;
+    <span class="tp">int</span> length;
+
+<span class="kw">public</span>:
+    <span class="cm">// 1. Default Constructor</span>
+    <span class="fn">MyString</span>() <span class="op">:</span> data(<span class="kw">nullptr</span>), length(<span class="nm">0</span>) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Default constructor"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cm">// 2. Parameterized Constructor</span>
+    <span class="fn">MyString</span>(<span class="kw">const</span> <span class="tp">char</span><span class="op">*</span> str) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Parameterized constructor"</span> <span class="op">&lt;&lt;</span> endl;
+        length <span class="op">=</span> <span class="fn">strlen</span>(str);
+        data <span class="op">=</span> <span class="kw">new</span> <span class="tp">char</span>[length <span class="op">+</span> <span class="nm">1</span>];
+        <span class="fn">strcpy</span>(data, str);
+    }
+    
+    <span class="cm">// 3. Copy Constructor</span>
+    <span class="fn">MyString</span>(<span class="kw">const</span> <span class="tp">MyString</span><span class="op">&amp;</span> other) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Copy constructor"</span> <span class="op">&lt;&lt;</span> endl;
+        length <span class="op">=</span> other.length;
+        data <span class="op">=</span> <span class="kw">new</span> <span class="tp">char</span>[length <span class="op">+</span> <span class="nm">1</span>];
+        <span class="fn">strcpy</span>(data, other.data);
+    }
+    
+    <span class="cm">// 4. Move Constructor (C++11)</span>
+    <span class="fn">MyString</span>(<span class="tp">MyString</span><span class="op">&amp;&amp;</span> other) <span class="kw">noexcept</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Move constructor"</span> <span class="op">&lt;&lt;</span> endl;
+        data <span class="op">=</span> other.data;
+        length <span class="op">=</span> other.length;
+        other.data <span class="op">=</span> <span class="kw">nullptr</span>;
+        other.length <span class="op">=</span> <span class="nm">0</span>;
+    }
+    
+    <span class="cm">// Destructor</span>
+    <span class="op">~</span><span class="fn">MyString</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Destructor"</span> <span class="op">&lt;&lt;</span> endl;
+        <span class="kw">delete</span>[] data;
+    }
+    
+    <span class="tp">void</span> <span class="fn">print</span>() <span class="kw">const</span> {
+        <span class="kw">if</span> (data) cout <span class="op">&lt;&lt;</span> <span class="st">"String: \""</span> <span class="op">&lt;&lt;</span> data <span class="op">&lt;&lt;</span> <span class="st">"\" (len: "</span> <span class="op">&lt;&lt;</span> length <span class="op">&lt;&lt;</span> <span class="st">")"</span> <span class="op">&lt;&lt;</span> endl;
+        <span class="kw">else</span> cout <span class="op">&lt;&lt;</span> <span class="st">"String: empty"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="tp">MyString</span> <span class="fn">createString</span>() {
+    <span class="kw">return</span> <span class="tp">MyString</span>(<span class="st">"Temporary"</span>);
+}
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    cout <span class="op">&lt;&lt;</span> <span class="st">"--- s1 (default) ---"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="tp">MyString</span> s1;
+    s1.<span class="fn">print</span>();
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"\n--- s2 (parameterized) ---"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="tp">MyString</span> s2(<span class="st">"Hello World"</span>);
+    s2.<span class="fn">print</span>();
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"\n--- s3 (copy of s2) ---"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="tp">MyString</span> s3 <span class="op">=</span> s2;
+    s3.<span class="fn">print</span>();
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"\n--- s4 (move) ---"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="tp">MyString</span> s4 <span class="op">=</span> <span class="fn">createString</span>();
+    s4.<span class="fn">print</span>();
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"\n--- End of main ---"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box warn">
+                <div class="info-box-title">⚠️ Rule of Three / Five</div>
+                <p>If you define any of: destructor, copy constructor, or copy assignment — define all three. In C++11+, also consider move constructor and move assignment (Rule of Five).</p>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Initializer Lists & Delegating Constructors</h3>
+
+            <div class="code-wrapper">
+                <div class="code-top">
+                    <div class="code-info">
+                        <div class="code-circles"><span class="code-circle r"></span><span class="code-circle y"></span><span class="code-circle g"></span></div>
+                        <span class="code-name">initializer_list.cpp</span>
+                    </div>
+                    <div class="code-btns">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="tp">Person</span> {
+<span class="kw">private</span>:
+    <span class="kw">const</span> <span class="tp">int</span> id;         <span class="cm">// const - MUST use initializer list</span>
+    <span class="tp">string</span> name;
+    <span class="tp">int</span> age;
+
+<span class="kw">public</span>:
+    <span class="cm">// Initializer list (required for const members)</span>
+    <span class="fn">Person</span>(<span class="tp">int</span> i, <span class="tp">string</span> n, <span class="tp">int</span> a) <span class="op">:</span> id(i), name(n), age(a) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Created Person: "</span> <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="tp">void</span> <span class="fn">display</span>() <span class="kw">const</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"ID: "</span> <span class="op">&lt;&lt;</span> id <span class="op">&lt;&lt;</span> <span class="st">", Name: "</span> <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="st">", Age: "</span> <span class="op">&lt;&lt;</span> age <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="kw">class</span> <span class="tp">Rectangle</span> {
+<span class="kw">private</span>:
+    <span class="tp">double</span> width, height;
+
+<span class="kw">public</span>:
+    <span class="cm">// Delegating constructor - calls another constructor</span>
+    <span class="fn">Rectangle</span>() <span class="op">:</span> <span class="fn">Rectangle</span>(<span class="nm">1.0</span>, <span class="nm">1.0</span>) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Default delegated to parameterized"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="fn">Rectangle</span>(<span class="tp">double</span> w, <span class="tp">double</span> h) <span class="op">:</span> width(w), height(h) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Parameterized: "</span> <span class="op">&lt;&lt;</span> w <span class="op">&lt;&lt;</span> <span class="st">"x"</span> <span class="op">&lt;&lt;</span> h <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cm">// Explicit - prevents implicit conversion</span>
+    <span class="kw">explicit</span> <span class="fn">Rectangle</span>(<span class="tp">double</span> side) <span class="op">:</span> width(side), height(side) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Explicit square: "</span> <span class="op">&lt;&lt;</span> side <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="tp">void</span> <span class="fn">print</span>() <span class="kw">const</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Rectangle: "</span> <span class="op">&lt;&lt;</span> width <span class="op">&lt;&lt;</span> <span class="st">" x "</span> <span class="op">&lt;&lt;</span> height <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">Person</span> p(<span class="nm">101</span>, <span class="st">"Alice"</span>, <span class="nm">25</span>);
+    p.<span class="fn">display</span>();
+    
+    cout <span class="op">&lt;&lt;</span> endl;
+    <span class="tp">Rectangle</span> r1;           <span class="cm">// Delegates</span>
+    r1.<span class="fn">print</span>();
+    
+    <span class="tp">Rectangle</span> r2(<span class="nm">5.0</span>, <span class="nm">3.0</span>);
+    r2.<span class="fn">print</span>();
+    
+    <span class="tp">Rectangle</span> r3(<span class="nm">4.0</span>);       <span class="cm">// Explicit square</span>
+    r3.<span class="fn">print</span>();
+    
+    <span class="cm">// Rectangle r4 = 5.0;   // ERROR! explicit prevents this</span>
+    
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 3: INLINE FUNCTIONS ==================== -->
+    <section class="section reveal" id="inline">
+        <div class="section-header">
+            <div class="section-label">Section 03</div>
+            <h2 class="section-title"><span class="hl">Inline</span> Functions</h2>
+            <p class="section-subtitle">Inline functions suggest the compiler replace function calls with the actual code for performance</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon green">⚡</div>
+                <h3 class="card-title">Performance Benefit</h3>
+                <p class="card-desc">Eliminates function call overhead. Best for small, frequently called functions.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon orange">📏</div>
+                <h3 class="card-title">Code Size Trade-off</h3>
+                <p class="card-desc">Inlining increases code size as the function body is duplicated at each call site.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon cyan">🤖</div>
+                <h3 class="card-title">Compiler Discretion</h3>
+                <p class="card-desc">The <code class="il">inline</code> keyword is a suggestion. The compiler decides what to actually inline.</p>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Inline Functions in Practice</h3>
+
+            <div class="code-wrapper">
+                <div class="code-top">
+                    <div class="code-info">
+                        <div class="code-circles"><span class="code-circle r"></span><span class="code-circle y"></span><span class="code-circle g"></span></div>
+                        <span class="code-name">inline_functions.cpp</span>
+                    </div>
+                    <div class="code-btns">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// Inline functions - suggest inlining to compiler</span>
+<span class="kw">inline</span> <span class="tp">int</span> <span class="fn">square</span>(<span class="tp">int</span> x) { <span class="kw">return</span> x <span class="op">*</span> x; }
+<span class="kw">inline</span> <span class="tp">int</span> <span class="fn">max</span>(<span class="tp">int</span> a, <span class="tp">int</span> b) { <span class="kw">return</span> (a <span class="op">&gt;</span> b) <span class="op">?</span> a <span class="op">:</span> b; }
+<span class="kw">inline</span> <span class="tp">double</span> <span class="fn">celsiusToF</span>(<span class="tp">double</span> c) { <span class="kw">return</span> c <span class="op">*</span> <span class="nm">9.0</span>/<span class="nm">5.0</span> <span class="op">+</span> <span class="nm">32</span>; }
+
+<span class="kw">class</span> <span class="tp">Circle</span> {
+<span class="kw">private</span>:
+    <span class="tp">double</span> radius;
+
+<span class="kw">public</span>:
+    <span class="fn">Circle</span>(<span class="tp">double</span> r) <span class="op">:</span> radius(r) {}
+    
+    <span class="cm">// Methods defined inside class are implicitly inline</span>
+    <span class="tp">double</span> <span class="fn">getRadius</span>() <span class="kw">const</span> { <span class="kw">return</span> radius; }
+    <span class="tp">double</span> <span class="fn">area</span>() <span class="kw">const</span> { <span class="kw">return</span> <span class="nm">3.14159</span> <span class="op">*</span> radius <span class="op">*</span> radius; }
+    <span class="tp">double</span> <span class="fn">circumference</span>() <span class="kw">const</span> { <span class="kw">return</span> <span class="nm">2</span> <span class="op">*</span> <span class="nm">3.14159</span> <span class="op">*</span> radius; }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    cout <span class="op">&lt;&lt;</span> <span class="st">"square(5) = "</span> <span class="op">&lt;&lt;</span> <span class="fn">square</span>(<span class="nm">5</span>) <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"max(10, 7) = "</span> <span class="op">&lt;&lt;</span> <span class="fn">max</span>(<span class="nm">10</span>, <span class="nm">7</span>) <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"100°C = "</span> <span class="op">&lt;&lt;</span> <span class="fn">celsiusToF</span>(<span class="nm">100</span>) <span class="op">&lt;&lt;</span> <span class="st">"°F"</span> <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="tp">Circle</span> c(<span class="nm">5.0</span>);
+    cout <span class="op">&lt;&lt;</span> <span class="st">"\nCircle (r="</span> <span class="op">&lt;&lt;</span> c.<span class="fn">getRadius</span>() <span class="op">&lt;&lt;</span> <span class="st">"):"</span> <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"  Area: "</span> <span class="op">&lt;&lt;</span> c.<span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"  Circumference: "</span> <span class="op">&lt;&lt;</span> c.<span class="fn">circumference</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">💡 When to Use Inline</div>
+                <p><strong>Good:</strong> Small functions (1-5 lines), getters/setters, simple calculations<br>
+                <strong>Avoid:</strong> Functions with loops, recursion, complex logic, or large bodies</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 4: STATIC MEMBERS ==================== -->
+    <section class="section reveal" id="static">
+        <div class="section-header">
+            <div class="section-label">Section 04</div>
+            <h2 class="section-title"><span class="hl">Static</span> Members</h2>
+            <p class="section-subtitle">Static members belong to the class itself, not to individual objects</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon purple">📊</div>
+                <h3 class="card-title">Static Variables</h3>
+                <p class="card-desc">Shared by all instances. Only one copy exists regardless of object count.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon cyan">🔧</div>
+                <h3 class="card-title">Static Methods</h3>
+                <p class="card-desc">Called without an object. Cannot access non-static members or <code class="il">this</code>.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon green">🏭</div>
+                <h3 class="card-title">Use Cases</h3>
+                <p class="card-desc">Object counters, factory methods, utility functions, shared configuration.</p>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Static Members Example</h3>
+
+            <div class="code-wrapper">
+                <div class="code-top">
+                    <div class="code-info">
+                        <div class="code-circles"><span class="code-circle r"></span><span class="code-circle y"></span><span class="code-circle g"></span></div>
+                        <span class="code-name">static_members.cpp</span>
+                    </div>
+                    <div class="code-btns">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="tp">BankAccount</span> {
+<span class="kw">private</span>:
+    <span class="tp">string</span> owner;
+    <span class="tp">double</span> balance;
+    <span class="tp">int</span> accountId;
+    
+    <span class="cm">// Static members - shared by ALL instances</span>
+    <span class="kw">static</span> <span class="tp">int</span> totalAccounts;
+    <span class="kw">static</span> <span class="tp">double</span> interestRate;
+    <span class="kw">static</span> <span class="tp">int</span> nextId;
+
+<span class="kw">public</span>:
+    <span class="fn">BankAccount</span>(<span class="tp">string</span> name, <span class="tp">double</span> initial) 
+        <span class="op">:</span> owner(name), balance(initial), accountId(nextId<span class="op">++</span>) {
+        totalAccounts<span class="op">++</span>;
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Account #"</span> <span class="op">&lt;&lt;</span> accountId <span class="op">&lt;&lt;</span> <span class="st">" created"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="op">~</span><span class="fn">BankAccount</span>() { totalAccounts<span class="op">--</span>; }
+    
+    <span class="cm">// Static methods - called without an object</span>
+    <span class="kw">static</span> <span class="tp">int</span> <span class="fn">getTotalAccounts</span>() { <span class="kw">return</span> totalAccounts; }
+    <span class="kw">static</span> <span class="tp">double</span> <span class="fn">getInterestRate</span>() { <span class="kw">return</span> interestRate; }
+    
+    <span class="kw">static</span> <span class="tp">void</span> <span class="fn">setInterestRate</span>(<span class="tp">double</span> rate) {
+        <span class="kw">if</span> (rate <span class="op">&gt;=</span> <span class="nm">0</span> <span class="op">&amp;&amp;</span> rate <span class="op">&lt;=</span> <span class="nm">0.20</span>) interestRate <span class="op">=</span> rate;
+    }
+    
+    <span class="tp">void</span> <span class="fn">applyInterest</span>() { balance <span class="op">+=</span> balance <span class="op">*</span> interestRate; }
+    
+    <span class="tp">void</span> <span class="fn">display</span>() <span class="kw">const</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"#"</span> <span class="op">&lt;&lt;</span> accountId <span class="op">&lt;&lt;</span> <span class="st">": "</span> <span class="op">&lt;&lt;</span> owner <span class="op">&lt;&lt;</span> <span class="st">" - $"</span> <span class="op">&lt;&lt;</span> balance <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="cm">// Static member initialization (required outside class)</span>
+<span class="tp">int</span> <span class="tp">BankAccount</span>::totalAccounts <span class="op">=</span> <span class="nm">0</span>;
+<span class="tp">double</span> <span class="tp">BankAccount</span>::interestRate <span class="op">=</span> <span class="nm">0.05</span>;
+<span class="tp">int</span> <span class="tp">BankAccount</span>::nextId <span class="op">=</span> <span class="nm">1001</span>;
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Total: "</span> <span class="op">&lt;&lt;</span> <span class="tp">BankAccount</span>::<span class="fn">getTotalAccounts</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="tp">BankAccount</span> acc1(<span class="st">"Alice"</span>, <span class="nm">1000</span>);
+    <span class="tp">BankAccount</span> acc2(<span class="st">"Bob"</span>, <span class="nm">2000</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Total: "</span> <span class="op">&lt;&lt;</span> <span class="tp">BankAccount</span>::<span class="fn">getTotalAccounts</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="tp">BankAccount</span>::<span class="fn">setInterestRate</span>(<span class="nm">0.07</span>);
+    acc1.<span class="fn">applyInterest</span>();
+    acc2.<span class="fn">applyInterest</span>();
+    
+    acc1.<span class="fn">display</span>();
+    acc2.<span class="fn">display</span>();
+    
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box note">
+                <div class="info-box-title">📘 Static Member Rules</div>
+                <p>• Static data members must be defined outside the class<br>
+                • Static methods cannot access <code class="il">this</code> or non-static members<br>
+                • Call with <code class="il">ClassName::method()</code></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 5: NESTED CLASSES ==================== -->
+    <section class="section reveal" id="nested">
+        <div class="section-header">
+            <div class="section-label">Section 05</div>
+            <h2 class="section-title"><span class="hl">Nested</span> Classes</h2>
+            <p class="section-subtitle">Classes defined inside other classes for logical grouping and encapsulation</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon purple">🪆</div>
+                <h3 class="card-title">What are Nested Classes?</h3>
+                <p class="card-desc">A class defined within another class. Useful for helper classes only relevant to the outer class.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon cyan">🔐</div>
+                <h3 class="card-title">Access Control</h3>
+                <p class="card-desc">Nested classes can access private members of the enclosing class.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon green">📦</div>
+                <h3 class="card-title">Use Cases</h3>
+                <p class="card-desc">Iterator classes, node classes for data structures, builder patterns.</p>
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3 class="subsection-title">Linked List with Nested Node & Iterator</h3>
+
+            <div class="code-wrapper">
+                <div class="code-top">
+                    <div class="code-info">
+                        <div class="code-circles"><span class="code-circle r"></span><span class="code-circle y"></span><span class="code-circle g"></span></div>
+                        <span class="code-name">linked_list.cpp</span>
+                    </div>
+                    <div class="code-btns">
+                        <button class="code-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="code-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="tp">LinkedList</span> {
+<span class="kw">private</span>:
+    <span class="cm">// Private nested Node class</span>
+    <span class="kw">struct</span> <span class="tp">Node</span> {
+        <span class="tp">int</span> data;
+        <span class="tp">Node</span><span class="op">*</span> next;
+        <span class="fn">Node</span>(<span class="tp">int</span> d) <span class="op">:</span> data(d), next(<span class="kw">nullptr</span>) {}
+    };
+    
+    <span class="tp">Node</span><span class="op">*</span> head;
+    <span class="tp">int</span> size;
+
+<span class="kw">public</span>:
+    <span class="cm">// Public nested Iterator class</span>
+    <span class="kw">class</span> <span class="tp">Iterator</span> {
+    <span class="kw">private</span>:
+        <span class="tp">Node</span><span class="op">*</span> current;
+    <span class="kw">public</span>:
+        <span class="fn">Iterator</span>(<span class="tp">Node</span><span class="op">*</span> n) <span class="op">:</span> current(n) {}
+        <span class="tp">int</span><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">*</span>() { <span class="kw">return</span> current<span class="op">-&gt;</span>data; }
+        <span class="tp">Iterator</span><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">++</span>() { current <span class="op">=</span> current<span class="op">-&gt;</span>next; <span class="kw">return</span> <span class="op">*</span><span class="kw">this</span>; }
+        <span class="tp">bool</span> <span class="kw">operator</span><span class="op">!=</span>(<span class="kw">const</span> <span class="tp">Iterator</span><span class="op">&amp;</span> o) <span class="kw">const</span> { <span class="kw">return</span> current <span class="op">!=</span> o.current; }
+    };
+    
+    <span class="fn">LinkedList</span>() <span class="op">:</span> head(<span class="kw">nullptr</span>), size(<span class="nm">0</span>) {}
+    
+    <span class="op">~</span><span class="fn">LinkedList</span>() {
+        <span class="kw">while</span> (head) {
+            <span class="tp">Node</span><span class="op">*</span> temp <span class="op">=</span> head;
+            head <span class="op">=</span> head<span class="op">-&gt;</span>next;
+            <span class="kw">delete</span> temp;
+        }
+    }
+    
+    <span class="tp">void</span> <span class="fn">pushBack</span>(<span class="tp">int</span> val) {
+        <span class="tp">Node</span><span class="op">*</span> newNode <span class="op">=</span> <span class="kw">new</span> <span class="tp">Node</span>(val);
+        <span class="kw">if</span> (<span class="op">!</span>head) { head <span class="op">=</span> newNode; }
+        <span class="kw">else</span> {
+            <span class="tp">Node</span><span class="op">*</span> t <span class="op">=</span> head;
+            <span class="kw">while</span> (t<span class="op">-&gt;</span>next) t <span class="op">=</span> t<span class="op">-&gt;</span>next;
+            t<span class="op">-&gt;</span>next <span class="op">=</span> newNode;
+        }
+        size<span class="op">++</span>;
+    }
+    
+    <span class="tp">Iterator</span> <span class="fn">begin</span>() { <span class="kw">return</span> <span class="tp">Iterator</span>(head); }
+    <span class="tp">Iterator</span> <span class="fn">end</span>() { <span class="kw">return</span> <span class="tp">Iterator</span>(<span class="kw">nullptr</span>); }
+    <span class="tp">int</span> <span class="fn">getSize</span>() <span class="kw">const</span> { <span class="kw">return</span> size; }
+};
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">LinkedList</span> list;
+    list.<span class="fn">pushBack</span>(<span class="nm">10</span>);
+    list.<span class="fn">pushBack</span>(<span class="nm">20</span>);
+    list.<span class="fn">pushBack</span>(<span class="nm">30</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Size: "</span> <span class="op">&lt;&lt;</span> list.<span class="fn">getSize</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Using nested Iterator</span>
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Elements: "</span>;
+    <span class="kw">for</span> (<span class="tp">LinkedList</span>::<span class="tp">Iterator</span> it <span class="op">=</span> list.<span class="fn">begin</span>(); it <span class="op">!=</span> list.<span class="fn">end</span>(); <span class="op">++</span>it) {
+        cout <span class="op">&lt;&lt;</span> <span class="op">*</span>it <span class="op">&lt;&lt;</span> <span class="st">" "</span>;
+    }
+    cout <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Range-based for loop works too!</span>
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Range-for: "</span>;
+    <span class="kw">for</span> (<span class="tp">int</span> val <span class="op">:</span> list) {
+        cout <span class="op">&lt;&lt;</span> val <span class="op">&lt;&lt;</span> <span class="st">" "</span>;
+    }
+    cout <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <div class="info-box-title">💡 When to Use Nested Classes</div>
+                <p>• Helper classes only relevant to outer class (Node in List)<br>
+                • Iterator classes for containers<br>
+                • Implementation details to hide<br>
+                • Builder patterns</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>Advanced C++ OOP Concepts<br>Polymorphism • Constructors • Inline Functions • Static Members • Nested Classes</p>
+    </footer>
+
+    <!-- Chatbot -->
+    <button class="chat-btn" id="chatBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+    </button>
+
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-head">
+            <div class="chat-info">
+                <div class="chat-avatar">🤖</div>
+                <div>
+                    <div class="chat-name">C++ OOP Assistant</div>
+                    <div class="chat-status">Powered by Claude AI</div>
+                </div>
+            </div>
+            <button class="chat-close" id="chatClose">✕</button>
+        </div>
+        <div class="chat-messages" id="chatMsgs">
+            <div class="chat-msg bot">👋 Hi! I can help with polymorphism, constructors, inline functions, static members, and nested classes. What would you like to learn?</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask about C++ OOP..." autocomplete="off">
+            <button class="chat-send" id="chatSend">➤</button>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+
+        function copyCode(btn) {
+            const code = btn.closest('.code-wrapper').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.classList.add('copied');
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋 Copy'; }, 2000);
+            });
+        }
+
+        function runCode(btn) {
+            const code = btn.closest('.code-wrapper').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied! Paste in the online compiler.');
+                window.open('https://www.programiz.com/cpp-programming/online-compiler/', '_blank');
+            });
+        }
+
+        const chatBtn = document.getElementById('chatBtn');
+        const chatPanel = document.getElementById('chatPanel');
+        const chatClose = document.getElementById('chatClose');
+        const chatInput = document.getElementById('chatInput');
+        const chatSend = document.getElementById('chatSend');
+        const chatMsgs = document.getElementById('chatMsgs');
+
+        chatBtn.onclick = () => chatPanel.classList.toggle('open');
+        chatClose.onclick = () => chatPanel.classList.remove('open');
+
+        function addMsg(text, isUser = false) {
+            const div = document.createElement('div');
+            div.className = `chat-msg ${isUser ? 'user' : 'bot'}`;
+            div.textContent = text;
+            chatMsgs.appendChild(div);
+            chatMsgs.scrollTop = chatMsgs.scrollHeight;
+        }
+
+        async function sendMsg() {
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+            addMsg(msg, true);
+            chatInput.value = '';
+            try {
+                const res = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        system: 'You are a C++ OOP tutor. Topics: polymorphism (compile-time vs runtime, virtual functions, abstract classes), constructor types, inline functions, static members, nested classes. Keep answers concise with code examples.',
+                        messages: [{ role: 'user', content: msg }]
+                    })
+                });
+                const data = await res.json();
+                addMsg(data.content?.[0]?.text || getLocal(msg));
+            } catch { addMsg(getLocal(msg)); }
+        }
+
+        function getLocal(msg) {
+            const m = msg.toLowerCase();
+            if (m.includes('polymorph')) return "Polymorphism = 'many forms'. Compile-time: function/operator overloading (resolved at compile time). Runtime: virtual functions (resolved via vtable at runtime). Use 'virtual' keyword and 'override' for safety.";
+            if (m.includes('virtual')) return "Virtual functions enable runtime polymorphism. Declare with 'virtual' in base class. The vtable stores function pointers. Always use virtual destructors when deleting derived objects through base pointers!";
+            if (m.includes('abstract') || m.includes('pure')) return "Pure virtual function: virtual void func() = 0; Makes class abstract. Cannot instantiate abstract classes. Derived classes MUST implement all pure virtual functions.";
+            if (m.includes('overload')) return "Function overloading: same name, different parameters. Operator overloading: define custom behavior for +, -, ==, <<, etc. Both are compile-time polymorphism.";
+            if (m.includes('constructor')) return "Constructor types: Default (no args), Parameterized, Copy (const T&), Move (T&&), Delegating, Explicit. Use initializer lists for efficiency and const members.";
+            if (m.includes('inline')) return "Inline functions: compiler replaces call with code. Good for small, frequent functions. Methods defined inside class are implicitly inline.";
+            if (m.includes('static')) return "Static members belong to class, not instances. Static variables shared by all objects. Static methods can't access 'this' or non-static members. Call with ClassName::method().";
+            if (m.includes('nested')) return "Nested classes: defined inside another class. Can access outer's private members. Use for: helper classes, iterators, implementation details.";
+            return "I can explain: polymorphism, virtual functions, constructors, inline functions, static members, nested classes. What would you like to know?";
+        }
+
+        chatSend.onclick = sendMsg;
+        chatInput.onkeypress = e => { if (e.key === 'Enter') sendMsg(); };
+
+        document.querySelectorAll('.nav-item').forEach(link => {
+            link.onclick = e => {
+                e.preventDefault();
+                document.querySelector(link.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+            };
+        });
+    </script>
+</body>
+</html>
