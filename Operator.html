@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Terminal Guide | Operators • Friends • Pointers</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Dela+Gothic+One&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --terminal-bg: #0a0e12;
+            --terminal-dark: #060809;
+            --terminal-surface: #0f1419;
+            --terminal-border: #1a2332;
+            --terminal-glow: #00ff9d;
+            --terminal-glow-dim: #00ff9d40;
+            --terminal-amber: #ffb800;
+            --terminal-amber-dim: #ffb80040;
+            --terminal-cyan: #00d4ff;
+            --terminal-magenta: #ff00aa;
+            --terminal-red: #ff3860;
+            --terminal-blue: #3d9bff;
+            --text-primary: #e4f0eb;
+            --text-dim: #6b8a7e;
+            --text-muted: #3d5249;
+            --scanline: rgba(0, 255, 157, 0.03);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background: var(--terminal-bg);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* CRT Scanline Effect */
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                var(--scanline) 2px,
+                var(--scanline) 4px
+            );
+        }
+
+        /* Grid Background */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: 
+                linear-gradient(var(--terminal-border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--terminal-border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.3;
+        }
+
+        /* Glow Orbs */
+        .glow-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.4;
+        }
+        .glow-orb.green { background: var(--terminal-glow); width: 400px; height: 400px; top: 10%; left: 5%; }
+        .glow-orb.amber { background: var(--terminal-amber); width: 300px; height: 300px; bottom: 20%; right: 10%; }
+        .glow-orb.cyan { background: var(--terminal-cyan); width: 350px; height: 350px; top: 60%; left: 30%; opacity: 0.2; }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(10, 14, 18, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--terminal-border);
+        }
+
+        .nav-inner {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--terminal-glow);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 0 0 20px var(--terminal-glow-dim);
+        }
+
+        .logo::before {
+            content: '>';
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-link {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--terminal-glow);
+            border-color: var(--terminal-glow);
+            text-shadow: 0 0 10px var(--terminal-glow-dim);
+        }
+
+        /* Progress */
+        .progress-bar {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            height: 2px;
+            background: var(--terminal-glow);
+            width: 0%;
+            z-index: 999;
+            box-shadow: 0 0 15px var(--terminal-glow);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 900px;
+        }
+
+        .terminal-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.75rem;
+            color: var(--terminal-glow);
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--terminal-glow);
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px var(--terminal-glow-dim);
+            box-shadow: 0 0 20px var(--terminal-glow-dim);
+        }
+
+        .hero-title {
+            font-family: 'Dela Gothic One', cursive;
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-title .line1 {
+            color: var(--text-primary);
+        }
+
+        .hero-title .line2 {
+            color: var(--terminal-glow);
+            text-shadow: 0 0 40px var(--terminal-glow-dim);
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .topic-grid {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .topic-btn {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            padding: 1rem 1.5rem;
+            background: var(--terminal-surface);
+            border: 1px solid var(--terminal-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .topic-btn:hover {
+            border-color: var(--terminal-glow);
+            box-shadow: 0 0 30px var(--terminal-glow-dim), inset 0 0 30px var(--terminal-glow-dim);
+            transform: translateY(-3px);
+        }
+
+        .topic-btn span {
+            font-size: 1.5rem;
+        }
+
+        /* Sections */
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--terminal-amber);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-label::before {
+            content: '//';
+            color: var(--text-muted);
+        }
+
+        .section-title {
+            font-family: 'Dela Gothic One', cursive;
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .section-title em {
+            font-style: normal;
+            color: var(--terminal-glow);
+            text-shadow: 0 0 30px var(--terminal-glow-dim);
+        }
+
+        .section-intro {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            max-width: 700px;
+            margin-bottom: 3rem;
+        }
+
+        /* Feature Cards */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature {
+            background: var(--terminal-surface);
+            border: 1px solid var(--terminal-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--terminal-glow), var(--terminal-cyan));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature:hover {
+            border-color: var(--terminal-glow);
+            box-shadow: 0 0 30px var(--terminal-glow-dim);
+        }
+
+        .feature:hover::before { opacity: 1; }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        /* Subsections */
+        .subsection {
+            margin: 4rem 0;
+        }
+
+        .subsection-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .subsection-marker {
+            width: 4px;
+            height: 24px;
+            background: var(--terminal-glow);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--terminal-glow);
+        }
+
+        .subsection-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .subsection > p {
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Code Blocks */
+        .code-wrapper {
+            background: var(--terminal-dark);
+            border: 1px solid var(--terminal-border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--terminal-surface);
+            border-bottom: 1px solid var(--terminal-border);
+        }
+
+        .code-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.r { background: #ff5f57; }
+        .dot.y { background: #febc2e; }
+        .dot.g { background: #28c840; }
+
+        .code-filename {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-btn {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            padding: 0.4rem 0.8rem;
+            border: 1px solid var(--terminal-border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .copy-btn {
+            background: transparent;
+            color: var(--text-dim);
+        }
+
+        .copy-btn:hover {
+            border-color: var(--terminal-glow);
+            color: var(--terminal-glow);
+        }
+
+        .copy-btn.copied {
+            background: var(--terminal-glow);
+            color: var(--terminal-dark);
+            border-color: var(--terminal-glow);
+        }
+
+        .run-btn {
+            background: var(--terminal-glow);
+            color: var(--terminal-dark);
+            border-color: var(--terminal-glow);
+            font-weight: 600;
+        }
+
+        .run-btn:hover {
+            box-shadow: 0 0 15px var(--terminal-glow);
+            transform: scale(1.02);
+        }
+
+        .code-body {
+            padding: 1.25rem;
+            overflow-x: auto;
+        }
+
+        .code-body pre {
+            margin: 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            tab-size: 4;
+        }
+
+        /* Syntax */
+        .kw { color: #ff79c6; font-weight: 500; }
+        .ty { color: #8be9fd; }
+        .st { color: #f1fa8c; }
+        .nu { color: #bd93f9; }
+        .cm { color: #6272a4; font-style: italic; }
+        .fn { color: #50fa7b; }
+        .op { color: #ff79c6; }
+        .pp { color: #ffb86c; }
+        .pt { color: #8be9fd; }
+
+        /* Callouts */
+        .callout {
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 3px solid;
+            background: var(--terminal-surface);
+        }
+
+        .callout.tip { border-color: var(--terminal-glow); }
+        .callout.warn { border-color: var(--terminal-amber); }
+        .callout.info { border-color: var(--terminal-cyan); }
+        .callout.danger { border-color: var(--terminal-red); }
+
+        .callout-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .callout.tip .callout-title { color: var(--terminal-glow); }
+        .callout.warn .callout-title { color: var(--terminal-amber); }
+        .callout.info .callout-title { color: var(--terminal-cyan); }
+        .callout.danger .callout-title { color: var(--terminal-red); }
+
+        .callout p { color: var(--text-dim); font-size: 0.9rem; margin: 0; }
+
+        /* Tables */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            border: 1px solid var(--terminal-border);
+            background: var(--terminal-surface);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            background: var(--terminal-dark);
+            padding: 0.875rem 1rem;
+            text-align: left;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--terminal-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--terminal-border);
+        }
+
+        td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--terminal-border);
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(0, 255, 157, 0.03); }
+
+        code.il {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--terminal-dark);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--terminal-glow);
+        }
+
+        /* Operator Grid */
+        .op-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .op-item {
+            background: var(--terminal-surface);
+            border: 1px solid var(--terminal-border);
+            border-radius: 6px;
+            padding: 0.75rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .op-item:hover {
+            border-color: var(--terminal-glow);
+            box-shadow: 0 0 15px var(--terminal-glow-dim);
+        }
+
+        .op-sym {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--terminal-glow);
+        }
+
+        .op-name {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+        }
+
+        /* Compare Cards */
+        .compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .compare-card {
+            background: var(--terminal-surface);
+            border: 1px solid var(--terminal-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .compare-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .compare-card.a::before { background: var(--terminal-glow); }
+        .compare-card.b::before { background: var(--terminal-amber); }
+
+        .compare-tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .compare-card.a .compare-tag { background: var(--terminal-glow-dim); color: var(--terminal-glow); }
+        .compare-card.b .compare-tag { background: var(--terminal-amber-dim); color: var(--terminal-amber); }
+
+        .compare-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .compare-list {
+            list-style: none;
+        }
+
+        .compare-list li {
+            padding: 0.4rem 0;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .compare-list li::before {
+            content: '→';
+            color: var(--terminal-glow);
+            flex-shrink: 0;
+        }
+
+        /* Memory Diagram */
+        .mem-diagram {
+            background: var(--terminal-surface);
+            border: 1px solid var(--terminal-border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .mem-box {
+            background: var(--terminal-dark);
+            border: 2px solid var(--terminal-border);
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .mem-box.ptr {
+            border-color: var(--terminal-glow);
+            box-shadow: 0 0 20px var(--terminal-glow-dim);
+        }
+
+        .mem-box.val {
+            border-color: var(--terminal-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .mem-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .mem-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0.25rem 0;
+        }
+
+        .mem-addr {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .mem-arrow {
+            color: var(--terminal-glow);
+            font-size: 1.5rem;
+        }
+
+        /* Chatbot */
+        .chat-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--terminal-glow);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px var(--terminal-glow);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .chat-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--terminal-dark);
+        }
+
+        .chat-panel {
+            position: fixed;
+            bottom: 6rem;
+            right: 1.5rem;
+            width: 380px;
+            max-width: calc(100vw - 1rem);
+            height: 500px;
+            max-height: calc(100vh - 8rem);
+            background: var(--terminal-surface);
+            border: 1px solid var(--terminal-border);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 1001;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--terminal-glow-dim);
+        }
+
+        .chat-panel.open {
+            display: flex;
+            animation: chatOpen 0.3s ease;
+        }
+
+        @keyframes chatOpen {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .chat-header {
+            padding: 1rem;
+            background: var(--terminal-dark);
+            border-bottom: 1px solid var(--terminal-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chat-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--terminal-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .chat-name {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .chat-status {
+            font-size: 0.7rem;
+            color: var(--terminal-glow);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .chat-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--terminal-glow);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--terminal-glow);
+        }
+
+        .chat-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .chat-close:hover { color: var(--text-primary); }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .msg {
+            max-width: 85%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .msg.bot {
+            background: var(--terminal-dark);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg.user {
+            background: var(--terminal-glow);
+            color: var(--terminal-dark);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-input-area {
+            padding: 0.75rem;
+            border-top: 1px solid var(--terminal-border);
+            display: flex;
+            gap: 0.5rem;
+            background: var(--terminal-dark);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--terminal-surface);
+            border: 1px solid var(--terminal-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: var(--terminal-glow);
+        }
+
+        .chat-send {
+            padding: 0.75rem 1.25rem;
+            background: var(--terminal-glow);
+            border: none;
+            border-radius: 8px;
+            color: var(--terminal-dark);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .chat-send:hover {
+            box-shadow: 0 0 15px var(--terminal-glow);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--terminal-border);
+        }
+
+        footer p {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--terminal-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--terminal-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .topic-grid { flex-direction: column; align-items: center; }
+            .features { grid-template-columns: 1fr; }
+            .compare { grid-template-columns: 1fr; }
+            .mem-diagram { flex-direction: column; }
+            .mem-arrow { transform: rotate(90deg); }
+            .chat-panel { 
+                width: calc(100vw - 1rem);
+                right: 0.5rem;
+                bottom: 5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="grid-bg"></div>
+    <div class="glow-orb green"></div>
+    <div class="glow-orb amber"></div>
+    <div class="glow-orb cyan"></div>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-inner">
+            <div class="logo">C++_TERMINAL</div>
+            <div class="nav-links">
+                <a href="#operators" class="nav-link">[OPERATORS]</a>
+                <a href="#friends" class="nav-link">[FRIENDS]</a>
+                <a href="#pointers" class="nav-link">[POINTERS]</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-content">
+            
+            <div class="terminal-tag">MAC125 Prof. Khalid Kassou</div>
+            <h1 class="hero-title">
+                <span class="line1">Master C++</span><br>
+                <span class="line2">Core Concepts</span>
+            </h1>
+            <p class="hero-desc">Deep dive into operator overloading, friend functions, and pointer mechanics. Interactive code examples included.</p>
+            <div class="topic-grid">
+                <a href="#operators" class="topic-btn"><span>⚡</span> Operator Overloading</a>
+                <a href="#friends" class="topic-btn"><span>🔗</span> Friend Functions</a>
+                <a href="#pointers" class="topic-btn"><span>📍</span> Pointers</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== OPERATOR OVERLOADING ==================== -->
+    <section class="section" id="operators">
+        <div class="section-label">MODULE 01</div>
+        <h2 class="section-title">Operator <em>Overloading</em></h2>
+        <p class="section-intro">Define custom behavior for C++ operators with your own classes. Write expressive, intuitive code.</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">➕</div>
+                <h3 class="feature-title">Arithmetic</h3>
+                <p class="feature-desc">Overload +, -, *, /, % for mathematical operations.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚖️</div>
+                <h3 class="feature-title">Comparison</h3>
+                <p class="feature-desc">Define ==, !=, <, >, <=, >= for object comparisons.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📤</div>
+                <h3 class="feature-title">Stream I/O</h3>
+                <p class="feature-desc">Customize << and >> for cout and cin.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔢</div>
+                <h3 class="feature-title">Increment</h3>
+                <p class="feature-desc">Implement prefix and postfix ++, --.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📋</div>
+                <h3 class="feature-title">Subscript</h3>
+                <p class="feature-desc">Overload [] for array-like access.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📦</div>
+                <h3 class="feature-title">Assignment</h3>
+                <p class="feature-desc">Control =, +=, -=, *=, /= behavior.</p>
+            </div>
+        </div>
+
+        <!-- Operators Grid -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker"></div>
+                <h3 class="subsection-title">Overloadable Operators</h3>
+            </div>
+            <div class="op-grid">
+                <div class="op-item"><div class="op-sym">+</div><div class="op-name">Add</div></div>
+                <div class="op-item"><div class="op-sym">-</div><div class="op-name">Sub</div></div>
+                <div class="op-item"><div class="op-sym">*</div><div class="op-name">Mul</div></div>
+                <div class="op-item"><div class="op-sym">/</div><div class="op-name">Div</div></div>
+                <div class="op-item"><div class="op-sym">%</div><div class="op-name">Mod</div></div>
+                <div class="op-item"><div class="op-sym">==</div><div class="op-name">Eq</div></div>
+                <div class="op-item"><div class="op-sym">!=</div><div class="op-name">Neq</div></div>
+                <div class="op-item"><div class="op-sym"><</div><div class="op-name">Lt</div></div>
+                <div class="op-item"><div class="op-sym">></div><div class="op-name">Gt</div></div>
+                <div class="op-item"><div class="op-sym">++</div><div class="op-name">Inc</div></div>
+                <div class="op-item"><div class="op-sym">--</div><div class="op-name">Dec</div></div>
+                <div class="op-item"><div class="op-sym">[]</div><div class="op-name">Idx</div></div>
+                <div class="op-item"><div class="op-sym">()</div><div class="op-name">Call</div></div>
+                <div class="op-item"><div class="op-sym"><<</div><div class="op-name">Out</div></div>
+                <div class="op-item"><div class="op-sym">>></div><div class="op-name">In</div></div>
+                <div class="op-item"><div class="op-sym">=</div><div class="op-name">Asgn</div></div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-title">📘 Cannot Overload</div>
+                <p><code class="il">::</code> <code class="il">.</code> <code class="il">.*</code> <code class="il">?:</code> <code class="il">sizeof</code> <code class="il">typeid</code></p>
+            </div>
+        </div>
+
+        <!-- Complex Numbers Example -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker"></div>
+                <h3 class="subsection-title">Complex Number Class</h3>
+            </div>
+            <p>Implement arithmetic operators for complex numbers:</p>
+
+            <div class="code-wrapper">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+                        <span class="code-filename">complex.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn copy-btn" onclick="copyCode(this)">📋 COPY</button>
+                        <button class="code-btn run-btn" onclick="runCode(this)">▶ RUN</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="ty">Complex</span> {
+<span class="kw">private</span>:
+    <span class="ty">double</span> real, imag;
+
+<span class="kw">public</span>:
+    <span class="cm">// Constructor</span>
+    <span class="fn">Complex</span>(<span class="ty">double</span> r <span class="op">=</span> <span class="nu">0</span>, <span class="ty">double</span> i <span class="op">=</span> <span class="nu">0</span>) <span class="op">:</span> real(r), imag(i) {}
+    
+    <span class="cm">// Overload + operator</span>
+    <span class="ty">Complex</span> <span class="kw">operator</span><span class="op">+</span>(<span class="kw">const</span> <span class="ty">Complex</span><span class="op">&amp;</span> other) <span class="kw">const</span> {
+        <span class="kw">return</span> <span class="ty">Complex</span>(real <span class="op">+</span> other.real, imag <span class="op">+</span> other.imag);
+    }
+    
+    <span class="cm">// Overload - operator</span>
+    <span class="ty">Complex</span> <span class="kw">operator</span><span class="op">-</span>(<span class="kw">const</span> <span class="ty">Complex</span><span class="op">&amp;</span> other) <span class="kw">const</span> {
+        <span class="kw">return</span> <span class="ty">Complex</span>(real <span class="op">-</span> other.real, imag <span class="op">-</span> other.imag);
+    }
+    
+    <span class="cm">// Overload * operator</span>
+    <span class="ty">Complex</span> <span class="kw">operator</span><span class="op">*</span>(<span class="kw">const</span> <span class="ty">Complex</span><span class="op">&amp;</span> other) <span class="kw">const</span> {
+        <span class="kw">return</span> <span class="ty">Complex</span>(
+            real <span class="op">*</span> other.real <span class="op">-</span> imag <span class="op">*</span> other.imag,
+            real <span class="op">*</span> other.imag <span class="op">+</span> imag <span class="op">*</span> other.real
+        );
+    }
+    
+    <span class="cm">// Overload == operator</span>
+    <span class="ty">bool</span> <span class="kw">operator</span><span class="op">==</span>(<span class="kw">const</span> <span class="ty">Complex</span><span class="op">&amp;</span> other) <span class="kw">const</span> {
+        <span class="kw">return</span> real <span class="op">==</span> other.real <span class="op">&amp;&amp;</span> imag <span class="op">==</span> other.imag;
+    }
+    
+    <span class="cm">// Display method</span>
+    <span class="ty">void</span> <span class="fn">print</span>() <span class="kw">const</span> {
+        cout <span class="op">&lt;&lt;</span> real;
+        <span class="kw">if</span> (imag <span class="op">&gt;=</span> <span class="nu">0</span>) cout <span class="op">&lt;&lt;</span> <span class="st">" + "</span> <span class="op">&lt;&lt;</span> imag <span class="op">&lt;&lt;</span> <span class="st">"i"</span>;
+        <span class="kw">else</span> cout <span class="op">&lt;&lt;</span> <span class="st">" - "</span> <span class="op">&lt;&lt;</span> <span class="op">-</span>imag <span class="op">&lt;&lt;</span> <span class="st">"i"</span>;
+    }
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">Complex</span> a(<span class="nu">3</span>, <span class="nu">4</span>);
+    <span class="ty">Complex</span> b(<span class="nu">1</span>, <span class="nu">2</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"a = "</span>; a.<span class="fn">print</span>(); cout <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"b = "</span>; b.<span class="fn">print</span>(); cout <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="ty">Complex</span> c <span class="op">=</span> a <span class="op">+</span> b;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"a + b = "</span>; c.<span class="fn">print</span>(); cout <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="ty">Complex</span> d <span class="op">=</span> a <span class="op">*</span> b;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"a * b = "</span>; d.<span class="fn">print</span>(); cout <span class="op">&lt;&lt;</span> endl;
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"a == b: "</span> <span class="op">&lt;&lt;</span> (a <span class="op">==</span> b <span class="op">?</span> <span class="st">"true"</span> <span class="op">:</span> <span class="st">"false"</span>) <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prefix vs Postfix -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker"></div>
+                <h3 class="subsection-title">Prefix vs Postfix Increment</h3>
+            </div>
+
+            <div class="compare">
+                <div class="compare-card a">
+                    <div class="compare-tag">++x PREFIX</div>
+                    <h4 class="compare-title">Increment First</h4>
+                    <ul class="compare-list">
+                        <li>No dummy parameter</li>
+                        <li>Returns reference to *this</li>
+                        <li>More efficient (no copy)</li>
+                    </ul>
+                </div>
+                <div class="compare-card b">
+                    <div class="compare-tag">x++ POSTFIX</div>
+                    <h4 class="compare-title">Return Then Increment</h4>
+                    <ul class="compare-list">
+                        <li>Dummy int parameter</li>
+                        <li>Returns copy of old value</li>
+                        <li>Creates temporary object</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="code-wrapper">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+                        <span class="code-filename">increment.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn copy-btn" onclick="copyCode(this)">📋 COPY</button>
+                        <button class="code-btn run-btn" onclick="runCode(this)">▶ RUN</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="ty">Counter</span> {
+<span class="kw">private</span>:
+    <span class="ty">int</span> val;
+
+<span class="kw">public</span>:
+    <span class="fn">Counter</span>(<span class="ty">int</span> v <span class="op">=</span> <span class="nu">0</span>) <span class="op">:</span> val(v) {}
+    
+    <span class="ty">int</span> <span class="fn">get</span>() <span class="kw">const</span> { <span class="kw">return</span> val; }
+    
+    <span class="cm">// PREFIX: ++counter</span>
+    <span class="ty">Counter</span><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">++</span>() {
+        <span class="op">++</span>val;
+        <span class="kw">return</span> <span class="op">*</span><span class="kw">this</span>;
+    }
+    
+    <span class="cm">// POSTFIX: counter++ (dummy int)</span>
+    <span class="ty">Counter</span> <span class="kw">operator</span><span class="op">++</span>(<span class="ty">int</span>) {
+        <span class="ty">Counter</span> old <span class="op">=</span> <span class="op">*</span><span class="kw">this</span>;
+        <span class="op">++</span>val;
+        <span class="kw">return</span> old;
+    }
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">Counter</span> c(<span class="nu">5</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Start: "</span> <span class="op">&lt;&lt;</span> c.<span class="fn">get</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"++c: "</span> <span class="op">&lt;&lt;</span> (<span class="op">++</span>c).<span class="fn">get</span>() <span class="op">&lt;&lt;</span> endl;  <span class="cm">// 6</span>
+    cout <span class="op">&lt;&lt;</span> <span class="st">"After: "</span> <span class="op">&lt;&lt;</span> c.<span class="fn">get</span>() <span class="op">&lt;&lt;</span> endl;   <span class="cm">// 6</span>
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"c++: "</span> <span class="op">&lt;&lt;</span> (c<span class="op">++</span>).<span class="fn">get</span>() <span class="op">&lt;&lt;</span> endl;  <span class="cm">// 6 (old)</span>
+    cout <span class="op">&lt;&lt;</span> <span class="st">"After: "</span> <span class="op">&lt;&lt;</span> c.<span class="fn">get</span>() <span class="op">&lt;&lt;</span> endl;   <span class="cm">// 7</span>
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscript Operator -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker"></div>
+                <h3 class="subsection-title">Subscript Operator []</h3>
+            </div>
+            <p>Create safe array access with bounds checking:</p>
+
+            <div class="code-wrapper">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+                        <span class="code-filename">safe_array.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn copy-btn" onclick="copyCode(this)">📋 COPY</button>
+                        <button class="code-btn run-btn" onclick="runCode(this)">▶ RUN</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="ty">SafeArray</span> {
+<span class="kw">private</span>:
+    <span class="ty">int</span><span class="op">*</span> data;
+    <span class="ty">int</span> size;
+
+<span class="kw">public</span>:
+    <span class="fn">SafeArray</span>(<span class="ty">int</span> s) <span class="op">:</span> size(s) {
+        data <span class="op">=</span> <span class="kw">new</span> <span class="ty">int</span>[size]();
+    }
+    
+    <span class="op">~</span><span class="fn">SafeArray</span>() { <span class="kw">delete</span>[] data; }
+    
+    <span class="cm">// Subscript operator for read/write</span>
+    <span class="ty">int</span><span class="op">&amp;</span> <span class="kw">operator</span>[](<span class="ty">int</span> idx) {
+        <span class="kw">if</span> (idx <span class="op">&lt;</span> <span class="nu">0</span> <span class="op">||</span> idx <span class="op">&gt;=</span> size) {
+            cout <span class="op">&lt;&lt;</span> <span class="st">"[ERROR] Index "</span> <span class="op">&lt;&lt;</span> idx <span class="op">&lt;&lt;</span> <span class="st">" out of bounds!"</span> <span class="op">&lt;&lt;</span> endl;
+            <span class="kw">return</span> data[<span class="nu">0</span>];
+        }
+        <span class="kw">return</span> data[idx];
+    }
+    
+    <span class="ty">int</span> <span class="fn">len</span>() <span class="kw">const</span> { <span class="kw">return</span> size; }
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">SafeArray</span> arr(<span class="nu">5</span>);
+    
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;</span> <span class="nu">5</span>; i<span class="op">++</span>) {
+        arr[i] <span class="op">=</span> (i <span class="op">+</span> <span class="nu">1</span>) <span class="op">*</span> <span class="nu">10</span>;
+    }
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Array: "</span>;
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;</span> arr.<span class="fn">len</span>(); i<span class="op">++</span>) {
+        cout <span class="op">&lt;&lt;</span> arr[i] <span class="op">&lt;&lt;</span> <span class="st">" "</span>;
+    }
+    cout <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Test bounds check</span>
+    arr[<span class="nu">10</span>] <span class="op">=</span> <span class="nu">99</span>;
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FRIEND FUNCTIONS ==================== -->
+    <section class="section" id="friends">
+        <div class="section-label">MODULE 02</div>
+        <h2 class="section-title"><em>Friend</em> Functions & Classes</h2>
+        <p class="section-intro">Grant special access to private members for external functions and classes.</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔗</div>
+                <h3 class="feature-title">Friend Functions</h3>
+                <p class="feature-desc">Non-member functions with private access.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🏠</div>
+                <h3 class="feature-title">Friend Classes</h3>
+                <p class="feature-desc">Entire class gains private access.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📤</div>
+                <h3 class="feature-title">Stream Operators</h3>
+                <p class="feature-desc">Classic use case for << and >>.</p>
+            </div>
+        </div>
+
+        <!-- When to Use -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker" style="background: var(--terminal-amber);"></div>
+                <h3 class="subsection-title">When to Use Friends</h3>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Why Friend?</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Stream operators</td>
+                            <td>Left operand is ostream</td>
+                            <td><code class="il">cout << obj</code></td>
+                        </tr>
+                        <tr>
+                            <td>Symmetric ops</td>
+                            <td>Equal treatment</td>
+                            <td><code class="il">5 + obj</code></td>
+                        </tr>
+                        <tr>
+                            <td>Multi-class access</td>
+                            <td>Needs both privates</td>
+                            <td><code class="il">compare(a, b)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Friend Function Example -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker" style="background: var(--terminal-amber);"></div>
+                <h3 class="subsection-title">Friend Function Example</h3>
+            </div>
+
+            <div class="code-wrapper">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+                        <span class="code-filename">friend_func.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn copy-btn" onclick="copyCode(this)">📋 COPY</button>
+                        <button class="code-btn run-btn" onclick="runCode(this)">▶ RUN</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="ty">Box</span> {
+<span class="kw">private</span>:
+    <span class="ty">double</span> width, height;
+
+<span class="kw">public</span>:
+    <span class="fn">Box</span>(<span class="ty">double</span> w, <span class="ty">double</span> h) <span class="op">:</span> width(w), height(h) {}
+    
+    <span class="cm">// Declare friend - can access private</span>
+    <span class="kw">friend</span> <span class="ty">double</span> <span class="fn">getArea</span>(<span class="kw">const</span> <span class="ty">Box</span><span class="op">&amp;</span> b);
+    <span class="kw">friend</span> ostream<span class="op">&amp;</span> <span class="kw">operator</span><span class="op">&lt;&lt;</span>(ostream<span class="op">&amp;</span> os, <span class="kw">const</span> <span class="ty">Box</span><span class="op">&amp;</span> b);
+};
+
+<span class="cm">// Friend function (NOT a member)</span>
+<span class="ty">double</span> <span class="fn">getArea</span>(<span class="kw">const</span> <span class="ty">Box</span><span class="op">&amp;</span> b) {
+    <span class="kw">return</span> b.width <span class="op">*</span> b.height;  <span class="cm">// Direct private access!</span>
+}
+
+<span class="cm">// Friend operator<<</span>
+ostream<span class="op">&amp;</span> <span class="kw">operator</span><span class="op">&lt;&lt;</span>(ostream<span class="op">&amp;</span> os, <span class="kw">const</span> <span class="ty">Box</span><span class="op">&amp;</span> b) {
+    os <span class="op">&lt;&lt;</span> <span class="st">"Box["</span> <span class="op">&lt;&lt;</span> b.width <span class="op">&lt;&lt;</span> <span class="st">"x"</span> <span class="op">&lt;&lt;</span> b.height <span class="op">&lt;&lt;</span> <span class="st">"]"</span>;
+    <span class="kw">return</span> os;
+}
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">Box</span> b1(<span class="nu">5</span>, <span class="nu">4</span>);
+    <span class="ty">Box</span> b2(<span class="nu">3</span>, <span class="nu">6</span>);
+    
+    cout <span class="op">&lt;&lt;</span> b1 <span class="op">&lt;&lt;</span> <span class="st">" Area: "</span> <span class="op">&lt;&lt;</span> <span class="fn">getArea</span>(b1) <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> b2 <span class="op">&lt;&lt;</span> <span class="st">" Area: "</span> <span class="op">&lt;&lt;</span> <span class="fn">getArea</span>(b2) <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Friend Class -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker" style="background: var(--terminal-amber);"></div>
+                <h3 class="subsection-title">Friend Class Example</h3>
+            </div>
+
+            <div class="code-wrapper">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+                        <span class="code-filename">friend_class.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn copy-btn" onclick="copyCode(this)">📋 COPY</button>
+                        <button class="code-btn run-btn" onclick="runCode(this)">▶ RUN</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="ty">Engine</span>;
+
+<span class="kw">class</span> <span class="ty">Car</span> {
+<span class="kw">private</span>:
+    <span class="ty">string</span> model;
+    <span class="ty">int</span> speed;
+    <span class="ty">bool</span> running;
+
+<span class="kw">public</span>:
+    <span class="fn">Car</span>(<span class="ty">string</span> m) <span class="op">:</span> model(m), speed(<span class="nu">0</span>), running(<span class="kw">false</span>) {}
+    
+    <span class="kw">friend</span> <span class="kw">class</span> <span class="ty">Engine</span>;  <span class="cm">// Engine can access all</span>
+    
+    <span class="ty">void</span> <span class="fn">status</span>() {
+        cout <span class="op">&lt;&lt;</span> model <span class="op">&lt;&lt;</span> <span class="st">": "</span> <span class="op">&lt;&lt;</span> (running <span class="op">?</span> <span class="st">"ON"</span> <span class="op">:</span> <span class="st">"OFF"</span>) 
+             <span class="op">&lt;&lt;</span> <span class="st">", "</span> <span class="op">&lt;&lt;</span> speed <span class="op">&lt;&lt;</span> <span class="st">" mph"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="kw">class</span> <span class="ty">Engine</span> {
+<span class="kw">public</span>:
+    <span class="ty">void</span> <span class="fn">start</span>(<span class="ty">Car</span><span class="op">&amp;</span> c) {
+        c.running <span class="op">=</span> <span class="kw">true</span>;
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Started: "</span> <span class="op">&lt;&lt;</span> c.model <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="ty">void</span> <span class="fn">accelerate</span>(<span class="ty">Car</span><span class="op">&amp;</span> c, <span class="ty">int</span> amt) {
+        <span class="kw">if</span> (c.running) c.speed <span class="op">+=</span> amt;
+    }
+    
+    <span class="ty">void</span> <span class="fn">stop</span>(<span class="ty">Car</span><span class="op">&amp;</span> c) {
+        c.running <span class="op">=</span> <span class="kw">false</span>;
+        c.speed <span class="op">=</span> <span class="nu">0</span>;
+    }
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">Car</span> car(<span class="st">"Tesla"</span>);
+    <span class="ty">Engine</span> eng;
+    
+    car.<span class="fn">status</span>();
+    eng.<span class="fn">start</span>(car);
+    eng.<span class="fn">accelerate</span>(car, <span class="nu">60</span>);
+    car.<span class="fn">status</span>();
+    eng.<span class="fn">stop</span>(car);
+    car.<span class="fn">status</span>();
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="callout warn">
+                <div class="callout-title">⚠️ Friend Rules</div>
+                <p>• NOT symmetric: A→B doesn't mean B→A<br>• NOT transitive: A→B→C doesn't mean A→C<br>• NOT inherited</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== POINTERS ==================== -->
+    <section class="section" id="pointers">
+        <div class="section-label">MODULE 03</div>
+        <h2 class="section-title"><em>Pointers</em>: Deep Dive</h2>
+        <p class="section-intro">Master memory addresses, dynamic allocation, and advanced pointer techniques.</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📍</div>
+                <h3 class="feature-title">Address & Deref</h3>
+                <p class="feature-desc">& for address, * for value at address.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🧮</div>
+                <h3 class="feature-title">Pointer Math</h3>
+                <p class="feature-desc">Navigate memory by element size.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💾</div>
+                <h3 class="feature-title">Dynamic Memory</h3>
+                <p class="feature-desc">new/delete for heap allocation.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔗</div>
+                <h3 class="feature-title">Object Pointers</h3>
+                <p class="feature-desc">Use -> to access members.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Arrays</h3>
+                <p class="feature-desc">Arrays decay to pointers.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Function Ptrs</h3>
+                <p class="feature-desc">Pass functions as data.</p>
+            </div>
+        </div>
+
+        <!-- Memory Diagram -->
+        <div class="mem-diagram">
+            <div class="mem-box ptr">
+                <div class="mem-label">int* ptr</div>
+                <div class="mem-value">0x1000</div>
+                <div class="mem-addr">@ 0x2000</div>
+            </div>
+            <div class="mem-arrow">→→→</div>
+            <div class="mem-box val">
+                <div class="mem-label">int x</div>
+                <div class="mem-value">42</div>
+                <div class="mem-addr">@ 0x1000</div>
+            </div>
+        </div>
+
+        <!-- Pointer Basics -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker" style="background: var(--terminal-cyan);"></div>
+                <h3 class="subsection-title">Pointer Basics</h3>
+            </div>
+
+            <div class="code-wrapper">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+                        <span class="code-filename">ptr_basics.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn copy-btn" onclick="copyCode(this)">📋 COPY</button>
+                        <button class="code-btn run-btn" onclick="runCode(this)">▶ RUN</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">int</span> x <span class="op">=</span> <span class="nu">42</span>;
+    <span class="ty">int</span><span class="pt">*</span> ptr <span class="op">=</span> <span class="op">&amp;</span>x;  <span class="cm">// ptr holds address of x</span>
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"x = "</span> <span class="op">&lt;&lt;</span> x <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"&amp;x = "</span> <span class="op">&lt;&lt;</span> <span class="op">&amp;</span>x <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"ptr = "</span> <span class="op">&lt;&lt;</span> ptr <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"*ptr = "</span> <span class="op">&lt;&lt;</span> <span class="op">*</span>ptr <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Modify through pointer</span>
+    <span class="op">*</span>ptr <span class="op">=</span> <span class="nu">100</span>;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"After *ptr = 100: x = "</span> <span class="op">&lt;&lt;</span> x <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Null pointer</span>
+    <span class="ty">int</span><span class="pt">*</span> np <span class="op">=</span> <span class="kw">nullptr</span>;
+    <span class="kw">if</span> (np <span class="op">==</span> <span class="kw">nullptr</span>) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"np is null"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cm">// Pointer to pointer</span>
+    <span class="ty">int</span><span class="pt">**</span> pp <span class="op">=</span> <span class="op">&amp;</span>ptr;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"**pp = "</span> <span class="op">&lt;&lt;</span> <span class="op">**</span>pp <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pointer Arithmetic -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker" style="background: var(--terminal-cyan);"></div>
+                <h3 class="subsection-title">Pointer Arithmetic</h3>
+            </div>
+
+            <div class="code-wrapper">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+                        <span class="code-filename">ptr_math.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn copy-btn" onclick="copyCode(this)">📋 COPY</button>
+                        <button class="code-btn run-btn" onclick="runCode(this)">▶ RUN</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">int</span> arr[] <span class="op">=</span> {<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>, <span class="nu">40</span>, <span class="nu">50</span>};
+    <span class="ty">int</span><span class="pt">*</span> p <span class="op">=</span> arr;  <span class="cm">// Array decays to pointer</span>
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Using pointer arithmetic:"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;</span> <span class="nu">5</span>; i<span class="op">++</span>) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"*(p+"</span> <span class="op">&lt;&lt;</span> i <span class="op">&lt;&lt;</span> <span class="st">") = "</span> <span class="op">&lt;&lt;</span> <span class="op">*</span>(p <span class="op">+</span> i) <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"\nAddresses:"</span> <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"p   = "</span> <span class="op">&lt;&lt;</span> p <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"p+1 = "</span> <span class="op">&lt;&lt;</span> (p<span class="op">+</span><span class="nu">1</span>) <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"p+2 = "</span> <span class="op">&lt;&lt;</span> (p<span class="op">+</span><span class="nu">2</span>) <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Pointer difference</span>
+    <span class="ty">int</span><span class="pt">*</span> start <span class="op">=</span> <span class="op">&amp;</span>arr[<span class="nu">0</span>];
+    <span class="ty">int</span><span class="pt">*</span> end <span class="op">=</span> <span class="op">&amp;</span>arr[<span class="nu">4</span>];
+    cout <span class="op">&lt;&lt;</span> <span class="st">"\nDistance: "</span> <span class="op">&lt;&lt;</span> (end <span class="op">-</span> start) <span class="op">&lt;&lt;</span> <span class="st">" elements"</span> <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="callout tip">
+                <div class="callout-title">💡 Key Insight</div>
+                <p><code class="il">ptr + 1</code> adds <code class="il">sizeof(type)</code> bytes, not 1 byte. For int*, that's 4 bytes.</p>
+            </div>
+        </div>
+
+        <!-- Dynamic Memory -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker" style="background: var(--terminal-cyan);"></div>
+                <h3 class="subsection-title">Dynamic Memory</h3>
+            </div>
+
+            <div class="code-wrapper">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+                        <span class="code-filename">dynamic_mem.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn copy-btn" onclick="copyCode(this)">📋 COPY</button>
+                        <button class="code-btn run-btn" onclick="runCode(this)">▶ RUN</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="ty">Student</span> {
+<span class="kw">public</span>:
+    <span class="ty">string</span> name;
+    <span class="fn">Student</span>(<span class="ty">string</span> n) <span class="op">:</span> name(n) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Created: "</span> <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> endl;
+    }
+    <span class="op">~</span><span class="fn">Student</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Destroyed: "</span> <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Single allocation</span>
+    <span class="ty">int</span><span class="pt">*</span> num <span class="op">=</span> <span class="kw">new</span> <span class="ty">int</span>(<span class="nu">42</span>);
+    cout <span class="op">&lt;&lt;</span> <span class="st">"*num = "</span> <span class="op">&lt;&lt;</span> <span class="op">*</span>num <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">delete</span> num;
+    
+    <span class="cm">// Array allocation</span>
+    <span class="ty">int</span><span class="pt">*</span> arr <span class="op">=</span> <span class="kw">new</span> <span class="ty">int</span>[<span class="nu">5</span>];
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;</span> <span class="nu">5</span>; i<span class="op">++</span>) arr[i] <span class="op">=</span> i <span class="op">*</span> <span class="nu">10</span>;
+    <span class="kw">delete</span>[] arr;  <span class="cm">// Use delete[] for arrays!</span>
+    
+    <span class="cm">// Object allocation</span>
+    <span class="ty">Student</span><span class="pt">*</span> s <span class="op">=</span> <span class="kw">new</span> <span class="ty">Student</span>(<span class="st">"Alice"</span>);
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Name: "</span> <span class="op">&lt;&lt;</span> s<span class="op">-&gt;</span>name <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">delete</span> s;
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="callout danger">
+                <div class="callout-title">🚨 Memory Leaks</div>
+                <p>Every <code class="il">new</code> needs <code class="il">delete</code>. Every <code class="il">new[]</code> needs <code class="il">delete[]</code>!</p>
+            </div>
+        </div>
+
+        <!-- Function Pointers -->
+        <div class="subsection">
+            <div class="subsection-header">
+                <div class="subsection-marker" style="background: var(--terminal-cyan);"></div>
+                <h3 class="subsection-title">Function Pointers</h3>
+            </div>
+
+            <div class="code-wrapper">
+                <div class="code-header">
+                    <div class="code-header-left">
+                        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+                        <span class="code-filename">func_ptr.cpp</span>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-btn copy-btn" onclick="copyCode(this)">📋 COPY</button>
+                        <button class="code-btn run-btn" onclick="runCode(this)">▶ RUN</button>
+                    </div>
+                </div>
+                <div class="code-body">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="ty">int</span> <span class="fn">add</span>(<span class="ty">int</span> a, <span class="ty">int</span> b) { <span class="kw">return</span> a <span class="op">+</span> b; }
+<span class="ty">int</span> <span class="fn">sub</span>(<span class="ty">int</span> a, <span class="ty">int</span> b) { <span class="kw">return</span> a <span class="op">-</span> b; }
+<span class="ty">int</span> <span class="fn">mul</span>(<span class="ty">int</span> a, <span class="ty">int</span> b) { <span class="kw">return</span> a <span class="op">*</span> b; }
+
+<span class="ty">void</span> <span class="fn">calc</span>(<span class="ty">int</span> a, <span class="ty">int</span> b, <span class="ty">int</span> (<span class="pt">*</span>op)(<span class="ty">int</span>, <span class="ty">int</span>), <span class="ty">string</span> name) {
+    cout <span class="op">&lt;&lt;</span> name <span class="op">&lt;&lt;</span> <span class="st">"("</span> <span class="op">&lt;&lt;</span> a <span class="op">&lt;&lt;</span> <span class="st">","</span> <span class="op">&lt;&lt;</span> b <span class="op">&lt;&lt;</span> <span class="st">") = "</span> <span class="op">&lt;&lt;</span> <span class="fn">op</span>(a, b) <span class="op">&lt;&lt;</span> endl;
+}
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Declare function pointer</span>
+    <span class="ty">int</span> (<span class="pt">*</span>fp)(<span class="ty">int</span>, <span class="ty">int</span>);
+    
+    fp <span class="op">=</span> add;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"fp(5,3) = "</span> <span class="op">&lt;&lt;</span> <span class="fn">fp</span>(<span class="nu">5</span>, <span class="nu">3</span>) <span class="op">&lt;&lt;</span> endl;
+    
+    fp <span class="op">=</span> mul;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"fp(5,3) = "</span> <span class="op">&lt;&lt;</span> <span class="fn">fp</span>(<span class="nu">5</span>, <span class="nu">3</span>) <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Array of function pointers</span>
+    <span class="ty">int</span> (<span class="pt">*</span>ops[<span class="nu">3</span>])(<span class="ty">int</span>, <span class="ty">int</span>) <span class="op">=</span> {add, sub, mul};
+    <span class="ty">string</span> names[] <span class="op">=</span> {<span class="st">"add"</span>, <span class="st">"sub"</span>, <span class="st">"mul"</span>};
+    
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;</span> <span class="nu">3</span>; i<span class="op">++</span>) {
+        <span class="fn">calc</span>(<span class="nu">10</span>, <span class="nu">5</span>, ops[i], names[i]);
+    }
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>C++ TERMINAL GUIDE | OPERATORS • FRIENDS • POINTERS</p>
+    </footer>
+
+    <!-- Chatbot -->
+    <button class="chat-btn" id="chatBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+    </button>
+
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <div class="chat-avatar">🤖</div>
+                <div>
+                    <div class="chat-name">C++ Assistant</div>
+                    <div class="chat-status">Claude AI</div>
+                </div>
+            </div>
+            <button class="chat-close" id="chatClose">✕</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="msg bot">👋 Hi! Ask me about operator overloading, friend functions, or pointers!</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Type your question..." autocomplete="off">
+            <button class="chat-send" id="chatSend">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const pct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+        });
+
+        // Copy code
+        function copyCode(btn) {
+            const code = btn.closest('.code-wrapper').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.classList.add('copied');
+                btn.textContent = '✓ COPIED';
+                setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋 COPY'; }, 2000);
+            });
+        }
+
+        // Run code
+        function runCode(btn) {
+            const code = btn.closest('.code-wrapper').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied! Paste in the compiler.');
+                window.open('https://www.programiz.com/cpp-programming/online-compiler/', '_blank');
+            });
+        }
+
+        // Chatbot
+        const chatBtn = document.getElementById('chatBtn');
+        const chatPanel = document.getElementById('chatPanel');
+        const chatClose = document.getElementById('chatClose');
+        const chatInput = document.getElementById('chatInput');
+        const chatSend = document.getElementById('chatSend');
+        const chatMessages = document.getElementById('chatMessages');
+
+        chatBtn.onclick = () => chatPanel.classList.toggle('open');
+        chatClose.onclick = () => chatPanel.classList.remove('open');
+
+        function addMsg(text, isUser) {
+            const m = document.createElement('div');
+            m.className = `msg ${isUser ? 'user' : 'bot'}`;
+            m.textContent = text;
+            chatMessages.appendChild(m);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function send() {
+            const t = chatInput.value.trim();
+            if (!t) return;
+            addMsg(t, true);
+            chatInput.value = '';
+            try {
+                const r = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 800,
+                        system: 'You are a C++ tutor. Topics: operator overloading, friend functions, pointers. Keep answers concise with code examples.',
+                        messages: [{ role: 'user', content: t }]
+                    })
+                });
+                const d = await r.json();
+                addMsg(d.content?.[0]?.text || fallback(t));
+            } catch { addMsg(fallback(t)); }
+        }
+
+        function fallback(m) {
+            const l = m.toLowerCase();
+            if (l.includes('operator') && l.includes('overload')) return "Operator overloading: define custom behavior for operators with your classes. Syntax: ReturnType operator+(const Class& other). Common: +, -, *, /, ==, <<, >>, [], ++, --.";
+            if (l.includes('friend')) return "Friend functions access private members. Declare with 'friend' keyword. Common use: stream operators << and >>. Friendship is NOT symmetric or transitive.";
+            if (l.includes('pointer') && l.includes('arith')) return "Pointer arithmetic: ptr+1 moves by sizeof(type) bytes. For int*, that's 4 bytes. ptr[i] equals *(ptr+i).";
+            if (l.includes('new') || l.includes('delete')) return "Dynamic memory: new allocates, delete frees. new[] for arrays, delete[] to free. Every new needs matching delete!";
+            if (l.includes('prefix') || l.includes('postfix')) return "Prefix ++x: operator++() returns reference. Postfix x++: operator++(int) has dummy param, returns copy.";
+            return "I can help with: operator overloading, friend functions/classes, pointers (basics, arithmetic, new/delete, function pointers). What interests you?";
+        }
+
+        chatSend.onclick = send;
+        chatInput.onkeypress = e => { if (e.key === 'Enter') send(); };
+
+        // Smooth scroll
+        document.querySelectorAll('.nav-link, .topic-btn').forEach(el => {
+            el.onclick = e => {
+                e.preventDefault();
+                const href = el.getAttribute('href');
+                if (href) document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+            };
+        });
+    </script>
+</body>
+</html>
