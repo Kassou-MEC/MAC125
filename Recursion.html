@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Mastery | Recursion • Virtual • Templates • Exceptions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&family=Fraunces:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0f0f12;
+            --bg-surface: #18181d;
+            --bg-elevated: #222228;
+            --bg-card: #1e1e24;
+            --border: #2a2a33;
+            --border-light: #3a3a45;
+            --coral: #ff6b6b;
+            --coral-dim: rgba(255, 107, 107, 0.15);
+            --orange: #ffa94d;
+            --orange-dim: rgba(255, 169, 77, 0.15);
+            --teal: #38d9a9;
+            --teal-dim: rgba(56, 217, 169, 0.15);
+            --lavender: #9775fa;
+            --lavender-dim: rgba(151, 117, 250, 0.15);
+            --sky: #74c0fc;
+            --sky-dim: rgba(116, 192, 252, 0.15);
+            --text-white: #ffffff;
+            --text-primary: #e8e8ed;
+            --text-secondary: #a0a0ad;
+            --text-muted: #6a6a78;
+            --gradient-warm: linear-gradient(135deg, #ff6b6b, #ffa94d);
+            --gradient-cool: linear-gradient(135deg, #38d9a9, #74c0fc);
+            --gradient-purple: linear-gradient(135deg, #9775fa, #ff6b6b);
+            --gradient-aurora: linear-gradient(135deg, #38d9a9, #9775fa, #ff6b6b);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Aurora Background */
+        .aurora {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .aurora-blob.one {
+            width: 600px;
+            height: 600px;
+            background: var(--coral);
+            top: -200px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .aurora-blob.two {
+            width: 500px;
+            height: 500px;
+            background: var(--teal);
+            bottom: -150px;
+            left: -100px;
+            animation-delay: -5s;
+        }
+
+        .aurora-blob.three {
+            width: 400px;
+            height: 400px;
+            background: var(--lavender);
+            top: 40%;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        .aurora-blob.four {
+            width: 350px;
+            height: 350px;
+            background: var(--orange);
+            bottom: 20%;
+            right: 20%;
+            animation-delay: -15s;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(20px, 10px) scale(1.02); }
+        }
+
+        /* Noise Texture */
+        .noise {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(15, 15, 18, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Fraunces', serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: var(--gradient-warm);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-item {
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--text-white);
+            background: var(--coral-dim);
+        }
+
+        /* Progress Bar */
+        .reading-progress {
+            position: fixed;
+            top: 68px;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-warm);
+            width: 0%;
+            z-index: 999;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+        }
+
+        .hero-inner {
+            max-width: 850px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.75rem;
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            color: var(--coral);
+            margin-bottom: 2rem;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--coral);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .hero-title {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-title .highlight {
+            background: var(--gradient-aurora);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .hero-tile {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .hero-tile:nth-child(1)::before { background: var(--gradient-warm); }
+        .hero-tile:nth-child(2)::before { background: var(--gradient-cool); }
+        .hero-tile:nth-child(3)::before { background: var(--gradient-purple); }
+        .hero-tile:nth-child(4)::before { background: var(--coral); }
+
+        .hero-tile:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-light);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-tile:hover::before { opacity: 1; }
+
+        .tile-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .tile-title { font-weight: 600; font-size: 1rem; }
+        .tile-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+        /* Section Styling */
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .section-tag.coral { background: var(--coral-dim); color: var(--coral); }
+        .section-tag.teal { background: var(--teal-dim); color: var(--teal); }
+        .section-tag.lavender { background: var(--lavender-dim); color: var(--lavender); }
+        .section-tag.orange { background: var(--orange-dim); color: var(--orange); }
+
+        .section-title {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-intro {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin-bottom: 3rem;
+        }
+
+        /* Feature Cards */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-light);
+            background: var(--bg-elevated);
+        }
+
+        .feature-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon.coral { background: var(--coral-dim); }
+        .feature-icon.teal { background: var(--teal-dim); }
+        .feature-icon.lavender { background: var(--lavender-dim); }
+        .feature-icon.orange { background: var(--orange-dim); }
+        .feature-icon.sky { background: var(--sky-dim); }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text-white);
+        }
+
+        .feature-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Subsection */
+        .subsection {
+            margin: 3rem 0;
+        }
+
+        .subsection-header {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-white);
+        }
+
+        .subsection-header .bar {
+            width: 4px;
+            height: 24px;
+            border-radius: 2px;
+        }
+
+        .subsection-header .bar.coral { background: var(--coral); }
+        .subsection-header .bar.teal { background: var(--teal); }
+        .subsection-header .bar.lavender { background: var(--lavender); }
+        .subsection-header .bar.orange { background: var(--orange); }
+
+        .subsection > p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Code Editor */
+        .code-editor {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .editor-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .traffic-lights {
+            display: flex;
+            gap: 6px;
+        }
+
+        .light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .light.red { background: #ff5f57; }
+        .light.yellow { background: #febc2e; }
+        .light.green { background: #28c840; }
+
+        .file-name {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .toolbar-right {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .editor-btn {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-copy:hover {
+            border-color: var(--coral);
+            color: var(--coral);
+        }
+
+        .btn-copy.success {
+            background: var(--teal);
+            border-color: var(--teal);
+            color: var(--bg-base);
+        }
+
+        .btn-run {
+            background: var(--gradient-warm);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-run:hover {
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            transform: scale(1.02);
+        }
+
+        .editor-content {
+            padding: 1.25rem;
+            overflow-x: auto;
+        }
+
+        .editor-content pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            tab-size: 4;
+        }
+
+        /* Syntax Colors */
+        .kw { color: #ff79c6; font-weight: 500; }
+        .ty { color: #8be9fd; }
+        .st { color: #f1fa8c; }
+        .nu { color: #bd93f9; }
+        .cm { color: #6272a4; font-style: italic; }
+        .fn { color: #50fa7b; }
+        .op { color: #ff79c6; }
+        .pp { color: #ffb86c; }
+        .ex { color: #ff6b6b; }
+
+        /* Callouts */
+        .callout {
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+            background: var(--bg-card);
+        }
+
+        .callout.tip { border-color: var(--teal); }
+        .callout.warning { border-color: var(--orange); }
+        .callout.info { border-color: var(--sky); }
+        .callout.danger { border-color: var(--coral); }
+
+        .callout-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .callout.tip .callout-title { color: var(--teal); }
+        .callout.warning .callout-title { color: var(--orange); }
+        .callout.info .callout-title { color: var(--sky); }
+        .callout.danger .callout-title { color: var(--coral); }
+
+        .callout p { color: var(--text-secondary); font-size: 0.9rem; margin: 0; }
+
+        /* Tables */
+        .data-table {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            background: var(--bg-elevated);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--coral);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(255, 107, 107, 0.03); }
+
+        code.inline {
+            font-family: 'Fira Code', monospace;
+            background: var(--bg-elevated);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--coral);
+        }
+
+        /* Diagram */
+        .diagram {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .diagram-box {
+            background: var(--bg-elevated);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .diagram-box.base { border-color: var(--coral); color: var(--coral); }
+        .diagram-box.derived { border-color: var(--teal); color: var(--teal); }
+
+        .diagram-arrow {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .diagram-row {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        /* Compare Blocks */
+        .compare-blocks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .compare-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .compare-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .compare-block.a::before { background: var(--gradient-warm); }
+        .compare-block.b::before { background: var(--gradient-cool); }
+
+        .compare-badge {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .compare-block.a .compare-badge { background: var(--coral-dim); color: var(--coral); }
+        .compare-block.b .compare-badge { background: var(--teal-dim); color: var(--teal); }
+
+        .compare-heading {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-white);
+        }
+
+        .compare-points {
+            list-style: none;
+        }
+
+        .compare-points li {
+            padding: 0.35rem 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .compare-points li::before {
+            content: '→';
+            flex-shrink: 0;
+        }
+
+        .compare-block.a .compare-points li::before { color: var(--coral); }
+        .compare-block.b .compare-points li::before { color: var(--teal); }
+
+        /* Recursion Visualization */
+        .recursion-visual {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+        }
+
+        .recursion-title {
+            color: var(--text-white);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .call-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .stack-frame {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stack-frame:nth-child(1) { background: rgba(255, 107, 107, 0.15); border-left: 3px solid var(--coral); }
+        .stack-frame:nth-child(2) { background: rgba(255, 169, 77, 0.15); border-left: 3px solid var(--orange); margin-left: 1rem; }
+        .stack-frame:nth-child(3) { background: rgba(56, 217, 169, 0.15); border-left: 3px solid var(--teal); margin-left: 2rem; }
+        .stack-frame:nth-child(4) { background: rgba(116, 192, 252, 0.15); border-left: 3px solid var(--sky); margin-left: 3rem; }
+        .stack-frame:nth-child(5) { background: rgba(151, 117, 250, 0.15); border-left: 3px solid var(--lavender); margin-left: 4rem; }
+
+        .return-val { color: var(--teal); font-weight: 500; }
+
+        /* Chatbot */
+        .chat-fab {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-warm);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(255, 107, 107, 0.4);
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .chat-fab:hover { transform: scale(1.1); }
+
+        .chat-fab svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        .chat-modal {
+            position: fixed;
+            bottom: 6rem;
+            right: 1.5rem;
+            width: 400px;
+            max-width: calc(100vw - 2rem);
+            height: 520px;
+            max-height: calc(100vh - 8rem);
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            z-index: 1001;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .chat-modal.visible {
+            display: flex;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .chat-top {
+            padding: 1rem 1.25rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--gradient-warm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .chat-status {
+            font-size: 0.75rem;
+            color: var(--teal);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .chat-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--teal);
+            border-radius: 50%;
+        }
+
+        .chat-x {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .chat-x:hover { color: var(--text-primary); }
+
+        .chat-log {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .bubble {
+            max-width: 85%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .bubble.bot {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .bubble.human {
+            background: var(--gradient-warm);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-bottom {
+            padding: 0.75rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-card);
+        }
+
+        .chat-field {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .chat-field:focus {
+            border-color: var(--coral);
+        }
+
+        .chat-go {
+            padding: 0.75rem 1.25rem;
+            background: var(--gradient-warm);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .chat-go:hover {
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        footer p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .features { grid-template-columns: 1fr; }
+            .compare-blocks { grid-template-columns: 1fr; }
+            .diagram-row { flex-direction: column; gap: 0.5rem; }
+            .chat-modal { width: calc(100vw - 1rem); right: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="aurora">
+        <div class="aurora-blob one"></div>
+        <div class="aurora-blob two"></div>
+        <div class="aurora-blob three"></div>
+        <div class="aurora-blob four"></div>
+    </div>
+    <div class="noise"></div>
+
+    <div class="reading-progress" id="readingProgress"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">C++ Mastery</div>
+            <div class="nav-menu">
+                <a href="#recursion" class="nav-item">Recursion</a>
+                <a href="#virtual" class="nav-item">Virtual</a>
+                <a href="#templates" class="nav-item">Templates</a>
+                <a href="#exceptions" class="nav-item">Exceptions</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-badge">MAC125 Prof. Khalid Kassou</div>
+            <h3 class="hero-title">
+                Master the <span class="highlight">Power</span> of C++
+            </h3>
+            <p class="hero-subtitle">Deep dive into recursion, polymorphism with virtual functions, generic programming with templates, and robust error handling.</p>
+            <div class="hero-grid">
+                <a href="#recursion" class="hero-tile">
+                    <div class="tile-icon">🔄</div>
+                    <div class="tile-title">Recursion</div>
+                    <div class="tile-desc">Self-calling functions</div>
+                </a>
+                <a href="#virtual" class="hero-tile">
+                    <div class="tile-icon">🎭</div>
+                    <div class="tile-title">Virtual</div>
+                    <div class="tile-desc">Runtime polymorphism</div>
+                </a>
+                <a href="#templates" class="hero-tile">
+                    <div class="tile-icon">📐</div>
+                    <div class="tile-title">Templates</div>
+                    <div class="tile-desc">Generic programming</div>
+                </a>
+                <a href="#exceptions" class="hero-tile">
+                    <div class="tile-icon">🛡️</div>
+                    <div class="tile-title">Exceptions</div>
+                    <div class="tile-desc">Error handling</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== RECURSION ==================== -->
+    <section class="section" id="recursion">
+        <div class="section-tag coral">MODULE 01</div>
+        <h2 class="section-title">Recursion</h2>
+        <p class="section-intro">Functions that call themselves to solve problems by breaking them into smaller subproblems. Essential for trees, graphs, and divide-and-conquer algorithms.</p>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon coral">📍</div>
+                <h3 class="feature-title">Base Case</h3>
+                <p class="feature-text">Condition that stops recursion and returns a direct value.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon orange">🔁</div>
+                <h3 class="feature-title">Recursive Case</h3>
+                <p class="feature-text">Calls itself with a smaller/simpler input.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon teal">📚</div>
+                <h3 class="feature-title">Call Stack</h3>
+                <p class="feature-text">Each call creates a new stack frame with its own variables.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon lavender">⚡</div>
+                <h3 class="feature-title">Tail Recursion</h3>
+                <p class="feature-text">Optimization where recursive call is the last operation.</p>
+            </div>
+        </div>
+
+        <!-- Call Stack Visualization -->
+        <div class="recursion-visual">
+            <div class="recursion-title">📚 Call Stack for factorial(4)</div>
+            <div class="call-stack">
+                <div class="stack-frame"><span>factorial(4)</span> <span class="return-val">→ 4 × 6 = 24</span></div>
+                <div class="stack-frame"><span>factorial(3)</span> <span class="return-val">→ 3 × 2 = 6</span></div>
+                <div class="stack-frame"><span>factorial(2)</span> <span class="return-val">→ 2 × 1 = 2</span></div>
+                <div class="stack-frame"><span>factorial(1)</span> <span class="return-val">→ 1 × 1 = 1</span></div>
+                <div class="stack-frame"><span>factorial(0)</span> <span class="return-val">→ 1 (base case)</span></div>
+            </div>
+        </div>
+
+        <!-- Factorial Example -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar coral"></span>Factorial Function</h3>
+            <p>Classic example: n! = n × (n-1) × (n-2) × ... × 1</p>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">factorial.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// Recursive factorial</span>
+<span class="ty">long long</span> <span class="fn">factorial</span>(<span class="ty">int</span> n) {
+    <span class="cm">// Base case</span>
+    <span class="kw">if</span> (n <span class="op">&lt;=</span> <span class="nu">1</span>) {
+        <span class="kw">return</span> <span class="nu">1</span>;
+    }
+    <span class="cm">// Recursive case</span>
+    <span class="kw">return</span> n <span class="op">*</span> <span class="fn">factorial</span>(n <span class="op">-</span> <span class="nu">1</span>);
+}
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;=</span> <span class="nu">10</span>; i<span class="op">++</span>) {
+        cout <span class="op">&lt;&lt;</span> i <span class="op">&lt;&lt;</span> <span class="st">"! = "</span> <span class="op">&lt;&lt;</span> <span class="fn">factorial</span>(i) <span class="op">&lt;&lt;</span> endl;
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fibonacci -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar coral"></span>Fibonacci Sequence</h3>
+            <p>Each number is the sum of the two preceding ones: 0, 1, 1, 2, 3, 5, 8, 13...</p>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">fibonacci.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// Simple recursive (inefficient for large n)</span>
+<span class="ty">int</span> <span class="fn">fibSimple</span>(<span class="ty">int</span> n) {
+    <span class="kw">if</span> (n <span class="op">&lt;=</span> <span class="nu">1</span>) <span class="kw">return</span> n;
+    <span class="kw">return</span> <span class="fn">fibSimple</span>(n <span class="op">-</span> <span class="nu">1</span>) <span class="op">+</span> <span class="fn">fibSimple</span>(n <span class="op">-</span> <span class="nu">2</span>);
+}
+
+<span class="cm">// Tail-recursive (optimized)</span>
+<span class="ty">int</span> <span class="fn">fibTail</span>(<span class="ty">int</span> n, <span class="ty">int</span> a <span class="op">=</span> <span class="nu">0</span>, <span class="ty">int</span> b <span class="op">=</span> <span class="nu">1</span>) {
+    <span class="kw">if</span> (n <span class="op">==</span> <span class="nu">0</span>) <span class="kw">return</span> a;
+    <span class="kw">if</span> (n <span class="op">==</span> <span class="nu">1</span>) <span class="kw">return</span> b;
+    <span class="kw">return</span> <span class="fn">fibTail</span>(n <span class="op">-</span> <span class="nu">1</span>, b, a <span class="op">+</span> b);
+}
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Fibonacci sequence:"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;=</span> <span class="nu">15</span>; i<span class="op">++</span>) {
+        cout <span class="op">&lt;&lt;</span> <span class="fn">fibTail</span>(i) <span class="op">&lt;&lt;</span> <span class="st">" "</span>;
+    }
+    cout <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-title">⚠️ Exponential Time Complexity</div>
+                <p>Simple recursive Fibonacci is O(2^n). For large n, use memoization, tail recursion, or iteration instead.</p>
+            </div>
+        </div>
+
+        <!-- Binary Search -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar coral"></span>Recursive Binary Search</h3>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">binary_search.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="ty">int</span> <span class="fn">binarySearch</span>(<span class="ty">int</span> arr[], <span class="ty">int</span> left, <span class="ty">int</span> right, <span class="ty">int</span> target) {
+    <span class="cm">// Base case: not found</span>
+    <span class="kw">if</span> (left <span class="op">&gt;</span> right) <span class="kw">return</span> <span class="op">-</span><span class="nu">1</span>;
+    
+    <span class="ty">int</span> mid <span class="op">=</span> left <span class="op">+</span> (right <span class="op">-</span> left) <span class="op">/</span> <span class="nu">2</span>;
+    
+    <span class="cm">// Base case: found</span>
+    <span class="kw">if</span> (arr[mid] <span class="op">==</span> target) <span class="kw">return</span> mid;
+    
+    <span class="cm">// Recursive cases</span>
+    <span class="kw">if</span> (arr[mid] <span class="op">&gt;</span> target) {
+        <span class="kw">return</span> <span class="fn">binarySearch</span>(arr, left, mid <span class="op">-</span> <span class="nu">1</span>, target);
+    }
+    <span class="kw">return</span> <span class="fn">binarySearch</span>(arr, mid <span class="op">+</span> <span class="nu">1</span>, right, target);
+}
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">int</span> arr[] <span class="op">=</span> {<span class="nu">2</span>, <span class="nu">5</span>, <span class="nu">8</span>, <span class="nu">12</span>, <span class="nu">16</span>, <span class="nu">23</span>, <span class="nu">38</span>, <span class="nu">45</span>, <span class="nu">56</span>, <span class="nu">72</span>};
+    <span class="ty">int</span> n <span class="op">=</span> <span class="kw">sizeof</span>(arr) <span class="op">/</span> <span class="kw">sizeof</span>(arr[<span class="nu">0</span>]);
+    
+    <span class="ty">int</span> target <span class="op">=</span> <span class="nu">23</span>;
+    <span class="ty">int</span> result <span class="op">=</span> <span class="fn">binarySearch</span>(arr, <span class="nu">0</span>, n <span class="op">-</span> <span class="nu">1</span>, target);
+    
+    <span class="kw">if</span> (result <span class="op">!=</span> <span class="op">-</span><span class="nu">1</span>) {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Found "</span> <span class="op">&lt;&lt;</span> target <span class="op">&lt;&lt;</span> <span class="st">" at index "</span> <span class="op">&lt;&lt;</span> result <span class="op">&lt;&lt;</span> endl;
+    } <span class="kw">else</span> {
+        cout <span class="op">&lt;&lt;</span> target <span class="op">&lt;&lt;</span> <span class="st">" not found"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== VIRTUAL FUNCTIONS ==================== -->
+    <section class="section" id="virtual">
+        <div class="section-tag teal">MODULE 02</div>
+        <h2 class="section-title">Virtual Functions</h2>
+        <p class="section-intro">Enable runtime polymorphism by allowing derived classes to override base class methods. The correct function is called based on the actual object type.</p>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon teal">🎭</div>
+                <h3 class="feature-title">Polymorphism</h3>
+                <p class="feature-text">One interface, multiple implementations at runtime.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon lavender">📋</div>
+                <h3 class="feature-title">vtable</h3>
+                <p class="feature-text">Lookup table of virtual function pointers.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon sky">🔧</div>
+                <h3 class="feature-title">override</h3>
+                <p class="feature-text">Explicitly mark function as overriding base.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon coral">🚫</div>
+                <h3 class="feature-title">Pure Virtual</h3>
+                <p class="feature-text">= 0 makes class abstract, must be overridden.</p>
+            </div>
+        </div>
+
+        <!-- Inheritance Diagram -->
+        <div class="diagram">
+            <div class="diagram-box base">class Shape (abstract)</div>
+            <div class="diagram-arrow">↓</div>
+            <div class="diagram-row">
+                <div class="diagram-box derived">class Circle</div>
+                <div class="diagram-box derived">class Rectangle</div>
+                <div class="diagram-box derived">class Triangle</div>
+            </div>
+        </div>
+
+        <!-- Basic Virtual -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar teal"></span>Virtual Function Basics</h3>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">virtual_basic.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="ty">Animal</span> {
+<span class="kw">public</span>:
+    <span class="cm">// Virtual function - can be overridden</span>
+    <span class="kw">virtual</span> <span class="ty">void</span> <span class="fn">speak</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Some sound..."</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cm">// Virtual destructor - ALWAYS for base classes!</span>
+    <span class="kw">virtual</span> <span class="op">~</span><span class="fn">Animal</span>() {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Animal destroyed"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="kw">class</span> <span class="ty">Dog</span> <span class="op">:</span> <span class="kw">public</span> <span class="ty">Animal</span> {
+<span class="kw">public</span>:
+    <span class="ty">void</span> <span class="fn">speak</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Woof! Woof!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    <span class="op">~</span><span class="fn">Dog</span>() { cout <span class="op">&lt;&lt;</span> <span class="st">"Dog destroyed"</span> <span class="op">&lt;&lt;</span> endl; }
+};
+
+<span class="kw">class</span> <span class="ty">Cat</span> <span class="op">:</span> <span class="kw">public</span> <span class="ty">Animal</span> {
+<span class="kw">public</span>:
+    <span class="ty">void</span> <span class="fn">speak</span>() <span class="kw">override</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Meow!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    <span class="op">~</span><span class="fn">Cat</span>() { cout <span class="op">&lt;&lt;</span> <span class="st">"Cat destroyed"</span> <span class="op">&lt;&lt;</span> endl; }
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Polymorphism via base pointer</span>
+    <span class="ty">Animal</span><span class="op">*</span> animals[<span class="nu">3</span>];
+    animals[<span class="nu">0</span>] <span class="op">=</span> <span class="kw">new</span> <span class="ty">Animal</span>();
+    animals[<span class="nu">1</span>] <span class="op">=</span> <span class="kw">new</span> <span class="ty">Dog</span>();
+    animals[<span class="nu">2</span>] <span class="op">=</span> <span class="kw">new</span> <span class="ty">Cat</span>();
+    
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;</span> <span class="nu">3</span>; i<span class="op">++</span>) {
+        animals[i]<span class="op">-&gt;</span><span class="fn">speak</span>();  <span class="cm">// Correct version called!</span>
+    }
+    
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;</span> <span class="nu">3</span>; i<span class="op">++</span>) {
+        <span class="kw">delete</span> animals[i];
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="callout danger">
+                <div class="callout-title">🚨 Always Use Virtual Destructors</div>
+                <p>If a class has virtual functions and might be used polymorphically, always make the destructor virtual. Otherwise, deleting through a base pointer causes undefined behavior!</p>
+            </div>
+        </div>
+
+        <!-- Pure Virtual / Abstract -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar teal"></span>Abstract Classes (Pure Virtual)</h3>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">abstract_class.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;cmath&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// Abstract class - cannot instantiate</span>
+<span class="kw">class</span> <span class="ty">Shape</span> {
+<span class="kw">public</span>:
+    <span class="cm">// Pure virtual functions (= 0)</span>
+    <span class="kw">virtual</span> <span class="ty">double</span> <span class="fn">area</span>() <span class="kw">const</span> <span class="op">=</span> <span class="nu">0</span>;
+    <span class="kw">virtual</span> <span class="ty">double</span> <span class="fn">perimeter</span>() <span class="kw">const</span> <span class="op">=</span> <span class="nu">0</span>;
+    <span class="kw">virtual</span> <span class="ty">void</span> <span class="fn">draw</span>() <span class="kw">const</span> <span class="op">=</span> <span class="nu">0</span>;
+    
+    <span class="kw">virtual</span> <span class="op">~</span><span class="fn">Shape</span>() {}
+};
+
+<span class="kw">class</span> <span class="ty">Circle</span> <span class="op">:</span> <span class="kw">public</span> <span class="ty">Shape</span> {
+    <span class="ty">double</span> radius;
+<span class="kw">public</span>:
+    <span class="fn">Circle</span>(<span class="ty">double</span> r) <span class="op">:</span> radius(r) {}
+    
+    <span class="ty">double</span> <span class="fn">area</span>() <span class="kw">const override</span> {
+        <span class="kw">return</span> M_PI <span class="op">*</span> radius <span class="op">*</span> radius;
+    }
+    <span class="ty">double</span> <span class="fn">perimeter</span>() <span class="kw">const override</span> {
+        <span class="kw">return</span> <span class="nu">2</span> <span class="op">*</span> M_PI <span class="op">*</span> radius;
+    }
+    <span class="ty">void</span> <span class="fn">draw</span>() <span class="kw">const override</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Drawing circle with r="</span> <span class="op">&lt;&lt;</span> radius <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="kw">class</span> <span class="ty">Rectangle</span> <span class="op">:</span> <span class="kw">public</span> <span class="ty">Shape</span> {
+    <span class="ty">double</span> w, h;
+<span class="kw">public</span>:
+    <span class="fn">Rectangle</span>(<span class="ty">double</span> width, <span class="ty">double</span> height) <span class="op">:</span> w(width), h(height) {}
+    
+    <span class="ty">double</span> <span class="fn">area</span>() <span class="kw">const override</span> { <span class="kw">return</span> w <span class="op">*</span> h; }
+    <span class="ty">double</span> <span class="fn">perimeter</span>() <span class="kw">const override</span> { <span class="kw">return</span> <span class="nu">2</span> <span class="op">*</span> (w <span class="op">+</span> h); }
+    <span class="ty">void</span> <span class="fn">draw</span>() <span class="kw">const override</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Drawing rect "</span> <span class="op">&lt;&lt;</span> w <span class="op">&lt;&lt;</span> <span class="st">"x"</span> <span class="op">&lt;&lt;</span> h <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Shape s;  // ERROR: cannot instantiate abstract class</span>
+    
+    <span class="ty">Shape</span><span class="op">*</span> shapes[<span class="nu">2</span>];
+    shapes[<span class="nu">0</span>] <span class="op">=</span> <span class="kw">new</span> <span class="ty">Circle</span>(<span class="nu">5</span>);
+    shapes[<span class="nu">1</span>] <span class="op">=</span> <span class="kw">new</span> <span class="ty">Rectangle</span>(<span class="nu">4</span>, <span class="nu">6</span>);
+    
+    <span class="kw">for</span> (<span class="ty">int</span> i <span class="op">=</span> <span class="nu">0</span>; i <span class="op">&lt;</span> <span class="nu">2</span>; i<span class="op">++</span>) {
+        shapes[i]<span class="op">-&gt;</span><span class="fn">draw</span>();
+        cout <span class="op">&lt;&lt;</span> <span class="st">"  Area: "</span> <span class="op">&lt;&lt;</span> shapes[i]<span class="op">-&gt;</span><span class="fn">area</span>() <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> <span class="st">"  Perimeter: "</span> <span class="op">&lt;&lt;</span> shapes[i]<span class="op">-&gt;</span><span class="fn">perimeter</span>() <span class="op">&lt;&lt;</span> endl;
+        <span class="kw">delete</span> shapes[i];
+    }
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison -->
+        <div class="compare-blocks">
+            <div class="compare-block a">
+                <div class="compare-badge">WITHOUT VIRTUAL</div>
+                <h4 class="compare-heading">Static Binding</h4>
+                <ul class="compare-points">
+                    <li>Decided at compile time</li>
+                    <li>Based on pointer/reference type</li>
+                    <li>Faster (no vtable lookup)</li>
+                    <li>Base version always called</li>
+                </ul>
+            </div>
+            <div class="compare-block b">
+                <div class="compare-badge">WITH VIRTUAL</div>
+                <h4 class="compare-heading">Dynamic Binding</h4>
+                <ul class="compare-points">
+                    <li>Decided at runtime</li>
+                    <li>Based on actual object type</li>
+                    <li>Slight overhead (vtable)</li>
+                    <li>Correct override called</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TEMPLATES ==================== -->
+    <section class="section" id="templates">
+        <div class="section-tag lavender">MODULE 03</div>
+        <h2 class="section-title">Templates</h2>
+        <p class="section-intro">Write generic, type-independent code that works with any data type. The compiler generates specific versions at compile time.</p>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon lavender">🔧</div>
+                <h3 class="feature-title">Function Templates</h3>
+                <p class="feature-text">Generic functions that work with any type.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon coral">📦</div>
+                <h3 class="feature-title">Class Templates</h3>
+                <p class="feature-text">Generic classes like vector&lt;T&gt;.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon teal">⚡</div>
+                <h3 class="feature-title">Compile-Time</h3>
+                <p class="feature-text">Code generated at compile time, zero runtime cost.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon orange">🎯</div>
+                <h3 class="feature-title">Specialization</h3>
+                <p class="feature-text">Custom implementation for specific types.</p>
+            </div>
+        </div>
+
+        <!-- Function Template -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar lavender"></span>Function Templates</h3>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">func_template.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// Function template</span>
+<span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> <span class="ty">T</span><span class="op">&gt;</span>
+<span class="ty">T</span> <span class="fn">maximum</span>(<span class="ty">T</span> a, <span class="ty">T</span> b) {
+    <span class="kw">return</span> (a <span class="op">&gt;</span> b) <span class="op">?</span> a <span class="op">:</span> b;
+}
+
+<span class="cm">// Template with multiple types</span>
+<span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> <span class="ty">T1</span>, <span class="kw">typename</span> <span class="ty">T2</span><span class="op">&gt;</span>
+<span class="ty">void</span> <span class="fn">printPair</span>(<span class="ty">T1</span> first, <span class="ty">T2</span> second) {
+    cout <span class="op">&lt;&lt;</span> <span class="st">"("</span> <span class="op">&lt;&lt;</span> first <span class="op">&lt;&lt;</span> <span class="st">", "</span> <span class="op">&lt;&lt;</span> second <span class="op">&lt;&lt;</span> <span class="st">")"</span> <span class="op">&lt;&lt;</span> endl;
+}
+
+<span class="cm">// Template to swap any type</span>
+<span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> <span class="ty">T</span><span class="op">&gt;</span>
+<span class="ty">void</span> <span class="fn">mySwap</span>(<span class="ty">T</span><span class="op">&amp;</span> a, <span class="ty">T</span><span class="op">&amp;</span> b) {
+    <span class="ty">T</span> temp <span class="op">=</span> a;
+    a <span class="op">=</span> b;
+    b <span class="op">=</span> temp;
+}
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Automatic type deduction</span>
+    cout <span class="op">&lt;&lt;</span> <span class="st">"max(10, 20) = "</span> <span class="op">&lt;&lt;</span> <span class="fn">maximum</span>(<span class="nu">10</span>, <span class="nu">20</span>) <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"max(3.14, 2.72) = "</span> <span class="op">&lt;&lt;</span> <span class="fn">maximum</span>(<span class="nu">3.14</span>, <span class="nu">2.72</span>) <span class="op">&lt;&lt;</span> endl;
+    cout <span class="op">&lt;&lt;</span> <span class="st">"max('a', 'z') = "</span> <span class="op">&lt;&lt;</span> <span class="fn">maximum</span>(<span class="st">'a'</span>, <span class="st">'z'</span>) <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Explicit type specification</span>
+    cout <span class="op">&lt;&lt;</span> <span class="st">"max&lt;string&gt; = "</span> <span class="op">&lt;&lt;</span> <span class="fn">maximum</span><span class="op">&lt;</span><span class="ty">string</span><span class="op">&gt;</span>(<span class="st">"apple"</span>, <span class="st">"banana"</span>) <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="fn">printPair</span>(<span class="nu">42</span>, <span class="st">"answer"</span>);
+    <span class="fn">printPair</span>(<span class="nu">3.14</span>, <span class="nu">159</span>);
+    
+    <span class="ty">int</span> x <span class="op">=</span> <span class="nu">5</span>, y <span class="op">=</span> <span class="nu">10</span>;
+    <span class="fn">mySwap</span>(x, y);
+    cout <span class="op">&lt;&lt;</span> <span class="st">"After swap: x="</span> <span class="op">&lt;&lt;</span> x <span class="op">&lt;&lt;</span> <span class="st">", y="</span> <span class="op">&lt;&lt;</span> y <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Class Template -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar lavender"></span>Class Templates</h3>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">class_template.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// Generic Stack class</span>
+<span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> <span class="ty">T</span>, <span class="ty">int</span> SIZE <span class="op">=</span> <span class="nu">100</span><span class="op">&gt;</span>
+<span class="kw">class</span> <span class="ty">Stack</span> {
+<span class="kw">private</span>:
+    <span class="ty">T</span> data[SIZE];
+    <span class="ty">int</span> top;
+
+<span class="kw">public</span>:
+    <span class="fn">Stack</span>() <span class="op">:</span> top(<span class="op">-</span><span class="nu">1</span>) {}
+    
+    <span class="ty">void</span> <span class="fn">push</span>(<span class="kw">const</span> <span class="ty">T</span><span class="op">&amp;</span> item) {
+        <span class="kw">if</span> (top <span class="op">&gt;=</span> SIZE <span class="op">-</span> <span class="nu">1</span>) {
+            cout <span class="op">&lt;&lt;</span> <span class="st">"Stack overflow!"</span> <span class="op">&lt;&lt;</span> endl;
+            <span class="kw">return</span>;
+        }
+        data[<span class="op">++</span>top] <span class="op">=</span> item;
+    }
+    
+    <span class="ty">T</span> <span class="fn">pop</span>() {
+        <span class="kw">if</span> (top <span class="op">&lt;</span> <span class="nu">0</span>) {
+            cout <span class="op">&lt;&lt;</span> <span class="st">"Stack underflow!"</span> <span class="op">&lt;&lt;</span> endl;
+            <span class="kw">return</span> <span class="ty">T</span>();
+        }
+        <span class="kw">return</span> data[top<span class="op">--</span>];
+    }
+    
+    <span class="ty">bool</span> <span class="fn">isEmpty</span>() <span class="kw">const</span> { <span class="kw">return</span> top <span class="op">&lt;</span> <span class="nu">0</span>; }
+    <span class="ty">int</span> <span class="fn">size</span>() <span class="kw">const</span> { <span class="kw">return</span> top <span class="op">+</span> <span class="nu">1</span>; }
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Stack of integers with default size</span>
+    <span class="ty">Stack</span><span class="op">&lt;</span><span class="ty">int</span><span class="op">&gt;</span> intStack;
+    intStack.<span class="fn">push</span>(<span class="nu">10</span>);
+    intStack.<span class="fn">push</span>(<span class="nu">20</span>);
+    intStack.<span class="fn">push</span>(<span class="nu">30</span>);
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Int stack size: "</span> <span class="op">&lt;&lt;</span> intStack.<span class="fn">size</span>() <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">while</span> (<span class="op">!</span>intStack.<span class="fn">isEmpty</span>()) {
+        cout <span class="op">&lt;&lt;</span> intStack.<span class="fn">pop</span>() <span class="op">&lt;&lt;</span> <span class="st">" "</span>;
+    }
+    cout <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="cm">// Stack of strings with custom size</span>
+    <span class="ty">Stack</span><span class="op">&lt;</span><span class="ty">string</span>, <span class="nu">5</span><span class="op">&gt;</span> strStack;
+    strStack.<span class="fn">push</span>(<span class="st">"Hello"</span>);
+    strStack.<span class="fn">push</span>(<span class="st">"World"</span>);
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Top: "</span> <span class="op">&lt;&lt;</span> strStack.<span class="fn">pop</span>() <span class="op">&lt;&lt;</span> endl;
+    
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="callout tip">
+                <div class="callout-title">💡 Template Parameters</div>
+                <p>Templates can have type parameters (<code class="inline">typename T</code>) and non-type parameters (<code class="inline">int SIZE</code>). Non-type params must be compile-time constants.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== EXCEPTION HANDLING ==================== -->
+    <section class="section" id="exceptions">
+        <div class="section-tag orange">MODULE 04</div>
+        <h2 class="section-title">Exception Handling</h2>
+        <p class="section-intro">Handle errors gracefully without crashing. Separate error-handling logic from normal code flow using try, catch, and throw.</p>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon coral">🎯</div>
+                <h3 class="feature-title">throw</h3>
+                <p class="feature-text">Signal an error by throwing an exception object.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon teal">🧪</div>
+                <h3 class="feature-title">try</h3>
+                <p class="feature-text">Block where exceptions may occur.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon lavender">🎣</div>
+                <h3 class="feature-title">catch</h3>
+                <p class="feature-text">Handle specific exception types.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon orange">📚</div>
+                <h3 class="feature-title">std::exception</h3>
+                <p class="feature-text">Base class for standard exceptions.</p>
+            </div>
+        </div>
+
+        <!-- Exception Table -->
+        <div class="data-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Exception Class</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code class="inline">std::exception</code></td><td>Base class for all standard exceptions</td></tr>
+                    <tr><td><code class="inline">std::runtime_error</code></td><td>Errors detectable only at runtime</td></tr>
+                    <tr><td><code class="inline">std::logic_error</code></td><td>Errors due to program logic</td></tr>
+                    <tr><td><code class="inline">std::invalid_argument</code></td><td>Invalid argument passed to function</td></tr>
+                    <tr><td><code class="inline">std::out_of_range</code></td><td>Index out of valid range</td></tr>
+                    <tr><td><code class="inline">std::bad_alloc</code></td><td>Memory allocation failure</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Basic Exception -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar orange"></span>Basic Exception Handling</h3>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">exception_basic.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;stdexcept&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="ty">double</span> <span class="fn">divide</span>(<span class="ty">double</span> a, <span class="ty">double</span> b) {
+    <span class="kw">if</span> (b <span class="op">==</span> <span class="nu">0</span>) {
+        <span class="kw">throw</span> <span class="ex">runtime_error</span>(<span class="st">"Division by zero!"</span>);
+    }
+    <span class="kw">return</span> a <span class="op">/</span> b;
+}
+
+<span class="ty">int</span> <span class="fn">getElement</span>(<span class="ty">int</span> arr[], <span class="ty">int</span> size, <span class="ty">int</span> index) {
+    <span class="kw">if</span> (index <span class="op">&lt;</span> <span class="nu">0</span> <span class="op">||</span> index <span class="op">&gt;=</span> size) {
+        <span class="kw">throw</span> <span class="ex">out_of_range</span>(<span class="st">"Index out of bounds!"</span>);
+    }
+    <span class="kw">return</span> arr[index];
+}
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Example 1: Division</span>
+    <span class="kw">try</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"10 / 2 = "</span> <span class="op">&lt;&lt;</span> <span class="fn">divide</span>(<span class="nu">10</span>, <span class="nu">2</span>) <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> <span class="st">"10 / 0 = "</span> <span class="op">&lt;&lt;</span> <span class="fn">divide</span>(<span class="nu">10</span>, <span class="nu">0</span>) <span class="op">&lt;&lt;</span> endl;
+    } <span class="kw">catch</span> (<span class="kw">const</span> <span class="ex">runtime_error</span><span class="op">&amp;</span> e) {
+        cerr <span class="op">&lt;&lt;</span> <span class="st">"Error: "</span> <span class="op">&lt;&lt;</span> e.<span class="fn">what</span>() <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="cm">// Example 2: Array access</span>
+    <span class="ty">int</span> arr[] <span class="op">=</span> {<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>};
+    <span class="kw">try</span> {
+        cout <span class="op">&lt;&lt;</span> <span class="st">"arr[1] = "</span> <span class="op">&lt;&lt;</span> <span class="fn">getElement</span>(arr, <span class="nu">3</span>, <span class="nu">1</span>) <span class="op">&lt;&lt;</span> endl;
+        cout <span class="op">&lt;&lt;</span> <span class="st">"arr[10] = "</span> <span class="op">&lt;&lt;</span> <span class="fn">getElement</span>(arr, <span class="nu">3</span>, <span class="nu">10</span>) <span class="op">&lt;&lt;</span> endl;
+    } <span class="kw">catch</span> (<span class="kw">const</span> <span class="ex">out_of_range</span><span class="op">&amp;</span> e) {
+        cerr <span class="op">&lt;&lt;</span> <span class="st">"Error: "</span> <span class="op">&lt;&lt;</span> e.<span class="fn">what</span>() <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Program continues..."</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Exceptions -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar orange"></span>Custom Exception Classes</h3>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">custom_exception.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;exception&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;string&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// Custom exception class</span>
+<span class="kw">class</span> <span class="ex">BankException</span> <span class="op">:</span> <span class="kw">public</span> exception {
+<span class="kw">protected</span>:
+    <span class="ty">string</span> message;
+<span class="kw">public</span>:
+    <span class="fn">BankException</span>(<span class="kw">const</span> <span class="ty">string</span><span class="op">&amp;</span> msg) <span class="op">:</span> message(msg) {}
+    <span class="kw">const</span> <span class="ty">char</span><span class="op">*</span> <span class="fn">what</span>() <span class="kw">const noexcept override</span> {
+        <span class="kw">return</span> message.<span class="fn">c_str</span>();
+    }
+};
+
+<span class="kw">class</span> <span class="ex">InsufficientFunds</span> <span class="op">:</span> <span class="kw">public</span> <span class="ex">BankException</span> {
+<span class="kw">public</span>:
+    <span class="ty">double</span> amount, balance;
+    <span class="fn">InsufficientFunds</span>(<span class="ty">double</span> amt, <span class="ty">double</span> bal) 
+        <span class="op">:</span> <span class="ex">BankException</span>(<span class="st">"Insufficient funds"</span>), amount(amt), balance(bal) {}
+};
+
+<span class="kw">class</span> <span class="ty">Account</span> {
+<span class="kw">private</span>:
+    <span class="ty">double</span> balance;
+<span class="kw">public</span>:
+    <span class="fn">Account</span>(<span class="ty">double</span> initial) <span class="op">:</span> balance(initial) {}
+    
+    <span class="ty">void</span> <span class="fn">withdraw</span>(<span class="ty">double</span> amount) {
+        <span class="kw">if</span> (amount <span class="op">&gt;</span> balance) {
+            <span class="kw">throw</span> <span class="ex">InsufficientFunds</span>(amount, balance);
+        }
+        balance <span class="op">-=</span> amount;
+        cout <span class="op">&lt;&lt;</span> <span class="st">"Withdrew $"</span> <span class="op">&lt;&lt;</span> amount <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="ty">double</span> <span class="fn">getBalance</span>() <span class="kw">const</span> { <span class="kw">return</span> balance; }
+};
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="ty">Account</span> acc(<span class="nu">100</span>);
+    
+    <span class="kw">try</span> {
+        acc.<span class="fn">withdraw</span>(<span class="nu">30</span>);
+        acc.<span class="fn">withdraw</span>(<span class="nu">50</span>);
+        acc.<span class="fn">withdraw</span>(<span class="nu">50</span>);  <span class="cm">// This will throw</span>
+    } <span class="kw">catch</span> (<span class="kw">const</span> <span class="ex">InsufficientFunds</span><span class="op">&amp;</span> e) {
+        cerr <span class="op">&lt;&lt;</span> <span class="st">"Error: "</span> <span class="op">&lt;&lt;</span> e.<span class="fn">what</span>() <span class="op">&lt;&lt;</span> endl;
+        cerr <span class="op">&lt;&lt;</span> <span class="st">"  Tried: $"</span> <span class="op">&lt;&lt;</span> e.amount <span class="op">&lt;&lt;</span> endl;
+        cerr <span class="op">&lt;&lt;</span> <span class="st">"  Available: $"</span> <span class="op">&lt;&lt;</span> e.balance <span class="op">&lt;&lt;</span> endl;
+    } <span class="kw">catch</span> (<span class="kw">const</span> <span class="ex">BankException</span><span class="op">&amp;</span> e) {
+        cerr <span class="op">&lt;&lt;</span> <span class="st">"Bank error: "</span> <span class="op">&lt;&lt;</span> e.<span class="fn">what</span>() <span class="op">&lt;&lt;</span> endl;
+    } <span class="kw">catch</span> (...) {
+        cerr <span class="op">&lt;&lt;</span> <span class="st">"Unknown error!"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"Final balance: $"</span> <span class="op">&lt;&lt;</span> acc.<span class="fn">getBalance</span>() <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- RAII -->
+        <div class="subsection">
+            <h3 class="subsection-header"><span class="bar orange"></span>Exception Safety (RAII)</h3>
+
+            <div class="code-editor">
+                <div class="editor-toolbar">
+                    <div class="toolbar-left">
+                        <div class="traffic-lights">
+                            <span class="light red"></span>
+                            <span class="light yellow"></span>
+                            <span class="light green"></span>
+                        </div>
+                        <span class="file-name">raii.cpp</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="editor-btn btn-copy" onclick="copyCode(this)">📋 Copy</button>
+                        <button class="editor-btn btn-run" onclick="runCode(this)">▶ Run</button>
+                    </div>
+                </div>
+                <div class="editor-content">
+<pre><code><span class="pp">#include</span> <span class="st">&lt;iostream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;fstream&gt;</span>
+<span class="pp">#include</span> <span class="st">&lt;memory&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="cm">// RAII: Resource Acquisition Is Initialization</span>
+<span class="cm">// Resources are automatically cleaned up when scope ends</span>
+
+<span class="kw">class</span> <span class="ty">FileGuard</span> {
+<span class="kw">private</span>:
+    <span class="ty">ofstream</span> file;
+<span class="kw">public</span>:
+    <span class="fn">FileGuard</span>(<span class="kw">const</span> <span class="ty">string</span><span class="op">&amp;</span> name) <span class="op">:</span> file(name) {
+        <span class="kw">if</span> (<span class="op">!</span>file) <span class="kw">throw</span> <span class="ex">runtime_error</span>(<span class="st">"Cannot open file"</span>);
+        cout <span class="op">&lt;&lt;</span> <span class="st">"File opened"</span> <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    <span class="op">~</span><span class="fn">FileGuard</span>() {
+        <span class="kw">if</span> (file.<span class="fn">is_open</span>()) {
+            file.<span class="fn">close</span>();
+            cout <span class="op">&lt;&lt;</span> <span class="st">"File closed"</span> <span class="op">&lt;&lt;</span> endl;
+        }
+    }
+    
+    <span class="ty">void</span> <span class="fn">write</span>(<span class="kw">const</span> <span class="ty">string</span><span class="op">&amp;</span> data) {
+        file <span class="op">&lt;&lt;</span> data <span class="op">&lt;&lt;</span> endl;
+    }
+};
+
+<span class="ty">void</span> <span class="fn">processData</span>(<span class="ty">bool</span> error) {
+    <span class="ty">FileGuard</span> guard(<span class="st">"output.txt"</span>);
+    guard.<span class="fn">write</span>(<span class="st">"Starting process..."</span>);
+    
+    <span class="kw">if</span> (error) {
+        <span class="kw">throw</span> <span class="ex">runtime_error</span>(<span class="st">"Processing failed!"</span>);
+        <span class="cm">// FileGuard destructor still runs!</span>
+    }
+    
+    guard.<span class="fn">write</span>(<span class="st">"Done!"</span>);
+}
+
+<span class="ty">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Using smart pointers (modern RAII)</span>
+    <span class="kw">try</span> {
+        <span class="ty">unique_ptr</span><span class="op">&lt;</span><span class="ty">int</span>[]<span class="op">&gt;</span> arr(<span class="kw">new</span> <span class="ty">int</span>[<span class="nu">100</span>]);
+        <span class="cm">// No need for delete[] - automatic!</span>
+        
+        <span class="fn">processData</span>(<span class="kw">true</span>);
+    } <span class="kw">catch</span> (<span class="kw">const</span> exception<span class="op">&amp;</span> e) {
+        cerr <span class="op">&lt;&lt;</span> <span class="st">"Caught: "</span> <span class="op">&lt;&lt;</span> e.<span class="fn">what</span>() <span class="op">&lt;&lt;</span> endl;
+    }
+    
+    cout <span class="op">&lt;&lt;</span> <span class="st">"All resources cleaned up!"</span> <span class="op">&lt;&lt;</span> endl;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="callout info">
+                <div class="callout-title">📘 RAII Pattern</div>
+                <p>Use RAII (constructors acquire, destructors release) to guarantee cleanup even when exceptions occur. Smart pointers, lock guards, and file streams use this pattern.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>C++ Mastery Guide | Recursion • Virtual Functions • Templates • Exception Handling</p>
+    </footer>
+
+    <!-- Chatbot -->
+    <button class="chat-fab" id="chatFab">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+    </button>
+
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-top">
+            <div class="chat-info">
+                <div class="chat-icon">🧠</div>
+                <div>
+                    <div class="chat-name">C++ Tutor</div>
+                    <div class="chat-status">Powered by Claude</div>
+                </div>
+            </div>
+            <button class="chat-x" id="chatX">×</button>
+        </div>
+        <div class="chat-log" id="chatLog">
+            <div class="bubble bot">Hi! 👋 Ask me about recursion, virtual functions, templates, or exception handling in C++!</div>
+        </div>
+        <div class="chat-bottom">
+            <input type="text" class="chat-field" id="chatField" placeholder="Type your question..." autocomplete="off">
+            <button class="chat-go" id="chatGo">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const pct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('readingProgress').style.width = pct + '%';
+        });
+
+        // Copy code
+        function copyCode(btn) {
+            const code = btn.closest('.code-editor').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.classList.add('success');
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => { btn.classList.remove('success'); btn.textContent = '📋 Copy'; }, 2000);
+            });
+        }
+
+        // Run code
+        function runCode(btn) {
+            const code = btn.closest('.code-editor').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied! Paste in the online compiler.');
+                window.open('https://www.programiz.com/cpp-programming/online-compiler/', '_blank');
+            });
+        }
+
+        // Chatbot
+        const chatFab = document.getElementById('chatFab');
+        const chatModal = document.getElementById('chatModal');
+        const chatX = document.getElementById('chatX');
+        const chatField = document.getElementById('chatField');
+        const chatGo = document.getElementById('chatGo');
+        const chatLog = document.getElementById('chatLog');
+
+        chatFab.onclick = () => chatModal.classList.toggle('visible');
+        chatX.onclick = () => chatModal.classList.remove('visible');
+
+        function addBubble(text, isUser) {
+            const b = document.createElement('div');
+            b.className = `bubble ${isUser ? 'human' : 'bot'}`;
+            b.textContent = text;
+            chatLog.appendChild(b);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        function fallback(q) {
+            const l = q.toLowerCase();
+            if (l.includes('recursion') || l.includes('recursive')) {
+                return "Recursion: A function that calls itself. Key components: (1) Base case - stops recursion, (2) Recursive case - calls itself with simpler input. Used for trees, graphs, divide-and-conquer. Watch for stack overflow with deep recursion!";
+            }
+            if (l.includes('virtual') || l.includes('polymorphism')) {
+                return "Virtual functions enable runtime polymorphism. Declare with 'virtual' keyword. Use 'override' in derived classes. Pure virtual (= 0) makes class abstract. Always use virtual destructors in base classes with virtual functions!";
+            }
+            if (l.includes('template')) {
+                return "Templates enable generic programming. Function templates: template<typename T> T func(T x). Class templates: template<typename T> class Container. Compiler generates specific versions at compile time - zero runtime overhead!";
+            }
+            if (l.includes('exception') || l.includes('throw') || l.includes('catch') || l.includes('try')) {
+                return "Exception handling: try{} catch(){} blocks. throw exceptions for errors. catch(const exception& e) to handle. Use specific exception types. RAII ensures cleanup even when exceptions occur. Always catch by reference!";
+            }
+            if (l.includes('raii')) {
+                return "RAII (Resource Acquisition Is Initialization): Acquire resources in constructors, release in destructors. Guarantees cleanup even with exceptions. Smart pointers (unique_ptr, shared_ptr) use RAII for memory.";
+            }
+            if (l.includes('abstract') || l.includes('pure virtual')) {
+                return "Abstract class: Has at least one pure virtual function (= 0). Cannot instantiate directly. Derived classes must implement all pure virtual functions to be concrete. Used for interfaces and base class contracts.";
+            }
+            if (l.includes('tail recursion') || l.includes('tail')) {
+                return "Tail recursion: The recursive call is the very last operation. Can be optimized by compilers to avoid stack growth. Example: fibTail(n-1, b, a+b) where nothing happens after the call.";
+            }
+            return "I can help with: Recursion (base case, recursive case, call stack), Virtual functions (polymorphism, override, pure virtual), Templates (function/class templates), Exception handling (try/catch/throw, RAII). What would you like to learn?";
+        }
+
+        async function send() {
+            const t = chatField.value.trim();
+            if (!t) return;
+            addBubble(t, true);
+            chatField.value = '';
+            
+            try {
+                const r = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 800,
+                        system: 'You are a C++ tutor. Topics: recursion, virtual functions, templates, exception handling. Give concise answers with code examples.',
+                        messages: [{ role: 'user', content: t }]
+                    })
+                });
+                const d = await r.json();
+                addBubble(d.content?.[0]?.text || fallback(t), false);
+            } catch { addBubble(fallback(t), false); }
+        }
+
+        chatGo.onclick = send;
+        chatField.onkeypress = e => { if (e.key === 'Enter') send(); };
+
+        // Smooth scroll
+        document.querySelectorAll('.nav-item, .hero-tile').forEach(el => {
+            el.onclick = e => {
+                e.preventDefault();
+                const href = el.getAttribute('href');
+                if (href) document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+            };
+        });
+    </script>
+</body>
+</html>
