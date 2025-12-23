@@ -1,0 +1,2830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC125 - C++ OOP Lab | Prof. Khalid Kassou</title>
+    <style>
+        /* ============== CSS RESET & BASE ============== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #3b82f6;
+            --light-blue: #eff6ff;
+            --dark-gray: #1f2937;
+            --light-gray: #f8fafc;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --border-color: #e5e7eb;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+        }
+
+        /* ============== HEADER ============== */
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-info {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.95;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-blue);
+        }
+
+        .btn-primary:hover {
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* ============== NAVIGATION ============== */
+        .nav-tabs {
+            background: white;
+            padding: 0.5rem 2rem;
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 76px;
+            z-index: 99;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--dark-gray);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .nav-tab:hover {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .nav-tab.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* ============== MAIN CONTAINER ============== */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ============== SECTIONS ============== */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============== CARDS ============== */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-blue);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .card-icon.blue { background: var(--light-blue); }
+        .card-icon.green { background: #ecfdf5; }
+        .card-icon.purple { background: #f5f3ff; }
+        .card-icon.orange { background: #fffbeb; }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--dark-gray);
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        /* ============== COVER PAGE ============== */
+        .cover-hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent-purple) 100%);
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .cover-hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cover-hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .topic-card {
+            background: var(--light-blue);
+            padding: 1.25rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .topic-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .topic-card h4 {
+            color: var(--primary-blue);
+            font-size: 0.95rem;
+        }
+
+        /* ============== STUDENT INFO FORM ============== */
+        .student-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--dark-gray);
+        }
+
+        .form-group input {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        /* ============== OBJECTIVES ============== */
+        .objectives-list {
+            list-style: none;
+        }
+
+        .objectives-list li {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: #ecfdf5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .objectives-list li::before {
+            content: "✓";
+            color: var(--accent-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* ============== CONCEPT BOX ============== */
+        .concept-box {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #dbeafe 100%);
+            border-left: 4px solid var(--primary-blue);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .concept-box h4 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .concept-box ul {
+            list-style: none;
+        }
+
+        .concept-box li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .concept-box li::before {
+            content: "•";
+            color: var(--primary-blue);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* ============== EXERCISE ============== */
+        .exercise {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--border-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .exercise:hover {
+            border-color: var(--accent-green);
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .exercise-number {
+            background: var(--accent-green);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .exercise-title {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+        }
+
+        .exercise-description {
+            color: #4b5563;
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .exercise-description code {
+            background: var(--light-blue);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            color: var(--primary-blue);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+
+        /* ============== CODE EDITOR ============== */
+        .code-section {
+            margin: 1rem 0;
+        }
+
+        .code-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--code-bg);
+            padding: 0.6rem 1rem;
+            border-radius: 8px 8px 0 0;
+            color: var(--code-text);
+            font-size: 0.85rem;
+        }
+
+        .code-label span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--code-text);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s ease;
+        }
+
+        .code-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .starter-code {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 0 0 8px 8px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .code-editor {
+            width: 100%;
+            min-height: 450px;
+            background: #fefefe;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .code-editor.large {
+            min-height: 1500px;
+        }
+
+        .code-editor.xlarge {
+            min-height: 500px;
+        }
+
+        .code-editor:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .code-editor::placeholder {
+            color: #9ca3af;
+        }
+
+        /* ============== HINT ============== */
+        .hint {
+            background: #fefce8;
+            border-left: 4px solid var(--accent-orange);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #854d0e;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .hint code {
+            background: rgba(245, 158, 11, 0.2);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+        }
+
+        /* ============== TABLES ============== */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table th {
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+
+        .comparison-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        .comparison-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        .comparison-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: var(--light-blue);
+        }
+
+        .comparison-table tr:last-child td:first-child {
+            border-radius: 0 0 0 8px;
+        }
+
+        .comparison-table tr:last-child td:last-child {
+            border-radius: 0 0 8px 0;
+        }
+
+        .check { color: var(--accent-green); font-weight: bold; }
+        .cross { color: var(--accent-red); font-weight: bold; }
+
+        /* ============== SUMMARY TABLE ============== */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .summary-table th {
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+        }
+
+        .summary-table td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-table td:nth-child(2) {
+            font-family: 'Consolas', monospace;
+            font-size: 0.8rem;
+            color: var(--primary-blue);
+        }
+
+        .summary-table tr:nth-child(even) {
+            background: var(--light-gray);
+        }
+
+        /* ============== MISTAKES BOX ============== */
+        .mistakes-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .mistakes-box h4 {
+            color: #b91c1c;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mistakes-box ul {
+            list-style: none;
+        }
+
+        .mistakes-box li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #7f1d1d;
+        }
+
+        .mistakes-box li::before {
+            content: "✗";
+            color: var(--accent-red);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* ============== NOTES SECTION ============== */
+        .notes-area {
+            width: 100%;
+            min-height: 400px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: none;
+            overflow: hidden;
+            background: #fefefe;
+        }
+
+        .notes-area:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        /* ============== PROGRESS BAR ============== */
+        .progress-container {
+            background: var(--border-color);
+            border-radius: 50px;
+            height: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--primary-blue));
+            border-radius: 50px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        /* ============== CHALLENGE BADGE ============== */
+        .challenge-badge {
+            background: linear-gradient(135deg, var(--accent-orange), #ea580c);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        /* ============== FOOTER ============== */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+
+        /* ============== PRINT STYLES ============== */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            body {
+                background: white !important;
+                font-size: 10pt;
+            }
+
+            .header {
+                position: relative !important;
+                background: #2563eb !important;
+                color: white !important;
+                padding: 0.5cm !important;
+            }
+
+            .header-actions {
+                display: none !important;
+            }
+
+            .nav-tabs, .code-actions, .btn, .topic-card:hover {
+                display: none !important;
+            }
+
+            .section {
+                display: block !important;
+                page-break-inside: avoid;
+                margin-bottom: 20pt;
+            }
+
+            .section:not(:first-child) {
+                page-break-before: always;
+            }
+
+            .card, .exercise {
+                box-shadow: none !important;
+                border: 1pt solid #ccc !important;
+                page-break-inside: avoid;
+                margin-bottom: 15pt;
+            }
+
+            .code-editor, .notes-area {
+                border: 1pt solid #999 !important;
+                min-height: 340pt !important;
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+                background: #fafafa !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                resize: none !important;
+                page-break-inside: avoid !important;
+            }
+
+            .code-editor.large {
+                min-height: 400pt !important;
+            }
+
+            .code-editor.xlarge {
+                min-height: 500pt !important;
+            }
+
+            /* Convert textareas to divs visually for print */
+            .print-content {
+                display: block !important;
+                border: 1pt solid #999 !important;
+                padding: 10pt !important;
+                min-height: 340pt !important;
+                height: auto !important;
+                background: #fafafa !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+                font-size: 9pt !important;
+                line-height: 1.4 !important;
+                page-break-inside: avoid !important;
+            }
+
+            .print-content.large {
+                min-height: 400pt !important;
+            }
+
+            .print-content.xlarge {
+                min-height: 500pt !important;
+            }
+
+            .code-editor.printing, .notes-area.printing {
+                display: none !important;
+            }
+
+            .starter-code {
+                background: #f1f5f9 !important;
+                color: #1e293b !important;
+                border: 1pt solid #ccc !important;
+                font-size: 8pt;
+            }
+
+            .code-label {
+                background: #334155 !important;
+                color: white !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0.5cm !important;
+            }
+
+            .cover-hero {
+                background: linear-gradient(135deg, #2563eb, #8b5cf6) !important;
+                color: white !important;
+                padding: 1.5cm !important;
+            }
+
+            .topics-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+
+            .topic-card {
+                border: 1pt solid #2563eb !important;
+                background: #eff6ff !important;
+            }
+
+            .concept-box {
+                background: #eff6ff !important;
+                border-left: 3pt solid #2563eb !important;
+            }
+
+            .comparison-table th {
+                background: #2563eb !important;
+                color: white !important;
+            }
+
+            .summary-table th {
+                background: #2563eb !important;
+                color: white !important;
+            }
+
+            .mistakes-box {
+                background: #fef2f2 !important;
+                border: 1pt solid #fecaca !important;
+            }
+
+            .hint {
+                background: #fefce8 !important;
+                border-left: 3pt solid #f59e0b !important;
+            }
+
+            .exercise-number {
+                background: #10b981 !important;
+                color: white !important;
+            }
+
+            .card-icon {
+                border: 1pt solid #ccc;
+            }
+
+            .progress-container, .progress-bar, .footer, 
+            .grade-modal, .feedback-modal, .login-modal,
+            .exercise-grade-indicator, #gradeBtn {
+                display: none !important;
+            }
+
+            h2, h3, h4 {
+                page-break-after: avoid;
+            }
+
+            .exercise {
+                page-break-inside: avoid;
+                page-break-before: always;
+            }
+
+            .exercise:first-of-type {
+                page-break-before: auto;
+            }
+
+            @page {
+                margin: 1.5cm;
+                size: letter;
+            }
+
+            @page :first {
+                margin-top: 1cm;
+            }
+        }
+
+        /* ============== RESPONSIVE ============== */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .nav-tabs {
+                padding: 0.5rem;
+            }
+
+            .nav-tab {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .cover-hero h2 {
+                font-size: 1.75rem;
+            }
+
+            .topics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+        }
+
+        /* ============== GRADING MODAL ============== */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .login-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-modal-content h3 {
+            margin: 0 0 1rem;
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+        }
+
+        .login-modal-content p {
+            color: var(--dark-gray);
+            margin-bottom: 1rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .login-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .login-hint {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .grade-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .grade-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .grade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .grade-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .grade-summary {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem;
+            background: var(--light-gray);
+        }
+
+        .grade-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .grade-a { background: linear-gradient(135deg, #10b981, #059669); }
+        .grade-b { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .grade-c { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .grade-low { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+        .grade-letter {
+            font-size: 3rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .grade-percent {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .grade-details {
+            flex: 1;
+        }
+
+        .grade-details p {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            color: var(--dark-gray);
+        }
+
+        .grade-table-container {
+            padding: 1rem 1.5rem;
+            overflow-x: auto;
+        }
+
+        .grade-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .grade-table th {
+            background: var(--dark-gray);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .grade-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .grade-table tr.grade-pass {
+            background: #ecfdf5;
+        }
+
+        .grade-table tr.grade-fail {
+            background: #fef2f2;
+        }
+
+        .grade-bar {
+            width: 80px;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .grade-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--primary-blue));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .feedback-btn {
+            background: var(--light-blue);
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .feedback-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .grade-actions {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-grade-header {
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            color: white;
+            border: none;
+        }
+
+        .btn-grade-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-grade {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-grade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary-grade {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary-grade:hover {
+            background: var(--border-color);
+        }
+
+        /* Feedback Modal */
+        .feedback-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+
+        .feedback-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .feedback-modal-content h3 {
+            margin: 0 0 0.5rem;
+            color: var(--primary-blue);
+        }
+
+        .feedback-list {
+            list-style: none;
+            margin: 0.5rem 0;
+            padding: 0;
+        }
+
+        .feedback-list li {
+            padding: 0.5rem 0.75rem;
+            margin: 0.25rem 0;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feedback-list.pass li {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .feedback-list.fail li {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .points {
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        /* Real-time grading indicator on exercises */
+        .exercise-grade-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: var(--light-gray);
+        }
+
+        .exercise-grade-indicator.good {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .exercise-grade-indicator.partial {
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .exercise-grade-indicator.empty {
+            background: var(--light-gray);
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <!-- ============== HEADER ============== -->
+    <header class="header">
+        <div class="header-content">
+            <h1>🖥️ MAC125 - C++ OOP Lab</h1>
+            <div class="header-info">
+                <span>👨‍🏫 Prof. Khalid Kassou</span>
+                <span>🏫 LaGuardia Community College</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="saveProgress()">💾 Save</button>
+                <button class="btn btn-grade-header" id="gradeBtn" onclick="instructorLogin()" style="display: none;">🔐 Instructor Grade</button>
+                <button class="btn btn-primary" onclick="printLab()">📄 PDF</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============== NAVIGATION ============== -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="showSection('cover')">📋 Cover</button>
+        <button class="nav-tab" onclick="showSection('structures')">📦 Structures</button>
+        <button class="nav-tab" onclick="showSection('classes')">🏛️ Classes</button>
+        <button class="nav-tab" onclick="showSection('encapsulation')">🔒 Encapsulation</button>
+        <button class="nav-tab" onclick="showSection('inheritance')">🧬 Inheritance</button>
+        <button class="nav-tab" onclick="showSection('polymorphism')">🔄 Polymorphism</button>
+        <button class="nav-tab" onclick="showSection('challenges')">🏆 Challenges</button>
+        <button class="nav-tab" onclick="showSection('summary')">📝 Summary</button>
+    </nav>
+
+    <main class="container">
+        <!-- ============== COVER SECTION ============== -->
+        <section id="cover" class="section active">
+            <div class="cover-hero">
+                <h2>🖥️ C++ Object-Oriented Programming</h2>
+                <p>Interactive Lab Exercises</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">📚</div>
+                    <div>
+                        <h3 class="card-title">Topics Covered in This Lab</h3>
+                        <p class="card-subtitle">Master the foundations of OOP in C++</p>
+                    </div>
+                </div>
+
+                <div class="topics-grid">
+                    <div class="topic-card" onclick="showSection('structures')">
+                        <div class="icon">📦</div>
+                        <h4>Part 1: Structures</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">Grouping related data</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('classes')">
+                        <div class="icon">🏛️</div>
+                        <h4>Part 2: Classes</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">Data and behavior</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('encapsulation')">
+                        <div class="icon">🔒</div>
+                        <h4>Part 3: Encapsulation</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">Data protection</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('inheritance')">
+                        <div class="icon">🧬</div>
+                        <h4>Part 4: Inheritance</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">Class hierarchies</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('polymorphism')">
+                        <div class="icon">🔄</div>
+                        <h4>Part 5: Polymorphism</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">Dynamic behavior</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">👤</div>
+                    <div>
+                        <h3 class="card-title">Student Information</h3>
+                        <p class="card-subtitle">Fill in your details below</p>
+                    </div>
+                </div>
+
+                <div class="student-form">
+                    <div class="form-group">
+                        <label for="studentName">Student Name</label>
+                        <input type="text" id="studentName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentDate">Date</label>
+                        <input type="date" id="studentDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentSection">Section</label>
+                        <input type="text" id="studentSection" placeholder="e.g., MAC125-01">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">🎯</div>
+                    <div>
+                        <h3 class="card-title">Learning Objectives</h3>
+                        <p class="card-subtitle">By completing this lab, you will be able to:</p>
+                    </div>
+                </div>
+
+                <ul class="objectives-list">
+                    <li>Define and use structures to group related data</li>
+                    <li>Create classes with private data and public methods</li>
+                    <li>Implement constructors, getters, and setters</li>
+                    <li>Apply encapsulation principles for data protection</li>
+                    <li>Build class hierarchies using inheritance</li>
+                    <li>Use virtual functions for polymorphic behavior</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-bottom: 1rem;">📊 Your Progress</h4>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+                <p class="progress-text"><span id="progressText">0</span> of 12 exercises completed</p>
+            </div>
+        </section>
+
+        <!-- ============== STRUCTURES SECTION ============== -->
+        <section id="structures" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">📦</div>
+                    <div>
+                        <h3 class="card-title">Part 1: Understanding Structures</h3>
+                        <p class="card-subtitle">Structures allow you to group related variables under a single name</p>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h4>💡 Key Concepts</h4>
+                    <ul>
+                        <li>A <strong>structure (struct)</strong> groups related variables of different types under a single name</li>
+                        <li>Members are <strong>public by default</strong> - accessible from outside the structure</li>
+                        <li>Use the <strong>dot operator (.)</strong> to access members</li>
+                        <li>Structures can contain member functions and be nested inside other structures</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Exercise 1.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.1</span>
+                    <h4 class="exercise-title">Creating Your First Structure</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a structure called <code>Book</code> with the following members: <code>title</code> (string), 
+                    <code>author</code> (string), <code>pages</code> (int), and <code>price</code> (double). 
+                    Then create a Book variable and display its information.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 starter_code.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">#include &lt;iostream&gt;
+using namespace std;
+
+// TODO: Define the Book structure here
+struct Book {
+    // Add your members here
+    
+};
+
+int main() {
+    // TODO: Create a Book variable and initialize it
+    
+    // TODO: Display the book information
+    
+    return 0;
+}</pre>
+                </div>
+
+                <div class="hint">
+                    <span>💡</span>
+                    <span>Use aggregate initialization like: <code>Book b1 = {"Title", "Author", 200, 19.99};</code></span>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="1.1" placeholder="Write your complete solution here..."></textarea>
+            </div>
+
+            <!-- Exercise 1.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.2</span>
+                    <h4 class="exercise-title">Structure with Member Functions</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Rectangle</code> structure with <code>width</code> and <code>height</code> members. 
+                    Add member functions for <code>area()</code> and <code>perimeter()</code>. Test your structure in main().
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 rectangle.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">#include &lt;iostream&gt;
+using namespace std;
+
+struct Rectangle {
+    double width;
+    double height;
+    
+    // TODO: Add area() function
+    
+    // TODO: Add perimeter() function
+    
+};
+
+int main() {
+    Rectangle rect = {10.0, 5.0};
+    
+    // TODO: Call and display area and perimeter
+    
+    return 0;
+}</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="1.2" placeholder="Write your complete solution here..."></textarea>
+            </div>
+
+            <!-- Exercise 1.3 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.3</span>
+                    <h4 class="exercise-title">Nested Structures</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Date</code> structure (day, month, year) and an <code>Event</code> structure that 
+                    contains a name (string), location (string), and a Date member. Create and display an event.
+                </p>
+
+                <textarea class="code-editor xlarge" data-exercise="1.3" placeholder="Write your complete solution here including the #include statements..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== CLASSES SECTION ============== -->
+        <section id="classes" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">🏛️</div>
+                    <div>
+                        <h3 class="card-title">Part 2: Introduction to Classes</h3>
+                        <p class="card-subtitle">Classes combine data and behavior with access control</p>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h4>💡 Key Concepts</h4>
+                    <ul>
+                        <li>Classes combine <strong>data (attributes)</strong> and <strong>functions (methods)</strong></li>
+                        <li>Members are <strong>private by default</strong> - hidden from outside access</li>
+                        <li><strong>Constructors</strong> initialize objects when they are created</li>
+                        <li><strong>Getters</strong> provide read access; <strong>Setters</strong> provide write access with validation</li>
+                        <li>Use <strong>public:</strong> and <strong>private:</strong> access specifiers</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>struct</th>
+                            <th>class</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Default Access</td>
+                            <td>public</td>
+                            <td>private</td>
+                        </tr>
+                        <tr>
+                            <td>Use Case</td>
+                            <td>Simple data containers</td>
+                            <td>Data + behavior with encapsulation</td>
+                        </tr>
+                        <tr>
+                            <td>Constructors</td>
+                            <td>Optional</td>
+                            <td>Recommended</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Exercise 2.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">2.1</span>
+                    <h4 class="exercise-title">Creating a Basic Class</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Circle</code> class with a private <code>radius</code> member. Include a constructor, 
+                    getter, setter (with validation), and methods for <code>area()</code> and <code>circumference()</code>. 
+                    Use π = 3.14159.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 circle.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">#include &lt;iostream&gt;
+using namespace std;
+
+class Circle {
+private:
+    double radius;
+
+public:
+    // TODO: Constructor
+    Circle(double r) {
+        
+    }
+    
+    // TODO: Getter
+    double getRadius() {
+        
+    }
+    
+    // TODO: Setter with validation (radius must be positive)
+    void setRadius(double r) {
+        
+    }
+    
+    // TODO: area() method
+    
+    // TODO: circumference() method
+    
+};
+
+int main() {
+    Circle c1(5.0);
+    cout &lt;&lt; "Radius: " &lt;&lt; c1.getRadius() &lt;&lt; endl;
+    cout &lt;&lt; "Area: " &lt;&lt; c1.area() &lt;&lt; endl;
+    cout &lt;&lt; "Circumference: " &lt;&lt; c1.circumference() &lt;&lt; endl;
+    
+    return 0;
+}</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="2.1" placeholder="Write your complete solution here..."></textarea>
+            </div>
+
+            <!-- Exercise 2.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">2.2</span>
+                    <h4 class="exercise-title">Constructors and Initializer Lists</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Student</code> class with private members: <code>name</code>, <code>id</code>, and <code>gpa</code>. 
+                    Implement a default constructor, a parameterized constructor using an <strong>initializer list</strong>, 
+                    and a <code>display()</code> method.
+                </p>
+
+                <div class="hint">
+                    <span>💡</span>
+                    <span>Initializer list syntax: <code>Student(string n, int i) : name(n), id(i), gpa(0.0) { }</code></span>
+                </div>
+
+                <textarea class="code-editor xlarge" data-exercise="2.2" placeholder="Write your complete solution here including the #include statements..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== ENCAPSULATION SECTION ============== -->
+        <section id="encapsulation" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">🔒</div>
+                    <div>
+                        <h3 class="card-title">Part 3: The Power of Encapsulation</h3>
+                        <p class="card-subtitle">Bundle data with methods while restricting direct access</p>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h4>💡 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Encapsulation</strong> = bundling data with methods that operate on it</li>
+                        <li><strong>Data hiding</strong>: private members can't be accessed directly from outside</li>
+                        <li><strong>Validation</strong>: setters can check values before assignment</li>
+                        <li><strong>const methods</strong>: promise not to modify the object's state</li>
+                        <li>The <strong>public interface</strong> remains stable even if internal implementation changes</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Access Specifier</th>
+                            <th>Within Class</th>
+                            <th>Derived Class</th>
+                            <th>Outside Class</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>public</code></td>
+                            <td class="check">✅ Yes</td>
+                            <td class="check">✅ Yes</td>
+                            <td class="check">✅ Yes</td>
+                        </tr>
+                        <tr>
+                            <td><code>protected</code></td>
+                            <td class="check">✅ Yes</td>
+                            <td class="check">✅ Yes</td>
+                            <td class="cross">❌ No</td>
+                        </tr>
+                        <tr>
+                            <td><code>private</code></td>
+                            <td class="check">✅ Yes</td>
+                            <td class="cross">❌ No</td>
+                            <td class="cross">❌ No</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Exercise 3.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">3.1</span>
+                    <h4 class="exercise-title">BankAccount Class with Validation</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>BankAccount</code> class with private members: <code>accountHolder</code>, <code>accountNumber</code>, 
+                    and <code>balance</code>. Implement <code>deposit()</code> and <code>withdraw()</code> methods with proper validation 
+                    (no negative amounts, no overdrafts). Use <code>const</code> for methods that don't modify state.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 bank_account.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">class BankAccount {
+private:
+    string accountHolder;
+    string accountNumber;
+    double balance;
+
+public:
+    // Constructor
+    BankAccount(string holder, string accNum, double initial)
+        : accountHolder(holder), accountNumber(accNum), balance(initial) {}
+    
+    // TODO: Add getBalance() - make it const
+    
+    // TODO: Add deposit(double amount) - return bool for success/failure
+    
+    // TODO: Add withdraw(double amount) - return bool, check for overdraft
+    
+    // TODO: Add displayInfo() const method
+    
+};</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="3.1" placeholder="Write your complete solution here..."></textarea>
+            </div>
+
+            <!-- Exercise 3.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">3.2</span>
+                    <h4 class="exercise-title">Temperature Class with Encapsulation</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Temperature</code> class that stores temperature in Celsius internally. 
+                    Provide methods <code>getCelsius()</code>, <code>getFahrenheit()</code>, <code>getKelvin()</code> and 
+                    <code>setCelsius()</code>, <code>setFahrenheit()</code>, <code>setKelvin()</code>. 
+                    Validate that temperature is above absolute zero (-273.15°C).
+                </p>
+
+                <div class="hint">
+                    <span>💡</span>
+                    <span>Formulas: <code>F = C × 9/5 + 32</code>, <code>K = C + 273.15</code></span>
+                </div>
+
+                <textarea class="code-editor xlarge" data-exercise="3.2" placeholder="Write your complete solution here including the #include statements..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== INHERITANCE SECTION ============== -->
+        <section id="inheritance" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">🧬</div>
+                    <div>
+                        <h3 class="card-title">Part 4: Understanding Inheritance</h3>
+                        <p class="card-subtitle">Inherit properties and behaviors to promote code reuse</p>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h4>💡 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Base class (parent)</strong>: The class being inherited from</li>
+                        <li><strong>Derived class (child)</strong>: The class that inherits - gets all public/protected members</li>
+                        <li>Syntax: <code>class Derived : public Base { };</code></li>
+                        <li>Use <strong>protected</strong> for members accessible by derived classes but not outside</li>
+                        <li>Constructors are called in order: base class first, then derived class</li>
+                    </ul>
+                </div>
+
+                <div style="background: var(--code-bg); padding: 1.5rem; border-radius: 12px; color: var(--code-text); font-family: monospace; margin: 1.5rem 0;">
+                    <div style="color: #93c5fd; font-weight: bold; margin-bottom: 1rem;">Inheritance Hierarchy Example</div>
+                    <pre style="margin: 0; line-height: 1.6;">
+Animal (Base Class)
+├── protected: name, age
+├── public: eat(), sleep()
+│
+├── Dog (Derived)
+│   ├── private: breed
+│   └── public: bark()
+│
+└── Cat (Derived)
+    ├── private: indoor
+    └── public: meow()</pre>
+                </div>
+            </div>
+
+            <!-- Exercise 4.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">4.1</span>
+                    <h4 class="exercise-title">Creating a Class Hierarchy</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a base class <code>Vehicle</code> with protected members: <code>brand</code> and <code>year</code>. 
+                    Add public methods: <code>start()</code> and <code>displayInfo()</code>. Then create derived classes 
+                    <code>Car</code> (add: numDoors) and <code>Motorcycle</code> (add: hasSidecar). 
+                    Each derived class should call the base class constructor.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 vehicles.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">class Vehicle {
+protected:
+    string brand;
+    int year;
+
+public:
+    Vehicle(string b, int y) : brand(b), year(y) {}
+    
+    void start() { cout &lt;&lt; brand &lt;&lt; " is starting..." &lt;&lt; endl; }
+    void displayInfo() { cout &lt;&lt; year &lt;&lt; " " &lt;&lt; brand &lt;&lt; endl; }
+};
+
+// TODO: Create Car class that inherits from Vehicle
+
+
+// TODO: Create Motorcycle class that inherits from Vehicle
+
+
+int main() {
+    Car car("Toyota", 2022, 4);
+    Motorcycle bike("Harley", 2021, false);
+    
+    car.displayInfo();
+    bike.displayInfo();
+    
+    return 0;
+}</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="4.1" placeholder="Write your complete solution here..."></textarea>
+            </div>
+
+            <!-- Exercise 4.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">4.2</span>
+                    <h4 class="exercise-title">Shape Hierarchy with Method Override</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a base class <code>Shape</code> with a name member and an <code>area()</code> method that returns 0. 
+                    Create derived classes <code>Rectangle</code> and <code>Circle</code> that override <code>area()</code> with the correct calculation.
+                </p>
+
+                <textarea class="code-editor xlarge" data-exercise="4.2" placeholder="Write your complete solution here including the #include statements..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== POLYMORPHISM SECTION ============== -->
+        <section id="polymorphism" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">🔄</div>
+                    <div>
+                        <h3 class="card-title">Part 5: Introduction to Polymorphism</h3>
+                        <p class="card-subtitle">Objects of different classes treated through a common interface</p>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h4>💡 Key Concepts</h4>
+                    <ul>
+                        <li><strong>virtual</strong> keyword enables runtime polymorphism</li>
+                        <li>Base class pointers can point to derived class objects</li>
+                        <li>The correct version of a virtual function is called based on the actual object type</li>
+                        <li>Use <strong>override</strong> keyword in derived classes (C++11) for clarity</li>
+                        <li>Always declare base class destructor as <strong>virtual</strong> to prevent memory leaks</li>
+                        <li><strong>Pure virtual functions</strong> (= 0) create abstract classes that cannot be instantiated</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Without virtual</th>
+                            <th>With virtual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Base pointer calls base version</td>
+                            <td>Base pointer calls derived version</td>
+                        </tr>
+                        <tr>
+                            <td>Compile-time binding (static)</td>
+                            <td>Runtime binding (dynamic)</td>
+                        </tr>
+                        <tr>
+                            <td>Faster but less flexible</td>
+                            <td>Slightly slower but polymorphic</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Exercise 5.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">5.1</span>
+                    <h4 class="exercise-title">Virtual Functions in Action</h4>
+                </div>
+                <p class="exercise-description">
+                    Complete the Shape hierarchy using <code>virtual</code> functions. The <code>printShapeInfo()</code> function 
+                    should work correctly with any shape type through a base class pointer.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 polymorphism.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">class Shape {
+protected:
+    string name;
+public:
+    Shape(string n) : name(n) {}
+    
+    // TODO: Make these virtual
+    double area() { return 0; }
+    void draw() { cout &lt;&lt; "Drawing " &lt;&lt; name &lt;&lt; endl; }
+    
+    // TODO: Add virtual destructor
+};
+
+class Rectangle : public Shape {
+    double w, h;
+public:
+    Rectangle(double width, double height) 
+        : Shape("Rectangle"), w(width), h(height) {}
+    
+    // TODO: Override area() with 'override' keyword
+    
+    // TODO: Override draw() with 'override' keyword
+};
+
+// Function that works with ANY shape
+void printShapeInfo(Shape* s) {
+    s-&gt;draw();
+    cout &lt;&lt; "Area: " &lt;&lt; s-&gt;area() &lt;&lt; endl;
+}</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="5.1" placeholder="Write your complete solution here..."></textarea>
+            </div>
+
+            <!-- Exercise 5.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">5.2</span>
+                    <h4 class="exercise-title">Abstract Class and Pure Virtual Functions</h4>
+                </div>
+                <p class="exercise-description">
+                    Create an abstract class <code>Animal</code> with pure virtual functions <code>makeSound()</code> and <code>move()</code>. 
+                    Create concrete classes <code>Dog</code> and <code>Bird</code> that implement these functions. 
+                    Demonstrate polymorphism using an array of Animal pointers.
+                </p>
+
+                <div class="hint">
+                    <span>💡</span>
+                    <span>Pure virtual syntax: <code>virtual void makeSound() = 0;</code></span>
+                </div>
+
+                <textarea class="code-editor xlarge" data-exercise="5.2" placeholder="Write your complete solution here including the #include statements..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== CHALLENGES SECTION ============== -->
+        <section id="challenges" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">🏆</div>
+                    <div>
+                        <h3 class="card-title">Challenge Exercises</h3>
+                        <p class="card-subtitle">Test your understanding of all OOP concepts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">C1</span>
+                    <h4 class="exercise-title">Employee Management System <span class="challenge-badge">CHALLENGE</span></h4>
+                </div>
+                <p class="exercise-description">
+                    Design a complete employee management system with:
+                </p>
+                <ul style="margin: 1rem 0 1rem 2rem; color: #4b5563;">
+                    <li>Base class <code>Employee</code>: name, id, baseSalary (protected), virtual <code>calculatePay()</code></li>
+                    <li>Derived class <code>Manager</code>: adds bonus, overrides <code>calculatePay()</code> to include bonus</li>
+                    <li>Derived class <code>Developer</code>: adds overtimeHours, hourlyRate, overrides <code>calculatePay()</code></li>
+                    <li>Use polymorphism to calculate total payroll for an array of employees</li>
+                </ul>
+
+                <textarea class="code-editor xlarge" data-exercise="C1" placeholder="Write your complete Employee Management System solution here..."></textarea>
+            </div>
+
+            <!-- Challenge 2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">C2</span>
+                    <h4 class="exercise-title">Game Character System <span class="challenge-badge">CHALLENGE</span></h4>
+                </div>
+                <p class="exercise-description">
+                    Create a game character hierarchy:
+                </p>
+                <ul style="margin: 1rem 0 1rem 2rem; color: #4b5563;">
+                    <li>Abstract base class <code>Character</code>: name, health, pure virtual <code>attack()</code> and <code>defend()</code></li>
+                    <li>Derived class <code>Warrior</code>: strength stat, melee attack</li>
+                    <li>Derived class <code>Mage</code>: mana stat, spell attack</li>
+                    <li>Derived class <code>Archer</code>: arrows stat, ranged attack</li>
+                    <li>Simulate a battle between different character types using polymorphism</li>
+                </ul>
+
+                <textarea class="code-editor xlarge" data-exercise="C2" placeholder="Write your complete Game Character System solution here..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== SUMMARY SECTION ============== -->
+        <section id="summary" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">📝</div>
+                    <div>
+                        <h3 class="card-title">Quick Reference Summary</h3>
+                        <p class="card-subtitle">Key syntax and concepts at a glance</p>
+                    </div>
+                </div>
+
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Concept</th>
+                            <th>Syntax/Example</th>
+                            <th>Key Point</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Structure</strong></td>
+                            <td>struct Point { int x, y; };</td>
+                            <td>Public by default</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Class</strong></td>
+                            <td>class Circle { private: double r; };</td>
+                            <td>Private by default</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Constructor</strong></td>
+                            <td>Circle(double r) : radius(r) { }</td>
+                            <td>Initializes object</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Getter</strong></td>
+                            <td>double getRadius() const { return r; }</td>
+                            <td>Read access</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Setter</strong></td>
+                            <td>void setRadius(double r) { if(r>0) this->r=r; }</td>
+                            <td>Write with validation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Inheritance</strong></td>
+                            <td>class Dog : public Animal { };</td>
+                            <td>Child inherits parent</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Virtual</strong></td>
+                            <td>virtual double area() { }</td>
+                            <td>Enables polymorphism</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Override</strong></td>
+                            <td>double area() override { }</td>
+                            <td>C++11 clarity</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pure Virtual</strong></td>
+                            <td>virtual void speak() = 0;</td>
+                            <td>Makes class abstract</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Virtual Destructor</strong></td>
+                            <td>virtual ~Base() { }</td>
+                            <td>Prevents memory leaks</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>⚠️ Common Mistakes to Avoid</h4>
+                <ul>
+                    <li>Forgetting virtual destructor when using polymorphism</li>
+                    <li>Not initializing members in constructor</li>
+                    <li>Making getters non-const when they should be const</li>
+                    <li>Using public for members that should be private/protected</li>
+                    <li>Forgetting to call base class constructor in derived class</li>
+                    <li>Not using override keyword in derived classes (C++11)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">📌</div>
+                    <div>
+                        <h3 class="card-title">Notes</h3>
+                        <p class="card-subtitle">Write any additional notes or questions here</p>
+                    </div>
+                </div>
+                <textarea class="notes-area" id="notesArea" placeholder="Type your notes here..."></textarea>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>MAC125 - C++ Object-Oriented Programming | LaGuardia Community College | MEC Department</p>
+        <p style="margin-top: 0.5rem;">Prof. Khalid Kassou © 2024</p>
+    </footer>
+
+    <script>
+        // ============== PRINT FUNCTION ============== 
+        function printLab() {
+            // Show all sections before printing
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('active');
+            });
+            
+            // Create print-friendly content for each textarea
+            document.querySelectorAll('.code-editor, .notes-area').forEach(textarea => {
+                const content = textarea.value || '(No answer provided)';
+                const printDiv = document.createElement('div');
+                printDiv.className = 'print-content';
+                
+                // Preserve size classes
+                if (textarea.classList.contains('large')) {
+                    printDiv.classList.add('large');
+                } else if (textarea.classList.contains('xlarge')) {
+                    printDiv.classList.add('xlarge');
+                }
+                
+                printDiv.textContent = content;
+                textarea.classList.add('printing');
+                textarea.parentNode.insertBefore(printDiv, textarea.nextSibling);
+            });
+            
+            // Small delay to allow DOM update
+            setTimeout(() => {
+                window.print();
+                
+                // After print dialog closes, clean up
+                setTimeout(() => {
+                    // Remove print divs
+                    document.querySelectorAll('.print-content').forEach(div => div.remove());
+                    document.querySelectorAll('.code-editor.printing, .notes-area.printing').forEach(ta => {
+                        ta.classList.remove('printing');
+                    });
+                    
+                    // Restore only Cover section
+                    document.querySelectorAll('.section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById('cover').classList.add('active');
+                    
+                    // Reset active tab
+                    document.querySelectorAll('.nav-tab').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    document.querySelector('.nav-tab').classList.add('active');
+                }, 500);
+            }, 100);
+        }
+
+        // ============== AUTO-GRADING SYSTEM ==============
+        const exerciseCriteria = {
+            '1.1': {
+                title: 'Creating Your First Structure',
+                points: 10,
+                required: [
+                    { pattern: /struct\s+Book\s*\{/, message: 'Define struct Book', points: 2 },
+                    { pattern: /string\s+title/, message: 'Add title member', points: 1 },
+                    { pattern: /string\s+author/, message: 'Add author member', points: 1 },
+                    { pattern: /int\s+pages/, message: 'Add pages member', points: 1 },
+                    { pattern: /double\s+price/, message: 'Add price member', points: 1 },
+                    { pattern: /Book\s+\w+\s*=?\s*[{(]/, message: 'Create Book instance', points: 2 },
+                    { pattern: /cout\s*<</, message: 'Display output', points: 2 }
+                ]
+            },
+            '1.2': {
+                title: 'Structure with Member Functions',
+                points: 10,
+                required: [
+                    { pattern: /double\s+area\s*\(\s*\)/, message: 'Define area() function', points: 3 },
+                    { pattern: /width\s*\*\s*height|height\s*\*\s*width/, message: 'Correct area formula', points: 2 },
+                    { pattern: /double\s+perimeter\s*\(\s*\)/, message: 'Define perimeter() function', points: 3 },
+                    { pattern: /2\s*\*\s*\(|width\s*\+\s*height/, message: 'Correct perimeter formula', points: 2 }
+                ]
+            },
+            '1.3': {
+                title: 'Nested Structures',
+                points: 10,
+                required: [
+                    { pattern: /struct\s+Date\s*\{/, message: 'Define Date struct', points: 2 },
+                    { pattern: /int\s+(day|month|year)/, message: 'Date has day/month/year', points: 2 },
+                    { pattern: /struct\s+Event\s*\{/, message: 'Define Event struct', points: 2 },
+                    { pattern: /Date\s+\w+/, message: 'Event contains Date member', points: 2 },
+                    { pattern: /Event\s+\w+\s*=/, message: 'Create Event instance', points: 2 }
+                ]
+            },
+            '2.1': {
+                title: 'Creating a Basic Class',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Circle/, message: 'Define Circle class', points: 2 },
+                    { pattern: /private\s*:/, message: 'Use private section', points: 1 },
+                    { pattern: /public\s*:/, message: 'Use public section', points: 1 },
+                    { pattern: /Circle\s*\(\s*double/, message: 'Constructor with parameter', points: 2 },
+                    { pattern: /getRadius\s*\(\s*\)/, message: 'Getter method', points: 2 },
+                    { pattern: /setRadius\s*\(\s*double/, message: 'Setter method', points: 2 },
+                    { pattern: /if\s*\(\s*r\s*>\s*0|r\s*<=\s*0/, message: 'Validation in setter', points: 2 },
+                    { pattern: /3\.14159?\s*\*\s*radius\s*\*\s*radius|radius\s*\*\s*radius\s*\*\s*3\.14159?/, message: 'Correct area formula', points: 2 },
+                    { pattern: /2\s*\*\s*3\.14159?\s*\*\s*radius/, message: 'Correct circumference formula', points: 1 }
+                ]
+            },
+            '2.2': {
+                title: 'Constructors and Initializer Lists',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Student/, message: 'Define Student class', points: 2 },
+                    { pattern: /private\s*:[\s\S]*string\s+name/, message: 'Private name member', points: 2 },
+                    { pattern: /Student\s*\(\s*\)/, message: 'Default constructor', points: 3 },
+                    { pattern: /:\s*\w+\s*\(\s*\w+\s*\)/, message: 'Use initializer list', points: 4 },
+                    { pattern: /void\s+display\s*\(\s*\)/, message: 'Display method', points: 2 },
+                    { pattern: /cout\s*<</, message: 'Output in display', points: 2 }
+                ]
+            },
+            '3.1': {
+                title: 'BankAccount Class',
+                points: 15,
+                required: [
+                    { pattern: /double\s+getBalance\s*\(\s*\)\s*const/, message: 'const getBalance()', points: 3 },
+                    { pattern: /bool\s+deposit\s*\(/, message: 'deposit returns bool', points: 2 },
+                    { pattern: /amount\s*<=\s*0|amount\s*<\s*0/, message: 'Validate deposit amount', points: 2 },
+                    { pattern: /bool\s+withdraw\s*\(/, message: 'withdraw returns bool', points: 2 },
+                    { pattern: /amount\s*>\s*balance|balance\s*<\s*amount/, message: 'Check for overdraft', points: 3 },
+                    { pattern: /void\s+displayInfo\s*\(\s*\)\s*const/, message: 'const displayInfo()', points: 3 }
+                ]
+            },
+            '3.2': {
+                title: 'Temperature Class',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Temperature/, message: 'Define Temperature class', points: 2 },
+                    { pattern: /getCelsius\s*\(\s*\)/, message: 'getCelsius method', points: 2 },
+                    { pattern: /getFahrenheit\s*\(\s*\)/, message: 'getFahrenheit method', points: 2 },
+                    { pattern: /getKelvin\s*\(\s*\)/, message: 'getKelvin method', points: 2 },
+                    { pattern: /9\.?0?\s*\/\s*5|1\.8/, message: 'Fahrenheit conversion', points: 2 },
+                    { pattern: /273\.15/, message: 'Kelvin conversion', points: 2 },
+                    { pattern: /-273\.15|if\s*\(/, message: 'Validate absolute zero', points: 3 }
+                ]
+            },
+            '4.1': {
+                title: 'Class Hierarchy',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Car\s*:\s*public\s+Vehicle/, message: 'Car inherits Vehicle', points: 3 },
+                    { pattern: /class\s+Motorcycle\s*:\s*public\s+Vehicle/, message: 'Motorcycle inherits Vehicle', points: 3 },
+                    { pattern: /Car\s*\([^)]*\)\s*:\s*Vehicle\s*\(/, message: 'Car calls base constructor', points: 3 },
+                    { pattern: /Motorcycle\s*\([^)]*\)\s*:\s*Vehicle\s*\(/, message: 'Motorcycle calls base constructor', points: 3 },
+                    { pattern: /int\s+numDoors|numDoors|doors/, message: 'Car has doors member', points: 1.5 },
+                    { pattern: /bool\s+hasSidecar|sidecar/, message: 'Motorcycle has sidecar member', points: 1.5 }
+                ]
+            },
+            '4.2': {
+                title: 'Shape Hierarchy with Override',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Shape/, message: 'Define Shape class', points: 2 },
+                    { pattern: /class\s+Rectangle\s*:\s*public\s+Shape/, message: 'Rectangle inherits Shape', points: 3 },
+                    { pattern: /class\s+Circle\s*:\s*public\s+Shape/, message: 'Circle inherits Shape', points: 3 },
+                    { pattern: /double\s+area\s*\(\s*\)/, message: 'Override area() method', points: 3 },
+                    { pattern: /width\s*\*\s*height|w\s*\*\s*h/, message: 'Rectangle area formula', points: 2 },
+                    { pattern: /3\.14\d*\s*\*\s*r\w*\s*\*\s*r|r\w*\s*\*\s*r\w*\s*\*\s*3\.14/, message: 'Circle area formula', points: 2 }
+                ]
+            },
+            '5.1': {
+                title: 'Virtual Functions',
+                points: 15,
+                required: [
+                    { pattern: /virtual\s+double\s+area/, message: 'Virtual area()', points: 3 },
+                    { pattern: /virtual\s+void\s+draw/, message: 'Virtual draw()', points: 3 },
+                    { pattern: /virtual\s+~\s*Shape|virtual\s+~Shape/, message: 'Virtual destructor', points: 3 },
+                    { pattern: /area\s*\(\s*\)\s*override/, message: 'Use override keyword', points: 3 },
+                    { pattern: /draw\s*\(\s*\)\s*override/, message: 'Use override for draw', points: 3 }
+                ]
+            },
+            '5.2': {
+                title: 'Abstract Class',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Animal/, message: 'Define Animal class', points: 2 },
+                    { pattern: /virtual\s+void\s+makeSound\s*\(\s*\)\s*=\s*0/, message: 'Pure virtual makeSound()', points: 3 },
+                    { pattern: /virtual\s+void\s+move\s*\(\s*\)\s*=\s*0/, message: 'Pure virtual move()', points: 3 },
+                    { pattern: /class\s+Dog\s*:\s*public\s+Animal/, message: 'Dog inherits Animal', points: 2 },
+                    { pattern: /class\s+Bird\s*:\s*public\s+Animal/, message: 'Bird inherits Animal', points: 2 },
+                    { pattern: /Animal\s*\*\s*\w+\s*\[|vector\s*<\s*Animal\s*\*\s*>/, message: 'Array of Animal pointers', points: 3 }
+                ]
+            },
+            'C1': {
+                title: 'Employee Management System',
+                points: 20,
+                required: [
+                    { pattern: /class\s+Employee/, message: 'Define Employee class', points: 2 },
+                    { pattern: /protected\s*:/, message: 'Use protected members', points: 2 },
+                    { pattern: /virtual\s+double\s+calculatePay/, message: 'Virtual calculatePay()', points: 3 },
+                    { pattern: /class\s+Manager\s*:\s*public\s+Employee/, message: 'Manager inherits Employee', points: 3 },
+                    { pattern: /class\s+Developer\s*:\s*public\s+Employee/, message: 'Developer inherits Employee', points: 3 },
+                    { pattern: /calculatePay\s*\(\s*\)\s*override/, message: 'Override calculatePay', points: 3 },
+                    { pattern: /Employee\s*\*\s*\w+\s*\[|vector\s*<\s*Employee\s*\*\s*>/, message: 'Polymorphic array', points: 4 }
+                ]
+            },
+            'C2': {
+                title: 'Game Character System',
+                points: 20,
+                required: [
+                    { pattern: /class\s+Character/, message: 'Define Character class', points: 2 },
+                    { pattern: /virtual\s+void\s+attack\s*\(\s*\)\s*=\s*0/, message: 'Pure virtual attack()', points: 3 },
+                    { pattern: /virtual\s+void\s+defend\s*\(\s*\)\s*=\s*0/, message: 'Pure virtual defend()', points: 3 },
+                    { pattern: /class\s+Warrior\s*:\s*public\s+Character/, message: 'Warrior class', points: 3 },
+                    { pattern: /class\s+Mage\s*:\s*public\s+Character/, message: 'Mage class', points: 3 },
+                    { pattern: /class\s+Archer\s*:\s*public\s+Character/, message: 'Archer class', points: 3 },
+                    { pattern: /Character\s*\*|vector\s*<\s*Character/, message: 'Polymorphic usage', points: 3 }
+                ]
+            }
+        };
+
+        function gradeExercise(exerciseId) {
+            const criteria = exerciseCriteria[exerciseId];
+            if (!criteria) return null;
+            
+            const editor = document.querySelector(`.code-editor[data-exercise="${exerciseId}"]`);
+            if (!editor) return null;
+            
+            const code = editor.value;
+            let earnedPoints = 0;
+            let feedback = [];
+            let passed = [];
+            
+            criteria.required.forEach(req => {
+                if (req.pattern.test(code)) {
+                    earnedPoints += req.points;
+                    passed.push({ message: req.message, points: req.points, status: 'pass' });
+                } else {
+                    feedback.push({ message: req.message, points: req.points, status: 'fail' });
+                }
+            });
+            
+            return {
+                exerciseId,
+                title: criteria.title,
+                maxPoints: criteria.points,
+                earnedPoints: Math.min(earnedPoints, criteria.points),
+                percentage: Math.round((earnedPoints / criteria.points) * 100),
+                passed,
+                feedback
+            };
+        }
+
+        function gradeAllExercises() {
+            const results = [];
+            let totalEarned = 0;
+            let totalMax = 0;
+            
+            Object.keys(exerciseCriteria).forEach(id => {
+                const result = gradeExercise(id);
+                if (result) {
+                    results.push(result);
+                    totalEarned += result.earnedPoints;
+                    totalMax += result.maxPoints;
+                }
+            });
+            
+            return {
+                exercises: results,
+                totalEarned,
+                totalMax,
+                percentage: Math.round((totalEarned / totalMax) * 100),
+                grade: calculateGrade(totalEarned / totalMax * 100)
+            };
+        }
+
+        function calculateGrade(percentage) {
+            if (percentage >= 90) return 'A';
+            if (percentage >= 80) return 'B';
+            if (percentage >= 70) return 'C';
+            if (percentage >= 60) return 'D';
+            return 'F';
+        }
+
+        function showGradeModal() {
+            const results = gradeAllExercises();
+            
+            let exerciseRows = results.exercises.map(ex => `
+                <tr class="${ex.percentage >= 70 ? 'grade-pass' : 'grade-fail'}">
+                    <td><strong>${ex.exerciseId}</strong></td>
+                    <td>${ex.title}</td>
+                    <td>${ex.earnedPoints.toFixed(1)} / ${ex.maxPoints}</td>
+                    <td>
+                        <div class="grade-bar">
+                            <div class="grade-fill" style="width: ${ex.percentage}%"></div>
+                        </div>
+                        ${ex.percentage}%
+                    </td>
+                    <td>
+                        <button class="feedback-btn" onclick="showFeedback('${ex.exerciseId}')">
+                            ${ex.feedback.length > 0 ? '⚠️ ' + ex.feedback.length + ' issues' : '✅ Complete'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            const modal = document.createElement('div');
+            modal.className = 'grade-modal';
+            modal.innerHTML = `
+                <div class="grade-modal-content">
+                    <div class="grade-header">
+                        <h2>📊 Lab Grading Results</h2>
+                        <button class="close-btn" onclick="closeGradeModal()">✕</button>
+                    </div>
+                    
+                    <div class="grade-summary">
+                        <div class="grade-circle ${results.grade === 'A' ? 'grade-a' : results.grade === 'B' ? 'grade-b' : results.grade === 'C' ? 'grade-c' : 'grade-low'}">
+                            <span class="grade-letter">${results.grade}</span>
+                            <span class="grade-percent">${results.percentage}%</span>
+                        </div>
+                        <div class="grade-details">
+                            <p><strong>Total Score:</strong> ${results.totalEarned.toFixed(1)} / ${results.totalMax} points</p>
+                            <p><strong>Exercises Completed:</strong> ${results.exercises.filter(e => e.percentage > 0).length} / ${results.exercises.length}</p>
+                            <p><strong>Student:</strong> ${document.getElementById('studentName').value || 'Not provided'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grade-table-container">
+                        <table class="grade-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Exercise</th>
+                                    <th>Score</th>
+                                    <th>Progress</th>
+                                    <th>Feedback</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${exerciseRows}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="grade-actions">
+                        <button class="btn btn-grade" onclick="exportGrades()">📥 Export Results</button>
+                        <button class="btn btn-secondary-grade" onclick="closeGradeModal()">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Store results for feedback
+            window.gradingResults = results;
+        }
+
+        function showFeedback(exerciseId) {
+            const result = window.gradingResults.exercises.find(e => e.exerciseId === exerciseId);
+            if (!result) return;
+            
+            let feedbackHtml = '';
+            
+            if (result.passed.length > 0) {
+                feedbackHtml += '<h4 style="color: #10b981; margin-bottom: 0.5rem;">✅ Passed Checks:</h4><ul class="feedback-list pass">';
+                result.passed.forEach(f => {
+                    feedbackHtml += `<li>${f.message} <span class="points">+${f.points} pts</span></li>`;
+                });
+                feedbackHtml += '</ul>';
+            }
+            
+            if (result.feedback.length > 0) {
+                feedbackHtml += '<h4 style="color: #ef4444; margin: 1rem 0 0.5rem;">❌ Missing or Incorrect:</h4><ul class="feedback-list fail">';
+                result.feedback.forEach(f => {
+                    feedbackHtml += `<li>${f.message} <span class="points">-${f.points} pts</span></li>`;
+                });
+                feedbackHtml += '</ul>';
+            }
+            
+            const feedbackModal = document.createElement('div');
+            feedbackModal.className = 'feedback-modal';
+            feedbackModal.innerHTML = `
+                <div class="feedback-modal-content">
+                    <h3>Exercise ${exerciseId}: ${result.title}</h3>
+                    <p style="margin-bottom: 1rem;">Score: <strong>${result.earnedPoints.toFixed(1)} / ${result.maxPoints}</strong> (${result.percentage}%)</p>
+                    ${feedbackHtml}
+                    <button class="btn btn-secondary-grade" onclick="this.parentElement.parentElement.remove()" style="margin-top: 1rem;">Close</button>
+                </div>
+            `;
+            
+            document.body.appendChild(feedbackModal);
+        }
+
+        function closeGradeModal() {
+            document.querySelector('.grade-modal')?.remove();
+        }
+
+        function exportGrades() {
+            const results = window.gradingResults;
+            const studentName = document.getElementById('studentName').value || 'Unknown';
+            const date = document.getElementById('studentDate').value || new Date().toISOString().split('T')[0];
+            
+            let csv = 'MAC125 C++ OOP Lab - Grading Report\n';
+            csv += `Student,${studentName}\n`;
+            csv += `Date,${date}\n`;
+            csv += `Total Score,${results.totalEarned.toFixed(1)}/${results.totalMax}\n`;
+            csv += `Percentage,${results.percentage}%\n`;
+            csv += `Grade,${results.grade}\n\n`;
+            csv += 'Exercise,Title,Earned,Max,Percentage\n';
+            
+            results.exercises.forEach(ex => {
+                csv += `${ex.exerciseId},"${ex.title}",${ex.earnedPoints.toFixed(1)},${ex.maxPoints},${ex.percentage}%\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MAC125_Lab_Grades_${studentName.replace(/\s+/g, '_')}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ============== NAVIGATION ============== 
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Activate corresponding tab
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(sectionId) || 
+                    (sectionId === 'cover' && tab.textContent.includes('Cover'))) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ============== CODE COPY ============== 
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-section').querySelector('.starter-code');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // ============== PROGRESS TRACKING ============== 
+        function updateProgress() {
+            const editors = document.querySelectorAll('.code-editor');
+            let completed = 0;
+            
+            editors.forEach(editor => {
+                if (editor.value.trim().length > 50) {
+                    completed++;
+                }
+            });
+            
+            const total = editors.length;
+            const percentage = Math.round((completed / total) * 100);
+            
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = completed;
+        }
+
+        // ============== LOCAL STORAGE ============== 
+        let labSaved = false;
+        const INSTRUCTOR_PASSWORD = 'mac125'; // Instructor password
+
+        function saveProgress() {
+            const data = {
+                studentName: document.getElementById('studentName').value,
+                studentDate: document.getElementById('studentDate').value,
+                studentSection: document.getElementById('studentSection').value,
+                notes: document.getElementById('notesArea').value,
+                exercises: {}
+            };
+            
+            document.querySelectorAll('.code-editor').forEach(editor => {
+                const exerciseId = editor.dataset.exercise;
+                data.exercises[exerciseId] = editor.value;
+            });
+            
+            localStorage.setItem('mac125_oop_lab', JSON.stringify(data));
+            labSaved = true;
+            
+            // Show grade button after saving
+            document.getElementById('gradeBtn').style.display = 'flex';
+            
+            // Show feedback
+            const btn = document.querySelector('.btn-secondary');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✓ Saved!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        // ============== INSTRUCTOR AUTHENTICATION ==============
+        function instructorLogin() {
+            if (!labSaved) {
+                alert('Please save the lab first before grading.');
+                return;
+            }
+            
+            showLoginModal();
+        }
+
+        function showLoginModal() {
+            const modal = document.createElement('div');
+            modal.className = 'login-modal';
+            modal.innerHTML = `
+                <div class="login-modal-content">
+                    <h3>🔐 Instructor Access</h3>
+                    <p>Enter the instructor password to access grading:</p>
+                    <input type="password" id="instructorPassword" placeholder="Enter password" class="login-input" onkeypress="if(event.key==='Enter') verifyPassword()">
+                    <div class="login-actions">
+                        <button class="btn btn-grade" onclick="verifyPassword()">Verify</button>
+                        <button class="btn btn-secondary-grade" onclick="closeLoginModal()">Cancel</button>
+                    </div>
+                    <p class="login-hint">Contact your instructor for the grading password.</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('instructorPassword').focus();
+        }
+
+        function verifyPassword() {
+            const password = document.getElementById('instructorPassword').value;
+            if (password === INSTRUCTOR_PASSWORD) {
+                closeLoginModal();
+                showGradeModal();
+            } else {
+                const input = document.getElementById('instructorPassword');
+                input.style.borderColor = '#ef4444';
+                input.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    input.style.animation = '';
+                    input.style.borderColor = '';
+                }, 500);
+            }
+        }
+
+        function closeLoginModal() {
+            document.querySelector('.login-modal')?.remove();
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('mac125_oop_lab');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                if (data.studentName) document.getElementById('studentName').value = data.studentName;
+                if (data.studentDate) document.getElementById('studentDate').value = data.studentDate;
+                if (data.studentSection) document.getElementById('studentSection').value = data.studentSection;
+                if (data.notes) document.getElementById('notesArea').value = data.notes;
+                
+                if (data.exercises) {
+                    document.querySelectorAll('.code-editor').forEach(editor => {
+                        const exerciseId = editor.dataset.exercise;
+                        if (data.exercises[exerciseId]) {
+                            editor.value = data.exercises[exerciseId];
+                        }
+                    });
+                }
+                
+                // Show grade button since data was previously saved
+                labSaved = true;
+                document.getElementById('gradeBtn').style.display = 'flex';
+                
+                updateProgress();
+                
+                // Update all indicators after a short delay (after indicators are created)
+                setTimeout(() => {
+                    document.querySelectorAll('.code-editor').forEach(editor => {
+                        updateExerciseIndicator(editor);
+                    });
+                }, 100);
+            }
+        }
+
+        // ============== INITIALIZE ============== 
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set today's date
+            document.getElementById('studentDate').valueAsDate = new Date();
+            
+            // Load saved progress
+            loadProgress();
+            
+            // Add grade indicators to exercise headers
+            document.querySelectorAll('.code-editor').forEach(editor => {
+                const exerciseId = editor.dataset.exercise;
+                const header = editor.closest('.exercise')?.querySelector('.exercise-header');
+                
+                if (header && exerciseCriteria[exerciseId]) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'exercise-grade-indicator empty';
+                    indicator.id = `indicator-${exerciseId}`;
+                    indicator.innerHTML = '⏳ Not started';
+                    header.appendChild(indicator);
+                }
+            });
+            
+            // Track progress on input with real-time grading
+            document.querySelectorAll('.code-editor').forEach(editor => {
+                editor.addEventListener('input', () => {
+                    updateProgress();
+                    updateExerciseIndicator(editor);
+                });
+                // Initial indicator update
+                updateExerciseIndicator(editor);
+            });
+            
+            // Auto-save every 30 seconds
+            setInterval(saveProgress, 30000);
+        });
+
+        function updateExerciseIndicator(editor) {
+            const exerciseId = editor.dataset.exercise;
+            const indicator = document.getElementById(`indicator-${exerciseId}`);
+            if (!indicator) return;
+            
+            const result = gradeExercise(exerciseId);
+            if (!result) return;
+            
+            if (result.percentage === 0) {
+                indicator.className = 'exercise-grade-indicator empty';
+                indicator.innerHTML = '⏳ Not started';
+            } else if (result.percentage >= 70) {
+                indicator.className = 'exercise-grade-indicator good';
+                indicator.innerHTML = `✅ ${result.percentage}% (${result.earnedPoints.toFixed(1)}/${result.maxPoints} pts)`;
+            } else {
+                indicator.className = 'exercise-grade-indicator partial';
+                indicator.innerHTML = `⚠️ ${result.percentage}% (${result.earnedPoints.toFixed(1)}/${result.maxPoints} pts)`;
+            }
+        }
+
+        // ============== KEYBOARD SHORTCUTS ============== 
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+S to save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveProgress();
+            }
+        });
+    </script>
+</body>
+</html>
