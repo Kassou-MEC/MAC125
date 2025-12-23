@@ -1,0 +1,2764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC125 - Advanced C++ OOP Lab | Prof. Khalid Kassou</title>
+    <style>
+        /* ============== CSS RESET & BASE ============== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #3b82f6;
+            --light-blue: #eff6ff;
+            --dark-gray: #1f2937;
+            --light-gray: #f8fafc;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --border-color: #e5e7eb;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* ============== HEADER ============== */
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-info {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.95;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), var(--primary-blue));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .btn-grade-header {
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            color: white;
+            border: none;
+            display: none;
+        }
+
+        .btn-grade-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        /* ============== NAVIGATION ============== */
+        .nav-tabs {
+            background: white;
+            padding: 0.5rem 2rem;
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 76px;
+            z-index: 99;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--dark-gray);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .nav-tab:hover {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            color: white;
+        }
+
+        /* ============== MAIN CONTAINER ============== */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ============== SECTIONS ============== */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============== CARDS ============== */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-blue);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .card-icon.blue { background: var(--light-blue); }
+        .card-icon.green { background: #ecfdf5; }
+        .card-icon.purple { background: #f5f3ff; }
+        .card-icon.orange { background: #fffbeb; }
+        .card-icon.cyan { background: #ecfeff; }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--dark-gray);
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        /* ============== COVER PAGE ============== */
+        .cover-hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #1e293b 0%, var(--accent-purple) 100%);
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .cover-hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cover-hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .topic-card {
+            background: linear-gradient(135deg, var(--light-blue), #dbeafe);
+            padding: 1.25rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-blue);
+        }
+
+        .topic-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .topic-card h4 {
+            color: var(--primary-blue);
+            font-size: 0.95rem;
+        }
+
+        /* ============== STUDENT INFO FORM ============== */
+        .student-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--dark-gray);
+        }
+
+        .form-group input {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        /* ============== OBJECTIVES ============== */
+        .objectives-list {
+            list-style: none;
+        }
+
+        .objectives-list li {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: #ecfdf5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .objectives-list li::before {
+            content: "✓";
+            color: var(--accent-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* ============== CONCEPT BOX ============== */
+        .concept-box {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #dbeafe 100%);
+            border-left: 4px solid var(--primary-blue);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .concept-box.purple {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border-left-color: var(--accent-purple);
+        }
+
+        .concept-box.cyan {
+            background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+            border-left-color: var(--accent-cyan);
+        }
+
+        .concept-box h4 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .concept-box.purple h4 { color: var(--accent-purple); }
+        .concept-box.cyan h4 { color: var(--accent-cyan); }
+
+        .concept-box ul {
+            list-style: none;
+        }
+
+        .concept-box li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .concept-box li::before {
+            content: "•";
+            color: var(--primary-blue);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .concept-box.purple li::before { color: var(--accent-purple); }
+        .concept-box.cyan li::before { color: var(--accent-cyan); }
+
+        /* ============== EXERCISE ============== */
+        .exercise {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--border-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .exercise:hover {
+            border-color: var(--accent-green);
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .exercise-number {
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .exercise-title {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+        }
+
+        .exercise-description {
+            color: #4b5563;
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .exercise-description code {
+            background: var(--light-blue);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            color: var(--primary-blue);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+
+        /* ============== CODE EDITOR ============== */
+        .code-section {
+            margin: 1rem 0;
+        }
+
+        .code-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--code-bg);
+            padding: 0.6rem 1rem;
+            border-radius: 8px 8px 0 0;
+            color: var(--code-text);
+            font-size: 0.85rem;
+        }
+
+        .code-label span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--code-text);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s ease;
+        }
+
+        .code-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .starter-code {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 0 0 8px 8px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .code-editor {
+            width: 100%;
+            min-height: 450px;
+            background: #fefefe;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: none;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .code-editor.large {
+            min-height: 2000px;
+        }
+
+        .code-editor.xlarge {
+            min-height: 2000px;
+        }
+
+        .code-editor:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .code-editor::placeholder {
+            color: #9ca3af;
+        }
+
+        /* ============== HINT ============== */
+        .hint {
+            background: #fefce8;
+            border-left: 4px solid var(--accent-orange);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #854d0e;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .hint code {
+            background: rgba(245, 158, 11, 0.2);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+        }
+
+        /* ============== TABLES ============== */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+
+        .comparison-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        .comparison-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        .comparison-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: var(--light-blue);
+        }
+
+        .comparison-table tr:last-child td:first-child {
+            border-radius: 0 0 0 8px;
+        }
+
+        .comparison-table tr:last-child td:last-child {
+            border-radius: 0 0 8px 0;
+        }
+
+        .check { color: var(--accent-green); font-weight: bold; }
+        .cross { color: var(--accent-red); font-weight: bold; }
+
+        /* ============== SUMMARY TABLE ============== */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .summary-table th {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            color: white;
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+        }
+
+        .summary-table td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-table td:nth-child(2) {
+            font-family: 'Consolas', monospace;
+            font-size: 0.8rem;
+            color: var(--primary-blue);
+        }
+
+        .summary-table tr:nth-child(even) {
+            background: var(--light-gray);
+        }
+
+        /* ============== MISTAKES BOX ============== */
+        .mistakes-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .mistakes-box h4 {
+            color: #b91c1c;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mistakes-box ul {
+            list-style: none;
+        }
+
+        .mistakes-box li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #7f1d1d;
+        }
+
+        .mistakes-box li::before {
+            content: "✗";
+            color: var(--accent-red);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* ============== NOTES SECTION ============== */
+        .notes-area {
+            width: 100%;
+            min-height: 400px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: none;
+            overflow: hidden;
+            background: #fefefe;
+        }
+
+        .notes-area:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        /* ============== PROGRESS BAR ============== */
+        .progress-container {
+            background: var(--border-color);
+            border-radius: 50px;
+            height: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-purple));
+            border-radius: 50px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        /* ============== CHALLENGE BADGE ============== */
+        .challenge-badge {
+            background: linear-gradient(135deg, var(--accent-orange), #ea580c);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        /* ============== FOOTER ============== */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: white;
+            font-size: 0.85rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* ============== GRADING & LOGIN MODALS ============== */
+        .login-modal, .grade-modal, .feedback-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .login-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-modal-content h3 {
+            margin: 0 0 1rem;
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+        }
+
+        .login-modal-content p {
+            color: var(--dark-gray);
+            margin-bottom: 1rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .login-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .login-hint {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .grade-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .grade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .grade-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .grade-summary {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem;
+            background: var(--light-gray);
+        }
+
+        .grade-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .grade-a { background: linear-gradient(135deg, #10b981, #059669); }
+        .grade-b { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .grade-c { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .grade-low { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+        .grade-letter {
+            font-size: 3rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .grade-percent {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .grade-details {
+            flex: 1;
+        }
+
+        .grade-details p {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            color: var(--dark-gray);
+        }
+
+        .grade-table-container {
+            padding: 1rem 1.5rem;
+            overflow-x: auto;
+        }
+
+        .grade-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .grade-table th {
+            background: var(--dark-gray);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .grade-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .grade-table tr.grade-pass {
+            background: #ecfdf5;
+        }
+
+        .grade-table tr.grade-fail {
+            background: #fef2f2;
+        }
+
+        .grade-bar {
+            width: 80px;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .grade-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--primary-blue));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .feedback-btn {
+            background: var(--light-blue);
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .feedback-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .grade-actions {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-grade {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-purple));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-grade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary-grade {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary-grade:hover {
+            background: var(--border-color);
+        }
+
+        .feedback-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .feedback-modal-content h3 {
+            margin: 0 0 0.5rem;
+            color: var(--primary-blue);
+        }
+
+        .feedback-list {
+            list-style: none;
+            margin: 0.5rem 0;
+            padding: 0;
+        }
+
+        .feedback-list li {
+            padding: 0.5rem 0.75rem;
+            margin: 0.25rem 0;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feedback-list.pass li {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .feedback-list.fail li {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .points {
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .exercise-grade-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: var(--light-gray);
+        }
+
+        .exercise-grade-indicator.good {
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .exercise-grade-indicator.partial {
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .exercise-grade-indicator.empty {
+            background: var(--light-gray);
+            color: #6b7280;
+        }
+
+        /* ============== PRINT STYLES ============== */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            body {
+                background: white !important;
+                font-size: 10pt;
+            }
+
+            .header {
+                position: relative !important;
+                background: #1e293b !important;
+                color: white !important;
+                padding: 0.5cm !important;
+            }
+
+            .header-actions {
+                display: none !important;
+            }
+
+            .nav-tabs, .code-actions, .btn, .topic-card:hover {
+                display: none !important;
+            }
+
+            .section {
+                display: block !important;
+                page-break-inside: avoid;
+                margin-bottom: 20pt;
+            }
+
+            .section:not(:first-child) {
+                page-break-before: always;
+            }
+
+            .card, .exercise {
+                box-shadow: none !important;
+                border: 1pt solid #ccc !important;
+                page-break-inside: avoid;
+                margin-bottom: 15pt;
+            }
+
+            .code-editor, .notes-area {
+                border: 1pt solid #999 !important;
+                min-height: 340pt !important;
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+                background: #fafafa !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                resize: none !important;
+                page-break-inside: avoid !important;
+            }
+
+            .code-editor.large {
+                min-height: 400pt !important;
+            }
+
+            .code-editor.xlarge {
+                min-height: 500pt !important;
+            }
+
+            .print-content {
+                display: block !important;
+                border: 1pt solid #999 !important;
+                padding: 10pt !important;
+                min-height: 340pt !important;
+                height: auto !important;
+                background: #fafafa !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+                font-size: 9pt !important;
+                line-height: 1.4 !important;
+                page-break-inside: avoid !important;
+            }
+
+            .print-content.large {
+                min-height: 400pt !important;
+            }
+
+            .print-content.xlarge {
+                min-height: 500pt !important;
+            }
+
+            .code-editor.printing, .notes-area.printing {
+                display: none !important;
+            }
+
+            .starter-code {
+                background: #f1f5f9 !important;
+                color: #1e293b !important;
+                border: 1pt solid #ccc !important;
+                font-size: 8pt;
+            }
+
+            .code-label {
+                background: #334155 !important;
+                color: white !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0.5cm !important;
+            }
+
+            .cover-hero {
+                background: linear-gradient(135deg, #1e293b, #8b5cf6) !important;
+                color: white !important;
+                padding: 1.5cm !important;
+            }
+
+            .topics-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+
+            .topic-card {
+                border: 1pt solid #2563eb !important;
+                background: #eff6ff !important;
+            }
+
+            .concept-box {
+                background: #eff6ff !important;
+                border-left: 3pt solid #2563eb !important;
+            }
+
+            .comparison-table th, .summary-table th {
+                background: #2563eb !important;
+                color: white !important;
+            }
+
+            .mistakes-box {
+                background: #fef2f2 !important;
+                border: 1pt solid #fecaca !important;
+            }
+
+            .hint {
+                background: #fefce8 !important;
+                border-left: 3pt solid #f59e0b !important;
+            }
+
+            .exercise-number {
+                background: #10b981 !important;
+                color: white !important;
+            }
+
+            .card-icon {
+                border: 1pt solid #ccc;
+            }
+
+            .progress-container, .progress-bar, .footer, 
+            .grade-modal, .feedback-modal, .login-modal,
+            .exercise-grade-indicator, #gradeBtn {
+                display: none !important;
+            }
+
+            h2, h3, h4 {
+                page-break-after: avoid;
+            }
+
+            .exercise {
+                page-break-inside: avoid;
+                page-break-before: always;
+            }
+
+            .exercise:first-of-type {
+                page-break-before: auto;
+            }
+
+            @page {
+                margin: 1.5cm;
+                size: letter;
+            }
+
+            @page :first {
+                margin-top: 1cm;
+            }
+        }
+
+        /* ============== RESPONSIVE ============== */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .nav-tabs {
+                padding: 0.5rem;
+            }
+
+            .nav-tab {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .cover-hero h2 {
+                font-size: 1.75rem;
+            }
+
+            .topics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ============== HEADER ============== -->
+    <header class="header">
+        <div class="header-content">
+            <h1>🚀 MAC125 - Lab 2</h1>
+            <div class="header-info">
+                <span>👨‍🏫 Prof. Khalid Kassou</span>
+                <span>🏫 LaGuardia Community College</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="saveProgress()">💾 Save</button>
+                <button class="btn btn-grade-header" id="gradeBtn" onclick="instructorLogin()">🔐 Instructor Grade</button>
+                <button class="btn btn-primary" onclick="printLab()">📄 PDF</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============== NAVIGATION ============== -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="showSection('cover')">📋 Cover</button>
+        <button class="nav-tab" onclick="showSection('polymorphism')">🎭 Polymorphism</button>
+        <button class="nav-tab" onclick="showSection('constructors')">🏗️ Constructors</button>
+        <button class="nav-tab" onclick="showSection('inline')">⚡ Inline</button>
+        <button class="nav-tab" onclick="showSection('static')">📊 Static</button>
+        <button class="nav-tab" onclick="showSection('nested')">🪆 Nested Classes</button>
+        <button class="nav-tab" onclick="showSection('challenges')">🏆 Challenges</button>
+        <button class="nav-tab" onclick="showSection('summary')">📝 Summary</button>
+    </nav>
+
+    <main class="container">
+        <!-- ============== COVER SECTION ============== -->
+        <section id="cover" class="section active">
+            <div class="cover-hero">
+                <h2>🚀 Advanced C++ Object-Oriented Programming</h2>
+                <p>Polymorphism, Constructors & Advanced Class Features</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">📚</div>
+                    <div>
+                        <h3 class="card-title">Topics Covered in This Lab</h3>
+                        <p class="card-subtitle">Master advanced OOP concepts in C++</p>
+                    </div>
+                </div>
+
+                <div class="topics-grid">
+                    <div class="topic-card" onclick="showSection('polymorphism')">
+                        <div class="icon">🎭</div>
+                        <h4>Part 1: Polymorphism</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">Compile-time & Runtime</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('constructors')">
+                        <div class="icon">🏗️</div>
+                        <h4>Part 2: Constructors</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">All constructor types</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('inline')">
+                        <div class="icon">⚡</div>
+                        <h4>Part 3: Inline Functions</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">Performance optimization</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('static')">
+                        <div class="icon">📊</div>
+                        <h4>Part 4: Static Members</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">Class-level data</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('nested')">
+                        <div class="icon">🪆</div>
+                        <h4>Part 5: Nested Classes</h4>
+                        <p style="font-size: 0.8rem; color: #6b7280;">Inner class design</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">👤</div>
+                    <div>
+                        <h3 class="card-title">Student Information</h3>
+                        <p class="card-subtitle">Fill in your details below</p>
+                    </div>
+                </div>
+
+                <div class="student-form">
+                    <div class="form-group">
+                        <label for="studentName">Student Name</label>
+                        <input type="text" id="studentName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentDate">Date</label>
+                        <input type="date" id="studentDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentSection">Section</label>
+                        <input type="text" id="studentSection" placeholder="e.g., MAC125-01">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">🎯</div>
+                    <div>
+                        <h3 class="card-title">Learning Objectives</h3>
+                        <p class="card-subtitle">By completing this lab, you will be able to:</p>
+                    </div>
+                </div>
+
+                <ul class="objectives-list">
+                    <li>Implement compile-time polymorphism using function and operator overloading</li>
+                    <li>Create runtime polymorphism with virtual functions and abstract classes</li>
+                    <li>Write different types of constructors including copy and move constructors</li>
+                    <li>Use initializer lists and delegating constructors effectively</li>
+                    <li>Apply inline functions for performance optimization</li>
+                    <li>Implement static members for class-level data and methods</li>
+                    <li>Design nested classes for helper and iterator patterns</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-bottom: 1rem;">📊 Your Progress</h4>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+                <p class="progress-text"><span id="progressText">0</span> of 14 exercises completed</p>
+            </div>
+        </section>
+
+        <!-- ============== POLYMORPHISM SECTION ============== -->
+        <section id="polymorphism" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">🎭</div>
+                    <div>
+                        <h3 class="card-title">Part 1: Understanding Polymorphism</h3>
+                        <p class="card-subtitle">"Many forms" — objects taking different behaviors through a common interface</p>
+                    </div>
+                </div>
+
+                <div class="concept-box purple">
+                    <h4>💡 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Compile-Time Polymorphism:</strong> Function overloading, operator overloading, templates</li>
+                        <li><strong>Runtime Polymorphism:</strong> Virtual functions, function overriding, abstract classes</li>
+                        <li>Use <code>virtual</code> keyword in base class to enable dynamic dispatch</li>
+                        <li>Use <code>override</code> keyword in derived classes for clarity and safety</li>
+                        <li><strong>Always</strong> declare base class destructors as <code>virtual</code></li>
+                        <li>Pure virtual functions (<code>= 0</code>) create abstract classes</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Compile-Time</th>
+                            <th>Runtime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>When Resolved</td>
+                            <td>During compilation</td>
+                            <td>During execution</td>
+                        </tr>
+                        <tr>
+                            <td>Mechanism</td>
+                            <td>Function signatures</td>
+                            <td>Virtual table (vtable)</td>
+                        </tr>
+                        <tr>
+                            <td>Keywords</td>
+                            <td>None (implicit)</td>
+                            <td><code>virtual</code>, <code>override</code></td>
+                        </tr>
+                        <tr>
+                            <td>Performance</td>
+                            <td class="check">✅ Faster</td>
+                            <td>⚠️ Slight overhead</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Exercise 1.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.1</span>
+                    <h4 class="exercise-title">Function Overloading</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Calculator</code> class with overloaded <code>multiply()</code> methods that handle:
+                    two integers, two doubles, three integers, and an integer with a double. Each version should return the product.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 calculator.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">#include &lt;iostream&gt;
+using namespace std;
+
+class Calculator {
+public:
+    // TODO: Overload multiply() for different parameter types
+    // int multiply(int a, int b)
+    // double multiply(double a, double b)
+    // int multiply(int a, int b, int c)
+    // double multiply(int a, double b)
+};
+
+int main() {
+    Calculator calc;
+    
+    cout &lt;&lt; "5 * 3 = " &lt;&lt; calc.multiply(5, 3) &lt;&lt; endl;
+    cout &lt;&lt; "2.5 * 4.0 = " &lt;&lt; calc.multiply(2.5, 4.0) &lt;&lt; endl;
+    cout &lt;&lt; "2 * 3 * 4 = " &lt;&lt; calc.multiply(2, 3, 4) &lt;&lt; endl;
+    cout &lt;&lt; "5 * 2.5 = " &lt;&lt; calc.multiply(5, 2.5) &lt;&lt; endl;
+    
+    return 0;
+}</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="1.1" placeholder="Write your complete solution here..."></textarea>
+            </div>
+
+            <!-- Exercise 1.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.2</span>
+                    <h4 class="exercise-title">Operator Overloading</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Complex</code> class representing complex numbers (real + imaginary parts).
+                    Overload the <code>+</code>, <code>-</code>, <code>==</code> operators and the <code>&lt;&lt;</code> operator for output using a friend function.
+                </p>
+
+                <div class="hint">
+                    <span>💡</span>
+                    <span>Friend function syntax: <code>friend ostream& operator&lt;&lt;(ostream& os, const Complex& c);</code></span>
+                </div>
+
+                <textarea class="code-editor xlarge" data-exercise="1.2" placeholder="Write your complete Complex class with operator overloading..."></textarea>
+            </div>
+
+            <!-- Exercise 1.3 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.3</span>
+                    <h4 class="exercise-title">Virtual Functions & Runtime Polymorphism</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a base class <code>Employee</code> with virtual method <code>calculateSalary()</code>.
+                    Create derived classes <code>FullTimeEmployee</code> (monthly salary) and <code>PartTimeEmployee</code> (hourly rate × hours).
+                    Demonstrate polymorphism using an array of Employee pointers. Include a virtual destructor.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 employees.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">class Employee {
+protected:
+    string name;
+public:
+    Employee(string n) : name(n) {}
+    
+    // TODO: Add virtual calculateSalary()
+    // TODO: Add virtual destructor
+    
+    string getName() { return name; }
+};
+
+// TODO: Create FullTimeEmployee class
+
+// TODO: Create PartTimeEmployee class
+
+int main() {
+    Employee* employees[3];
+    employees[0] = new FullTimeEmployee("Alice", 5000);
+    employees[1] = new PartTimeEmployee("Bob", 25, 80);
+    employees[2] = new FullTimeEmployee("Charlie", 6000);
+    
+    for (int i = 0; i &lt; 3; i++) {
+        cout &lt;&lt; employees[i]-&gt;getName() &lt;&lt; ": $" 
+             &lt;&lt; employees[i]-&gt;calculateSalary() &lt;&lt; endl;
+        delete employees[i];
+    }
+    return 0;
+}</pre>
+                </div>
+
+                <textarea class="code-editor xlarge" data-exercise="1.3" placeholder="Write your complete solution with virtual functions..."></textarea>
+            </div>
+
+            <!-- Exercise 1.4 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.4</span>
+                    <h4 class="exercise-title">Abstract Classes & Pure Virtual Functions</h4>
+                </div>
+                <p class="exercise-description">
+                    Create an abstract class <code>Shape</code> with pure virtual functions <code>area()</code> and <code>perimeter()</code>.
+                    Implement concrete classes <code>Circle</code> and <code>Triangle</code>. Show that Shape cannot be instantiated.
+                </p>
+
+                <div class="hint">
+                    <span>💡</span>
+                    <span>Pure virtual syntax: <code>virtual double area() = 0;</code></span>
+                </div>
+
+                <textarea class="code-editor xlarge" data-exercise="1.4" placeholder="Write your abstract Shape class and concrete implementations..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== CONSTRUCTORS SECTION ============== -->
+        <section id="constructors" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">🏗️</div>
+                    <div>
+                        <h3 class="card-title">Part 2: Types of Constructors</h3>
+                        <p class="card-subtitle">Special member functions that initialize objects when created</p>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h4>💡 Constructor Types</h4>
+                    <ul>
+                        <li><strong>Default Constructor:</strong> Takes no arguments, called when object created without parameters</li>
+                        <li><strong>Parameterized Constructor:</strong> Takes parameters to initialize with specific values</li>
+                        <li><strong>Copy Constructor:</strong> Creates new object as copy of existing object</li>
+                        <li><strong>Move Constructor (C++11):</strong> Transfers resources from temporary objects efficiently</li>
+                        <li><strong>Delegating Constructor:</strong> One constructor calls another of the same class</li>
+                        <li><strong>Explicit Constructor:</strong> Prevents implicit type conversions with <code>explicit</code> keyword</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Constructor</th>
+                            <th>Syntax</th>
+                            <th>When Called</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Default</td>
+                            <td><code>MyClass()</code></td>
+                            <td><code>MyClass obj;</code></td>
+                        </tr>
+                        <tr>
+                            <td>Parameterized</td>
+                            <td><code>MyClass(int x)</code></td>
+                            <td><code>MyClass obj(5);</code></td>
+                        </tr>
+                        <tr>
+                            <td>Copy</td>
+                            <td><code>MyClass(const MyClass&)</code></td>
+                            <td><code>MyClass obj2 = obj1;</code></td>
+                        </tr>
+                        <tr>
+                            <td>Move</td>
+                            <td><code>MyClass(MyClass&&)</code></td>
+                            <td><code>MyClass obj = func();</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Exercise 2.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">2.1</span>
+                    <h4 class="exercise-title">Default and Parameterized Constructors</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Book</code> class with title, author, and pages. Implement both a default constructor
+                    (sets default values) and a parameterized constructor. Use an <strong>initializer list</strong> in the parameterized constructor.
+                </p>
+
+                <textarea class="code-editor large" data-exercise="2.1" placeholder="Write your Book class with both constructor types..."></textarea>
+            </div>
+
+            <!-- Exercise 2.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">2.2</span>
+                    <h4 class="exercise-title">Copy Constructor</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>DynamicArray</code> class that manages a dynamic integer array. Implement a proper 
+                    <strong>copy constructor</strong> that performs a <strong>deep copy</strong> (not just copying the pointer).
+                    Also implement a destructor to prevent memory leaks.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 dynamic_array.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">class DynamicArray {
+private:
+    int* data;
+    int size;
+
+public:
+    // Parameterized constructor
+    DynamicArray(int s) : size(s) {
+        data = new int[size];
+        for (int i = 0; i &lt; size; i++) data[i] = 0;
+    }
+    
+    // TODO: Copy constructor - deep copy!
+    DynamicArray(const DynamicArray& other) {
+        // Your implementation here
+    }
+    
+    // TODO: Destructor
+    ~DynamicArray() {
+        // Your implementation here
+    }
+    
+    void set(int index, int value) { data[index] = value; }
+    int get(int index) const { return data[index]; }
+    int getSize() const { return size; }
+};</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="2.2" placeholder="Complete the DynamicArray class with copy constructor and destructor..."></textarea>
+            </div>
+
+            <!-- Exercise 2.3 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">2.3</span>
+                    <h4 class="exercise-title">Delegating and Explicit Constructors</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Rectangle</code> class where the default constructor <strong>delegates</strong> to the parameterized constructor.
+                    Add an <code>explicit</code> constructor that takes a single value to create a square. Test that implicit conversion is prevented.
+                </p>
+
+                <div class="hint">
+                    <span>💡</span>
+                    <span>Delegating: <code>Rectangle() : Rectangle(1.0, 1.0) { }</code> | Explicit: <code>explicit Rectangle(double side)</code></span>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="2.3" placeholder="Write your Rectangle class with delegating and explicit constructors..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== INLINE SECTION ============== -->
+        <section id="inline" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon cyan">⚡</div>
+                    <div>
+                        <h3 class="card-title">Part 3: Inline Functions</h3>
+                        <p class="card-subtitle">Performance optimization by eliminating function call overhead</p>
+                    </div>
+                </div>
+
+                <div class="concept-box cyan">
+                    <h4>💡 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Inline:</strong> Suggests compiler replace function calls with actual code</li>
+                        <li>Eliminates function call overhead (pushing/popping stack, jumping)</li>
+                        <li>Methods defined inside class body are <strong>implicitly inline</strong></li>
+                        <li>The <code>inline</code> keyword is a <strong>suggestion</strong> — compiler decides</li>
+                        <li><strong>Good for:</strong> Small functions (1-5 lines), getters/setters, simple calculations</li>
+                        <li><strong>Avoid for:</strong> Functions with loops, recursion, complex logic</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Exercise 3.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">3.1</span>
+                    <h4 class="exercise-title">Inline Functions</h4>
+                </div>
+                <p class="exercise-description">
+                    Create standalone inline functions: <code>square(int)</code>, <code>cube(int)</code>, <code>max(int, int)</code>, 
+                    and <code>celsiusToFahrenheit(double)</code>. Then create a <code>Point</code> class with implicitly inline 
+                    getters/setters defined inside the class body.
+                </p>
+
+                <textarea class="code-editor large" data-exercise="3.1" placeholder="Write inline functions and a Point class with inline methods..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== STATIC SECTION ============== -->
+        <section id="static" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">📊</div>
+                    <div>
+                        <h3 class="card-title">Part 4: Static Members</h3>
+                        <p class="card-subtitle">Class-level data and methods shared by all instances</p>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h4>💡 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Static Variables:</strong> Shared by all instances, only one copy exists</li>
+                        <li><strong>Static Methods:</strong> Called without an object, cannot access <code>this</code> or non-static members</li>
+                        <li>Static data members <strong>must be defined outside</strong> the class</li>
+                        <li>Call static methods with <code>ClassName::method()</code></li>
+                        <li><strong>Use cases:</strong> Object counters, factory methods, utility functions, shared configuration</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Exercise 4.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">4.1</span>
+                    <h4 class="exercise-title">Static Member Variables</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Student</code> class with a static member <code>totalStudents</code> that tracks how many Student 
+                    objects exist. Increment in constructor, decrement in destructor. Add a static method <code>getTotalStudents()</code>.
+                    Remember to initialize the static member outside the class.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>📄 student.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">📋 Copy</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">class Student {
+private:
+    string name;
+    int id;
+    // TODO: Add static totalStudents
+    // TODO: Add static nextId for auto-incrementing IDs
+
+public:
+    // TODO: Constructor - increment totalStudents, assign id from nextId
+    
+    // TODO: Destructor - decrement totalStudents
+    
+    // TODO: Static method getTotalStudents()
+    
+    void display() const {
+        cout &lt;&lt; "ID: " &lt;&lt; id &lt;&lt; ", Name: " &lt;&lt; name &lt;&lt; endl;
+    }
+};
+
+// TODO: Initialize static members outside class
+
+int main() {
+    cout &lt;&lt; "Initial count: " &lt;&lt; Student::getTotalStudents() &lt;&lt; endl;
+    
+    Student s1("Alice");
+    Student s2("Bob");
+    cout &lt;&lt; "After creating 2: " &lt;&lt; Student::getTotalStudents() &lt;&lt; endl;
+    
+    {
+        Student s3("Charlie");
+        cout &lt;&lt; "After creating 3rd: " &lt;&lt; Student::getTotalStudents() &lt;&lt; endl;
+    }
+    
+    cout &lt;&lt; "After s3 destroyed: " &lt;&lt; Student::getTotalStudents() &lt;&lt; endl;
+    return 0;
+}</pre>
+                </div>
+
+                <textarea class="code-editor xlarge" data-exercise="4.1" placeholder="Complete the Student class with static members..."></textarea>
+            </div>
+
+            <!-- Exercise 4.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">4.2</span>
+                    <h4 class="exercise-title">Static Methods and Configuration</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Configuration</code> class with static members for application settings: 
+                    <code>appName</code> (string), <code>maxConnections</code> (int), <code>debugMode</code> (bool).
+                    Provide static getters and setters. All settings should be shared across the application.
+                </p>
+
+                <textarea class="code-editor large" data-exercise="4.2" placeholder="Write your Configuration class with static members..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== NESTED CLASSES SECTION ============== -->
+        <section id="nested" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">🪆</div>
+                    <div>
+                        <h3 class="card-title">Part 5: Nested Classes</h3>
+                        <p class="card-subtitle">Classes defined inside other classes for logical grouping</p>
+                    </div>
+                </div>
+
+                <div class="concept-box purple">
+                    <h4>💡 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Nested Class:</strong> A class defined within another class</li>
+                        <li>Nested classes can access <strong>private members</strong> of the enclosing class</li>
+                        <li>Access nested class with <code>OuterClass::InnerClass</code></li>
+                        <li><strong>Use cases:</strong> Iterator classes, Node classes for data structures, Builder patterns</li>
+                        <li>Keeps helper classes private to the implementation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Exercise 5.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">5.1</span>
+                    <h4 class="exercise-title">Nested Node Class</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Stack</code> class with a private nested <code>Node</code> struct/class.
+                    Implement <code>push()</code>, <code>pop()</code>, <code>top()</code>, and <code>isEmpty()</code> methods.
+                    The Node class should not be accessible from outside Stack.
+                </p>
+
+                <textarea class="code-editor xlarge" data-exercise="5.1" placeholder="Write your Stack class with nested Node..."></textarea>
+            </div>
+
+            <!-- Exercise 5.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">5.2</span>
+                    <h4 class="exercise-title">Nested Iterator Class</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>IntArray</code> class that wraps a dynamic array. Include a public nested <code>Iterator</code> class
+                    that supports <code>operator*</code>, <code>operator++</code>, and <code>operator!=</code>.
+                    Implement <code>begin()</code> and <code>end()</code> methods so range-based for loops work.
+                </p>
+
+                <div class="hint">
+                    <span>💡</span>
+                    <span>Range-based for needs: <code>begin()</code>, <code>end()</code>, and Iterator with <code>*, ++, !=</code></span>
+                </div>
+
+                <textarea class="code-editor xlarge" data-exercise="5.2" placeholder="Write your IntArray class with nested Iterator..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== CHALLENGES SECTION ============== -->
+        <section id="challenges" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">🏆</div>
+                    <div>
+                        <h3 class="card-title">Challenge Exercises</h3>
+                        <p class="card-subtitle">Test your mastery of all advanced OOP concepts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">C1</span>
+                    <h4 class="exercise-title">Smart Pointer Implementation <span class="challenge-badge">CHALLENGE</span></h4>
+                </div>
+                <p class="exercise-description">
+                    Implement a simple <code>SmartPtr</code> template-like class for integers that:
+                </p>
+                <ul style="margin: 1rem 0 1rem 2rem; color: #4b5563;">
+                    <li>Has a parameterized constructor taking an <code>int*</code></li>
+                    <li>Implements a <strong>copy constructor</strong> that transfers ownership (nulls original)</li>
+                    <li>Overloads <code>operator*</code> to dereference</li>
+                    <li>Overloads <code>operator-&gt;</code> for pointer-like access</li>
+                    <li>Has a destructor that deletes the managed memory</li>
+                    <li>Uses a static counter to track total SmartPtr instances</li>
+                </ul>
+
+                <textarea class="code-editor xlarge" data-exercise="C1" placeholder="Write your SmartPtr class implementation..."></textarea>
+            </div>
+
+            <!-- Challenge 2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">C2</span>
+                    <h4 class="exercise-title">Shape Factory with Polymorphism <span class="challenge-badge">CHALLENGE</span></h4>
+                </div>
+                <p class="exercise-description">
+                    Create a complete shape system with:
+                </p>
+                <ul style="margin: 1rem 0 1rem 2rem; color: #4b5563;">
+                    <li>Abstract base class <code>Shape</code> with pure virtual <code>area()</code>, <code>draw()</code></li>
+                    <li>Derived classes: <code>Circle</code>, <code>Rectangle</code>, <code>Triangle</code></li>
+                    <li>A <code>ShapeFactory</code> class with a static method <code>createShape(string type)</code></li>
+                    <li>Operator overloading: <code>+</code> to combine areas of two shapes</li>
+                    <li>Static counter tracking total shapes created</li>
+                    <li>Proper virtual destructors throughout</li>
+                </ul>
+
+                <textarea class="code-editor xlarge" data-exercise="C2" placeholder="Write your complete Shape Factory system..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== SUMMARY SECTION ============== -->
+        <section id="summary" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">📝</div>
+                    <div>
+                        <h3 class="card-title">Quick Reference Summary</h3>
+                        <p class="card-subtitle">Key syntax and concepts at a glance</p>
+                    </div>
+                </div>
+
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Concept</th>
+                            <th>Syntax/Example</th>
+                            <th>Key Point</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Function Overload</strong></td>
+                            <td>int add(int); double add(double);</td>
+                            <td>Same name, different params</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Operator Overload</strong></td>
+                            <td>T operator+(const T& other);</td>
+                            <td>Custom operator behavior</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Virtual Function</strong></td>
+                            <td>virtual void func();</td>
+                            <td>Enables runtime polymorphism</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pure Virtual</strong></td>
+                            <td>virtual void func() = 0;</td>
+                            <td>Makes class abstract</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Override</strong></td>
+                            <td>void func() override;</td>
+                            <td>Clarity + compile check</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Copy Constructor</strong></td>
+                            <td>MyClass(const MyClass& other);</td>
+                            <td>Deep copy objects</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Move Constructor</strong></td>
+                            <td>MyClass(MyClass&& other);</td>
+                            <td>Transfer ownership</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Initializer List</strong></td>
+                            <td>: member(value), member2(v2)</td>
+                            <td>Efficient initialization</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Delegating</strong></td>
+                            <td>MyClass() : MyClass(0) { }</td>
+                            <td>Constructor calls constructor</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Explicit</strong></td>
+                            <td>explicit MyClass(int x);</td>
+                            <td>No implicit conversion</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Inline</strong></td>
+                            <td>inline int square(int x);</td>
+                            <td>Suggest code substitution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Static Variable</strong></td>
+                            <td>static int count;</td>
+                            <td>Shared by all instances</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Static Method</strong></td>
+                            <td>static int getCount();</td>
+                            <td>Call without object</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nested Class</strong></td>
+                            <td>class Outer { class Inner { }; };</td>
+                            <td>Helper class inside</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>⚠️ Common Mistakes to Avoid</h4>
+                <ul>
+                    <li>Forgetting <code>virtual</code> destructor in polymorphic base classes</li>
+                    <li>Shallow copy in copy constructor (just copying pointers)</li>
+                    <li>Not initializing static members outside the class</li>
+                    <li>Trying to access non-static members from static methods</li>
+                    <li>Forgetting <code>override</code> keyword (no compile-time check)</li>
+                    <li>Inlining large or complex functions</li>
+                    <li>Not implementing all pure virtual functions in derived class</li>
+                    <li>Forgetting <code>const</code> in operator overloading</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">📌</div>
+                    <div>
+                        <h3 class="card-title">Notes</h3>
+                        <p class="card-subtitle">Write any additional notes or questions here</p>
+                    </div>
+                </div>
+                <textarea class="notes-area" id="notesArea" placeholder="Type your notes here..."></textarea>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>MAC125 - Advanced C++ Object-Oriented Programming | LaGuardia Community College | MEC Department</p>
+        <p style="margin-top: 0.5rem;">Prof. Khalid Kassou © 2024</p>
+    </footer>
+
+    <script>
+        // ============== LOCAL STORAGE ============== 
+        let labSaved = false;
+        const INSTRUCTOR_PASSWORD = 'mac125';
+
+        function saveProgress() {
+            const data = {
+                studentName: document.getElementById('studentName').value,
+                studentDate: document.getElementById('studentDate').value,
+                studentSection: document.getElementById('studentSection').value,
+                notes: document.getElementById('notesArea').value,
+                exercises: {}
+            };
+            
+            document.querySelectorAll('.code-editor').forEach(editor => {
+                const exerciseId = editor.dataset.exercise;
+                data.exercises[exerciseId] = editor.value;
+            });
+            
+            localStorage.setItem('mac125_advanced_oop_lab', JSON.stringify(data));
+            labSaved = true;
+            
+            document.getElementById('gradeBtn').style.display = 'flex';
+            
+            const btn = document.querySelector('.btn-secondary');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✓ Saved!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('mac125_advanced_oop_lab');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                if (data.studentName) document.getElementById('studentName').value = data.studentName;
+                if (data.studentDate) document.getElementById('studentDate').value = data.studentDate;
+                if (data.studentSection) document.getElementById('studentSection').value = data.studentSection;
+                if (data.notes) document.getElementById('notesArea').value = data.notes;
+                
+                if (data.exercises) {
+                    document.querySelectorAll('.code-editor').forEach(editor => {
+                        const exerciseId = editor.dataset.exercise;
+                        if (data.exercises[exerciseId]) {
+                            editor.value = data.exercises[exerciseId];
+                        }
+                    });
+                }
+                
+                labSaved = true;
+                document.getElementById('gradeBtn').style.display = 'flex';
+                
+                updateProgress();
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.code-editor').forEach(editor => {
+                        updateExerciseIndicator(editor);
+                    });
+                }, 100);
+            }
+        }
+
+        // ============== INSTRUCTOR AUTHENTICATION ==============
+        function instructorLogin() {
+            if (!labSaved) {
+                alert('Please save the lab first before grading.');
+                return;
+            }
+            showLoginModal();
+        }
+
+        function showLoginModal() {
+            const modal = document.createElement('div');
+            modal.className = 'login-modal';
+            modal.innerHTML = `
+                <div class="login-modal-content">
+                    <h3>🔐 Instructor Access</h3>
+                    <p>Enter the instructor password to access grading:</p>
+                    <input type="password" id="instructorPassword" placeholder="Enter password" class="login-input" onkeypress="if(event.key==='Enter') verifyPassword()">
+                    <div class="login-actions">
+                        <button class="btn btn-grade" onclick="verifyPassword()">Verify</button>
+                        <button class="btn btn-secondary-grade" onclick="closeLoginModal()">Cancel</button>
+                    </div>
+                    <p class="login-hint">Contact your instructor for the grading password.</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('instructorPassword').focus();
+        }
+
+        function verifyPassword() {
+            const password = document.getElementById('instructorPassword').value;
+            if (password === INSTRUCTOR_PASSWORD) {
+                closeLoginModal();
+                showGradeModal();
+            } else {
+                const input = document.getElementById('instructorPassword');
+                input.style.borderColor = '#ef4444';
+                input.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    input.style.animation = '';
+                    input.style.borderColor = '';
+                }, 500);
+            }
+        }
+
+        function closeLoginModal() {
+            document.querySelector('.login-modal')?.remove();
+        }
+
+        // ============== PRINT FUNCTION ============== 
+        function printLab() {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('active');
+            });
+            
+            document.querySelectorAll('.code-editor, .notes-area').forEach(textarea => {
+                const content = textarea.value || '(No answer provided)';
+                const printDiv = document.createElement('div');
+                printDiv.className = 'print-content';
+                
+                if (textarea.classList.contains('large')) {
+                    printDiv.classList.add('large');
+                } else if (textarea.classList.contains('xlarge')) {
+                    printDiv.classList.add('xlarge');
+                }
+                
+                printDiv.textContent = content;
+                textarea.classList.add('printing');
+                textarea.parentNode.insertBefore(printDiv, textarea.nextSibling);
+            });
+            
+            setTimeout(() => {
+                window.print();
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.print-content').forEach(div => div.remove());
+                    document.querySelectorAll('.code-editor.printing, .notes-area.printing').forEach(ta => {
+                        ta.classList.remove('printing');
+                    });
+                    
+                    document.querySelectorAll('.section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById('cover').classList.add('active');
+                    
+                    document.querySelectorAll('.nav-tab').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    document.querySelector('.nav-tab').classList.add('active');
+                }, 500);
+            }, 100);
+        }
+
+        // ============== AUTO-GRADING SYSTEM ==============
+        const exerciseCriteria = {
+            '1.1': {
+                title: 'Function Overloading',
+                points: 10,
+                required: [
+                    { pattern: /class\s+Calculator/, message: 'Define Calculator class', points: 1 },
+                    { pattern: /int\s+multiply\s*\(\s*int\s+\w+\s*,\s*int\s+\w+\s*\)/, message: 'multiply(int, int)', points: 2 },
+                    { pattern: /double\s+multiply\s*\(\s*double\s+\w+\s*,\s*double\s+\w+\s*\)/, message: 'multiply(double, double)', points: 2 },
+                    { pattern: /int\s+multiply\s*\(\s*int\s+\w+\s*,\s*int\s+\w+\s*,\s*int\s+\w+\s*\)/, message: 'multiply(int, int, int)', points: 2 },
+                    { pattern: /double\s+multiply\s*\(\s*int\s+\w+\s*,\s*double\s+\w+\s*\)/, message: 'multiply(int, double)', points: 2 },
+                    { pattern: /return\s+\w+\s*\*\s*\w+/, message: 'Return multiplication result', points: 1 }
+                ]
+            },
+            '1.2': {
+                title: 'Operator Overloading',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Complex/, message: 'Define Complex class', points: 2 },
+                    { pattern: /double\s+real|real\s*,\s*imag/, message: 'Real and imaginary parts', points: 2 },
+                    { pattern: /operator\s*\+\s*\(/, message: 'Overload + operator', points: 3 },
+                    { pattern: /operator\s*-\s*\(/, message: 'Overload - operator', points: 2 },
+                    { pattern: /operator\s*==\s*\(/, message: 'Overload == operator', points: 2 },
+                    { pattern: /friend\s+ostream\s*&\s*operator\s*<</, message: 'Friend << operator', points: 3 },
+                    { pattern: /const\s+Complex\s*&/, message: 'Use const reference', points: 1 }
+                ]
+            },
+            '1.3': {
+                title: 'Virtual Functions',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Employee/, message: 'Define Employee class', points: 1 },
+                    { pattern: /virtual\s+double\s+calculateSalary/, message: 'Virtual calculateSalary()', points: 3 },
+                    { pattern: /virtual\s+~\s*Employee|virtual\s+~Employee/, message: 'Virtual destructor', points: 3 },
+                    { pattern: /class\s+FullTimeEmployee\s*:\s*public\s+Employee/, message: 'FullTimeEmployee inherits', points: 2 },
+                    { pattern: /class\s+PartTimeEmployee\s*:\s*public\s+Employee/, message: 'PartTimeEmployee inherits', points: 2 },
+                    { pattern: /calculateSalary\s*\(\s*\)\s*override/, message: 'Use override keyword', points: 2 },
+                    { pattern: /Employee\s*\*\s*\w+\s*\[/, message: 'Array of Employee pointers', points: 2 }
+                ]
+            },
+            '1.4': {
+                title: 'Abstract Classes',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Shape/, message: 'Define Shape class', points: 1 },
+                    { pattern: /virtual\s+double\s+area\s*\(\s*\)\s*=\s*0/, message: 'Pure virtual area()', points: 3 },
+                    { pattern: /virtual\s+double\s+perimeter\s*\(\s*\)\s*=\s*0/, message: 'Pure virtual perimeter()', points: 3 },
+                    { pattern: /class\s+Circle\s*:\s*public\s+Shape/, message: 'Circle inherits Shape', points: 2 },
+                    { pattern: /class\s+Triangle\s*:\s*public\s+Shape/, message: 'Triangle inherits Shape', points: 2 },
+                    { pattern: /area\s*\(\s*\)\s*override/, message: 'Override area()', points: 2 },
+                    { pattern: /perimeter\s*\(\s*\)\s*override/, message: 'Override perimeter()', points: 2 }
+                ]
+            },
+            '2.1': {
+                title: 'Default & Parameterized Constructors',
+                points: 10,
+                required: [
+                    { pattern: /class\s+Book/, message: 'Define Book class', points: 1 },
+                    { pattern: /string\s+title|title/, message: 'Title member', points: 1 },
+                    { pattern: /Book\s*\(\s*\)/, message: 'Default constructor', points: 2 },
+                    { pattern: /Book\s*\([^)]+\)/, message: 'Parameterized constructor', points: 2 },
+                    { pattern: /:\s*\w+\s*\(\s*\w+\s*\)/, message: 'Use initializer list', points: 3 },
+                    { pattern: /cout\s*<<|display\s*\(/, message: 'Display functionality', points: 1 }
+                ]
+            },
+            '2.2': {
+                title: 'Copy Constructor',
+                points: 15,
+                required: [
+                    { pattern: /class\s+DynamicArray/, message: 'Define DynamicArray class', points: 1 },
+                    { pattern: /int\s*\*\s*data/, message: 'Pointer member', points: 1 },
+                    { pattern: /DynamicArray\s*\(\s*const\s+DynamicArray\s*&/, message: 'Copy constructor signature', points: 3 },
+                    { pattern: /new\s+int\s*\[\s*\w+\s*\]/, message: 'Allocate new array (deep copy)', points: 4 },
+                    { pattern: /for\s*\(.*\)[\s\S]*data\s*\[\s*\w+\s*\]\s*=/, message: 'Copy elements', points: 3 },
+                    { pattern: /~\s*DynamicArray|delete\s*\[\s*\]\s*data/, message: 'Destructor with delete[]', points: 3 }
+                ]
+            },
+            '2.3': {
+                title: 'Delegating & Explicit Constructors',
+                points: 10,
+                required: [
+                    { pattern: /class\s+Rectangle/, message: 'Define Rectangle class', points: 1 },
+                    { pattern: /Rectangle\s*\(\s*\)\s*:\s*Rectangle\s*\(/, message: 'Delegating constructor', points: 4 },
+                    { pattern: /explicit\s+Rectangle\s*\(\s*double/, message: 'Explicit constructor', points: 4 },
+                    { pattern: /double\s+width|width\s*,\s*height/, message: 'Width and height members', points: 1 }
+                ]
+            },
+            '3.1': {
+                title: 'Inline Functions',
+                points: 10,
+                required: [
+                    { pattern: /inline\s+int\s+square/, message: 'Inline square function', points: 2 },
+                    { pattern: /inline\s+int\s+cube/, message: 'Inline cube function', points: 2 },
+                    { pattern: /inline\s+int\s+max|inline\s+double\s+max/, message: 'Inline max function', points: 2 },
+                    { pattern: /inline\s+double\s+celsius/, message: 'Inline temperature conversion', points: 2 },
+                    { pattern: /class\s+Point/, message: 'Point class', points: 1 },
+                    { pattern: /getX\s*\(\s*\)|getY\s*\(\s*\)/, message: 'Getter methods', points: 1 }
+                ]
+            },
+            '4.1': {
+                title: 'Static Member Variables',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Student/, message: 'Define Student class', points: 1 },
+                    { pattern: /static\s+int\s+totalStudents/, message: 'Static totalStudents', points: 3 },
+                    { pattern: /static\s+int\s+nextId/, message: 'Static nextId', points: 2 },
+                    { pattern: /totalStudents\s*\+\+/, message: 'Increment in constructor', points: 2 },
+                    { pattern: /totalStudents\s*--/, message: 'Decrement in destructor', points: 2 },
+                    { pattern: /static\s+int\s+getTotalStudents/, message: 'Static getter method', points: 2 },
+                    { pattern: /int\s+Student\s*::\s*totalStudents\s*=/, message: 'Initialize static outside', points: 3 }
+                ]
+            },
+            '4.2': {
+                title: 'Static Configuration',
+                points: 10,
+                required: [
+                    { pattern: /class\s+Configuration/, message: 'Define Configuration class', points: 1 },
+                    { pattern: /static\s+string\s+appName/, message: 'Static appName', points: 2 },
+                    { pattern: /static\s+int\s+maxConnections/, message: 'Static maxConnections', points: 2 },
+                    { pattern: /static\s+bool\s+debugMode/, message: 'Static debugMode', points: 2 },
+                    { pattern: /static\s+void\s+set|static\s+string\s+get|static\s+int\s+get|static\s+bool\s+get/, message: 'Static getters/setters', points: 3 }
+                ]
+            },
+            '5.1': {
+                title: 'Nested Node Class',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Stack/, message: 'Define Stack class', points: 1 },
+                    { pattern: /struct\s+Node|class\s+Node/, message: 'Nested Node class', points: 3 },
+                    { pattern: /void\s+push\s*\(/, message: 'push() method', points: 2 },
+                    { pattern: /void\s+pop\s*\(\s*\)|int\s+pop\s*\(\s*\)/, message: 'pop() method', points: 2 },
+                    { pattern: /int\s+top\s*\(\s*\)/, message: 'top() method', points: 2 },
+                    { pattern: /bool\s+isEmpty\s*\(\s*\)/, message: 'isEmpty() method', points: 2 },
+                    { pattern: /Node\s*\*\s*\w+/, message: 'Node pointer member', points: 2 },
+                    { pattern: /private\s*:[\s\S]*Node/, message: 'Node is private', points: 1 }
+                ]
+            },
+            '5.2': {
+                title: 'Nested Iterator Class',
+                points: 15,
+                required: [
+                    { pattern: /class\s+IntArray/, message: 'Define IntArray class', points: 1 },
+                    { pattern: /class\s+Iterator/, message: 'Nested Iterator class', points: 3 },
+                    { pattern: /operator\s*\*\s*\(\s*\)/, message: 'Iterator operator*', points: 3 },
+                    { pattern: /operator\s*\+\+\s*\(\s*\)/, message: 'Iterator operator++', points: 3 },
+                    { pattern: /operator\s*!=\s*\(/, message: 'Iterator operator!=', points: 2 },
+                    { pattern: /Iterator\s+begin\s*\(\s*\)/, message: 'begin() method', points: 1.5 },
+                    { pattern: /Iterator\s+end\s*\(\s*\)/, message: 'end() method', points: 1.5 }
+                ]
+            },
+            'C1': {
+                title: 'Smart Pointer Implementation',
+                points: 20,
+                required: [
+                    { pattern: /class\s+SmartPtr/, message: 'Define SmartPtr class', points: 2 },
+                    { pattern: /int\s*\*\s*\w+|ptr/, message: 'Pointer member', points: 1 },
+                    { pattern: /SmartPtr\s*\(\s*int\s*\*/, message: 'Constructor with int*', points: 2 },
+                    { pattern: /SmartPtr\s*\(\s*SmartPtr\s*&/, message: 'Copy constructor', points: 3 },
+                    { pattern: /operator\s*\*\s*\(\s*\)/, message: 'Dereference operator', points: 3 },
+                    { pattern: /operator\s*->\s*\(\s*\)/, message: 'Arrow operator', points: 3 },
+                    { pattern: /~\s*SmartPtr|delete\s+\w+/, message: 'Destructor', points: 3 },
+                    { pattern: /static\s+int/, message: 'Static counter', points: 3 }
+                ]
+            },
+            'C2': {
+                title: 'Shape Factory System',
+                points: 20,
+                required: [
+                    { pattern: /class\s+Shape/, message: 'Abstract Shape class', points: 2 },
+                    { pattern: /virtual\s+double\s+area\s*\(\s*\)\s*=\s*0/, message: 'Pure virtual area()', points: 2 },
+                    { pattern: /class\s+Circle\s*:\s*public\s+Shape/, message: 'Circle class', points: 2 },
+                    { pattern: /class\s+Rectangle\s*:\s*public\s+Shape/, message: 'Rectangle class', points: 2 },
+                    { pattern: /class\s+Triangle\s*:\s*public\s+Shape/, message: 'Triangle class', points: 2 },
+                    { pattern: /class\s+ShapeFactory/, message: 'ShapeFactory class', points: 2 },
+                    { pattern: /static\s+Shape\s*\*\s*createShape/, message: 'Static factory method', points: 3 },
+                    { pattern: /operator\s*\+\s*\(/, message: 'Operator+ for areas', points: 2 },
+                    { pattern: /static\s+int\s+\w*[Cc]ount/, message: 'Static shape counter', points: 2 },
+                    { pattern: /virtual\s+~/, message: 'Virtual destructors', points: 1 }
+                ]
+            }
+        };
+
+        function gradeExercise(exerciseId) {
+            const criteria = exerciseCriteria[exerciseId];
+            if (!criteria) return null;
+            
+            const editor = document.querySelector(`.code-editor[data-exercise="${exerciseId}"]`);
+            if (!editor) return null;
+            
+            const code = editor.value;
+            let earnedPoints = 0;
+            let feedback = [];
+            let passed = [];
+            
+            criteria.required.forEach(req => {
+                if (req.pattern.test(code)) {
+                    earnedPoints += req.points;
+                    passed.push({ message: req.message, points: req.points, status: 'pass' });
+                } else {
+                    feedback.push({ message: req.message, points: req.points, status: 'fail' });
+                }
+            });
+            
+            return {
+                exerciseId,
+                title: criteria.title,
+                maxPoints: criteria.points,
+                earnedPoints: Math.min(earnedPoints, criteria.points),
+                percentage: Math.round((earnedPoints / criteria.points) * 100),
+                passed,
+                feedback
+            };
+        }
+
+        function gradeAllExercises() {
+            const results = [];
+            let totalEarned = 0;
+            let totalMax = 0;
+            
+            Object.keys(exerciseCriteria).forEach(id => {
+                const result = gradeExercise(id);
+                if (result) {
+                    results.push(result);
+                    totalEarned += result.earnedPoints;
+                    totalMax += result.maxPoints;
+                }
+            });
+            
+            return {
+                exercises: results,
+                totalEarned,
+                totalMax,
+                percentage: Math.round((totalEarned / totalMax) * 100),
+                grade: calculateGrade(totalEarned / totalMax * 100)
+            };
+        }
+
+        function calculateGrade(percentage) {
+            if (percentage >= 90) return 'A';
+            if (percentage >= 80) return 'B';
+            if (percentage >= 70) return 'C';
+            if (percentage >= 60) return 'D';
+            return 'F';
+        }
+
+        function showGradeModal() {
+            const results = gradeAllExercises();
+            
+            let exerciseRows = results.exercises.map(ex => `
+                <tr class="${ex.percentage >= 70 ? 'grade-pass' : 'grade-fail'}">
+                    <td><strong>${ex.exerciseId}</strong></td>
+                    <td>${ex.title}</td>
+                    <td>${ex.earnedPoints.toFixed(1)} / ${ex.maxPoints}</td>
+                    <td>
+                        <div class="grade-bar">
+                            <div class="grade-fill" style="width: ${ex.percentage}%"></div>
+                        </div>
+                        ${ex.percentage}%
+                    </td>
+                    <td>
+                        <button class="feedback-btn" onclick="showFeedback('${ex.exerciseId}')">
+                            ${ex.feedback.length > 0 ? '⚠️ ' + ex.feedback.length + ' issues' : '✅ Complete'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            const modal = document.createElement('div');
+            modal.className = 'grade-modal';
+            modal.innerHTML = `
+                <div class="grade-modal-content">
+                    <div class="grade-header">
+                        <h2>📊 Lab Grading Results</h2>
+                        <button class="close-btn" onclick="closeGradeModal()">✕</button>
+                    </div>
+                    
+                    <div class="grade-summary">
+                        <div class="grade-circle ${results.grade === 'A' ? 'grade-a' : results.grade === 'B' ? 'grade-b' : results.grade === 'C' ? 'grade-c' : 'grade-low'}">
+                            <span class="grade-letter">${results.grade}</span>
+                            <span class="grade-percent">${results.percentage}%</span>
+                        </div>
+                        <div class="grade-details">
+                            <p><strong>Total Score:</strong> ${results.totalEarned.toFixed(1)} / ${results.totalMax} points</p>
+                            <p><strong>Exercises Completed:</strong> ${results.exercises.filter(e => e.percentage > 0).length} / ${results.exercises.length}</p>
+                            <p><strong>Student:</strong> ${document.getElementById('studentName').value || 'Not provided'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grade-table-container">
+                        <table class="grade-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Exercise</th>
+                                    <th>Score</th>
+                                    <th>Progress</th>
+                                    <th>Feedback</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${exerciseRows}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="grade-actions">
+                        <button class="btn btn-grade" onclick="exportGrades()">📥 Export Results</button>
+                        <button class="btn btn-secondary-grade" onclick="closeGradeModal()">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            window.gradingResults = results;
+        }
+
+        function showFeedback(exerciseId) {
+            const result = window.gradingResults.exercises.find(e => e.exerciseId === exerciseId);
+            if (!result) return;
+            
+            let feedbackHtml = '';
+            
+            if (result.passed.length > 0) {
+                feedbackHtml += '<h4 style="color: #10b981; margin-bottom: 0.5rem;">✅ Passed Checks:</h4><ul class="feedback-list pass">';
+                result.passed.forEach(f => {
+                    feedbackHtml += `<li>${f.message} <span class="points">+${f.points} pts</span></li>`;
+                });
+                feedbackHtml += '</ul>';
+            }
+            
+            if (result.feedback.length > 0) {
+                feedbackHtml += '<h4 style="color: #ef4444; margin: 1rem 0 0.5rem;">❌ Missing or Incorrect:</h4><ul class="feedback-list fail">';
+                result.feedback.forEach(f => {
+                    feedbackHtml += `<li>${f.message} <span class="points">-${f.points} pts</span></li>`;
+                });
+                feedbackHtml += '</ul>';
+            }
+            
+            const feedbackModal = document.createElement('div');
+            feedbackModal.className = 'feedback-modal';
+            feedbackModal.innerHTML = `
+                <div class="feedback-modal-content">
+                    <h3>Exercise ${exerciseId}: ${result.title}</h3>
+                    <p style="margin-bottom: 1rem;">Score: <strong>${result.earnedPoints.toFixed(1)} / ${result.maxPoints}</strong> (${result.percentage}%)</p>
+                    ${feedbackHtml}
+                    <button class="btn btn-secondary-grade" onclick="this.parentElement.parentElement.remove()" style="margin-top: 1rem;">Close</button>
+                </div>
+            `;
+            
+            document.body.appendChild(feedbackModal);
+        }
+
+        function closeGradeModal() {
+            document.querySelector('.grade-modal')?.remove();
+        }
+
+        function exportGrades() {
+            const results = window.gradingResults;
+            const studentName = document.getElementById('studentName').value || 'Unknown';
+            const date = document.getElementById('studentDate').value || new Date().toISOString().split('T')[0];
+            
+            let csv = 'MAC125 Advanced C++ OOP Lab - Grading Report\n';
+            csv += `Student,${studentName}\n`;
+            csv += `Date,${date}\n`;
+            csv += `Total Score,${results.totalEarned.toFixed(1)}/${results.totalMax}\n`;
+            csv += `Percentage,${results.percentage}%\n`;
+            csv += `Grade,${results.grade}\n\n`;
+            csv += 'Exercise,Title,Earned,Max,Percentage\n';
+            
+            results.exercises.forEach(ex => {
+                csv += `${ex.exerciseId},"${ex.title}",${ex.earnedPoints.toFixed(1)},${ex.maxPoints},${ex.percentage}%\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MAC125_Advanced_Lab_Grades_${studentName.replace(/\s+/g, '_')}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ============== NAVIGATION ============== 
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(sectionId) || 
+                    (sectionId === 'cover' && tab.textContent.includes('Cover'))) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ============== CODE COPY ============== 
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-section').querySelector('.starter-code');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // ============== PROGRESS TRACKING ============== 
+        function updateProgress() {
+            const editors = document.querySelectorAll('.code-editor');
+            let completed = 0;
+            
+            editors.forEach(editor => {
+                if (editor.value.trim().length > 50) {
+                    completed++;
+                }
+            });
+            
+            const total = editors.length;
+            const percentage = Math.round((completed / total) * 100);
+            
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = completed;
+        }
+
+        function updateExerciseIndicator(editor) {
+            const exerciseId = editor.dataset.exercise;
+            const indicator = document.getElementById(`indicator-${exerciseId}`);
+            if (!indicator) return;
+            
+            const result = gradeExercise(exerciseId);
+            if (!result) return;
+            
+            if (result.percentage === 0) {
+                indicator.className = 'exercise-grade-indicator empty';
+                indicator.innerHTML = '⏳ Not started';
+            } else if (result.percentage >= 70) {
+                indicator.className = 'exercise-grade-indicator good';
+                indicator.innerHTML = `✅ ${result.percentage}% (${result.earnedPoints.toFixed(1)}/${result.maxPoints} pts)`;
+            } else {
+                indicator.className = 'exercise-grade-indicator partial';
+                indicator.innerHTML = `⚠️ ${result.percentage}% (${result.earnedPoints.toFixed(1)}/${result.maxPoints} pts)`;
+            }
+        }
+
+        // ============== INITIALIZE ============== 
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('studentDate').valueAsDate = new Date();
+            
+            loadProgress();
+            
+            document.querySelectorAll('.code-editor').forEach(editor => {
+                const exerciseId = editor.dataset.exercise;
+                const header = editor.closest('.exercise')?.querySelector('.exercise-header');
+                
+                if (header && exerciseCriteria[exerciseId]) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'exercise-grade-indicator empty';
+                    indicator.id = `indicator-${exerciseId}`;
+                    indicator.innerHTML = '⏳ Not started';
+                    header.appendChild(indicator);
+                }
+            });
+            
+            document.querySelectorAll('.code-editor').forEach(editor => {
+                editor.addEventListener('input', () => {
+                    updateProgress();
+                    updateExerciseIndicator(editor);
+                });
+                updateExerciseIndicator(editor);
+            });
+            
+            setInterval(saveProgress, 30000);
+        });
+
+        // ============== KEYBOARD SHORTCUTS ============== 
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveProgress();
+            }
+        });
+    </script>
+</body>
+</html>
