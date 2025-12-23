@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAC125 - C++ Core Concepts Lab | Prof. Khalid Kassou</title>
+    <style>
+        /* ============== CSS RESET & BASE ============== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-green: #10b981;
+            --secondary-green: #34d399;
+            --dark-bg: #0f172a;
+            --darker-bg: #020617;
+            --light-text: #e2e8f0;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --border-color: #334155;
+            --code-bg: #1e293b;
+            --card-bg: #1e293b;
+            --light-gray: #f8fafc;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            line-height: 1.6;
+            color: var(--light-text);
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            min-height: 100vh;
+        }
+
+        /* ============== HEADER ============== */
+        .header {
+            background: linear-gradient(135deg, var(--darker-bg) 0%, #0c4a6e 100%);
+            color: var(--light-text);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid var(--primary-green);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-green);
+        }
+
+        .header h1 span {
+            color: var(--light-text);
+        }
+
+        .header-info {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-cyan));
+            color: var(--darker-bg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--light-text);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: var(--primary-green);
+        }
+
+        .btn-grade-header {
+            background: linear-gradient(135deg, var(--accent-purple), #7c3aed);
+            color: white;
+            border: none;
+        }
+
+        .btn-grade-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+        }
+
+        /* ============== NAVIGATION ============== */
+        .nav-tabs {
+            background: var(--card-bg);
+            padding: 0.5rem 2rem;
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 76px;
+            z-index: 99;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.25rem;
+            border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--light-text);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .nav-tab:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .nav-tab.active {
+            background: var(--primary-green);
+            color: var(--darker-bg);
+            border-color: var(--primary-green);
+        }
+
+        /* ============== MAIN CONTAINER ============== */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ============== SECTIONS ============== */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============== CARDS ============== */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .card-icon.green { background: rgba(16, 185, 129, 0.2); }
+        .card-icon.cyan { background: rgba(6, 182, 212, 0.2); }
+        .card-icon.purple { background: rgba(168, 85, 247, 0.2); }
+        .card-icon.orange { background: rgba(245, 158, 11, 0.2); }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--primary-green);
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        /* ============== COVER PAGE ============== */
+        .cover-hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--darker-bg) 0%, #164e63 50%, var(--darker-bg) 100%);
+            border-radius: 12px;
+            border: 1px solid var(--primary-green);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(16, 185, 129, 0.03) 2px,
+                rgba(16, 185, 129, 0.03) 4px
+            );
+            pointer-events: none;
+        }
+
+        .cover-hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-green);
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .cover-hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            color: var(--light-text);
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .topic-card {
+            background: rgba(16, 185, 129, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+        }
+
+        .topic-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .topic-card h4 {
+            color: var(--primary-green);
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .topic-card p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        /* ============== STUDENT INFO FORM ============== */
+        .student-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--primary-green);
+        }
+
+        .form-group input {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--darker-bg);
+            color: var(--light-text);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        /* ============== OBJECTIVES ============== */
+        .objectives-list {
+            list-style: none;
+        }
+
+        .objectives-list li {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .objectives-list li::before {
+            content: ">";
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        /* ============== CONCEPT BOX ============== */
+        .concept-box {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 1.5rem;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .concept-box.green {
+            background: rgba(16, 185, 129, 0.1);
+            border-left-color: var(--primary-green);
+        }
+
+        .concept-box.purple {
+            background: rgba(168, 85, 247, 0.1);
+            border-left-color: var(--accent-purple);
+        }
+
+        .concept-box.orange {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--accent-orange);
+        }
+
+        .concept-box h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .concept-box.green h4 { color: var(--primary-green); }
+        .concept-box.purple h4 { color: var(--accent-purple); }
+        .concept-box.orange h4 { color: var(--accent-orange); }
+
+        .concept-box ul {
+            list-style: none;
+        }
+
+        .concept-box li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .concept-box li::before {
+            content: "$";
+            color: var(--accent-cyan);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .concept-box.green li::before { color: var(--primary-green); }
+        .concept-box.purple li::before { color: var(--accent-purple); }
+        .concept-box.orange li::before { color: var(--accent-orange); }
+
+        /* ============== EXERCISE ============== */
+        .exercise {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .exercise:hover {
+            border-color: var(--primary-green);
+        }
+
+        .exercise-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .exercise-number {
+            background: var(--primary-green);
+            color: var(--darker-bg);
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .exercise-title {
+            font-size: 1.1rem;
+            color: var(--light-text);
+        }
+
+        .exercise-description {
+            color: #94a3b8;
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .exercise-description code {
+            background: var(--darker-bg);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            color: var(--primary-green);
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+
+        /* ============== CODE EDITOR ============== */
+        .code-section {
+            margin: 1rem 0;
+        }
+
+        .code-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--darker-bg);
+            padding: 0.6rem 1rem;
+            border-radius: 6px 6px 0 0;
+            color: var(--primary-green);
+            font-size: 0.85rem;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .code-label span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-btn {
+            background: rgba(16, 185, 129, 0.2);
+            border: none;
+            color: var(--primary-green);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: inherit;
+            transition: background 0.2s ease;
+        }
+
+        .code-btn:hover {
+            background: rgba(16, 185, 129, 0.4);
+        }
+
+        .starter-code {
+            background: var(--darker-bg);
+            color: var(--light-text);
+            padding: 1rem;
+            border-radius: 0 0 6px 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+            border: 1px solid var(--border-color);
+            border-top: none;
+        }
+
+        .code-editor {
+            width: 100%;
+            min-height: 450px;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--light-text);
+            resize: none;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .code-editor.large {
+            min-height: 1500px;
+        }
+
+        .code-editor.xlarge {
+            min-height: 1500px;
+        }
+
+        .code-editor:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .code-editor::placeholder {
+            color: #475569;
+        }
+
+        /* ============== HINT ============== */
+        .hint {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--accent-orange);
+            padding: 0.75rem 1rem;
+            border-radius: 0 6px 6px 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--accent-orange);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .hint code {
+            background: rgba(245, 158, 11, 0.2);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            color: var(--accent-orange);
+        }
+
+        /* ============== TABLES ============== */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table th {
+            background: var(--primary-green);
+            color: var(--darker-bg);
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+
+        .comparison-table th:first-child {
+            border-radius: 6px 0 0 0;
+        }
+
+        .comparison-table th:last-child {
+            border-radius: 0 6px 0 0;
+        }
+
+        .comparison-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--darker-bg);
+        }
+
+        .comparison-table tr:last-child td:first-child {
+            border-radius: 0 0 0 6px;
+        }
+
+        .comparison-table tr:last-child td:last-child {
+            border-radius: 0 0 6px 0;
+        }
+
+        .comparison-table code {
+            background: rgba(16, 185, 129, 0.2);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            color: var(--primary-green);
+        }
+
+        /* ============== SUMMARY TABLE ============== */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .summary-table th {
+            background: var(--primary-green);
+            color: var(--darker-bg);
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+        }
+
+        .summary-table td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--darker-bg);
+        }
+
+        .summary-table td:nth-child(2) {
+            font-family: inherit;
+            font-size: 0.8rem;
+            color: var(--primary-green);
+        }
+
+        /* ============== MISTAKES BOX ============== */
+        .mistakes-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .mistakes-box h4 {
+            color: var(--accent-red);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mistakes-box ul {
+            list-style: none;
+        }
+
+        .mistakes-box li {
+            padding: 0.4rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #fca5a5;
+        }
+
+        .mistakes-box li::before {
+            content: "✗";
+            color: var(--accent-red);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* ============== NOTES SECTION ============== */
+        .notes-area {
+            width: 100%;
+            min-height: 400px;
+            border: 1px dashed var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: none;
+            overflow: hidden;
+            background: var(--darker-bg);
+            color: var(--light-text);
+        }
+
+        .notes-area:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
+
+        /* ============== PROGRESS BAR ============== */
+        .progress-container {
+            background: var(--border-color);
+            border-radius: 50px;
+            height: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-cyan));
+            border-radius: 50px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        /* ============== CHALLENGE BADGE ============== */
+        .challenge-badge {
+            background: linear-gradient(135deg, var(--accent-orange), #ea580c);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        /* ============== OPERATOR GRID ============== */
+        .operator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .operator-item {
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+        }
+
+        .operator-item .op {
+            font-size: 1.2rem;
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        .operator-item .label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        /* ============== FOOTER ============== */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+
+        /* ============== GRADING & LOGIN MODALS ============== */
+        .login-modal, .grade-modal, .feedback-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .login-modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--primary-green);
+        }
+
+        .login-modal-content h3 {
+            margin: 0 0 1rem;
+            color: var(--primary-green);
+            font-size: 1.5rem;
+        }
+
+        .login-modal-content p {
+            color: var(--light-text);
+            margin-bottom: 1rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            margin-bottom: 1rem;
+            text-align: center;
+            letter-spacing: 2px;
+            background: var(--darker-bg);
+            color: var(--light-text);
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
+
+        .login-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .login-hint {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .grade-modal-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--primary-green);
+        }
+
+        .grade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-cyan));
+            color: var(--darker-bg);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .grade-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: rgba(0,0,0,0.2);
+            border: none;
+            color: var(--darker-bg);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(0,0,0,0.3);
+        }
+
+        .grade-summary {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem;
+            background: var(--darker-bg);
+        }
+
+        .grade-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .grade-a { background: linear-gradient(135deg, #10b981, #059669); }
+        .grade-b { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .grade-c { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .grade-low { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+        .grade-letter {
+            font-size: 3rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .grade-percent {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .grade-details {
+            flex: 1;
+        }
+
+        .grade-details p {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            color: var(--light-text);
+        }
+
+        .grade-table-container {
+            padding: 1rem 1.5rem;
+            overflow-x: auto;
+        }
+
+        .grade-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .grade-table th {
+            background: var(--darker-bg);
+            color: var(--primary-green);
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .grade-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .grade-table tr.grade-pass {
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .grade-table tr.grade-fail {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .grade-bar {
+            width: 80px;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .grade-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-cyan));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .feedback-btn {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .feedback-btn:hover {
+            background: var(--primary-green);
+            color: var(--darker-bg);
+        }
+
+        .grade-actions {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-grade {
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-cyan));
+            color: var(--darker-bg);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-grade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary-grade {
+            background: var(--darker-bg);
+            color: var(--light-text);
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary-grade:hover {
+            border-color: var(--primary-green);
+        }
+
+        .feedback-modal-content {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .feedback-modal-content h3 {
+            margin: 0 0 0.5rem;
+            color: var(--primary-green);
+        }
+
+        .feedback-list {
+            list-style: none;
+            margin: 0.5rem 0;
+            padding: 0;
+        }
+
+        .feedback-list li {
+            padding: 0.5rem 0.75rem;
+            margin: 0.25rem 0;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .feedback-list.pass li {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary-green);
+        }
+
+        .feedback-list.fail li {
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+        }
+
+        .points {
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .exercise-grade-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: var(--darker-bg);
+        }
+
+        .exercise-grade-indicator.good {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--primary-green);
+        }
+
+        .exercise-grade-indicator.partial {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-orange);
+        }
+
+        .exercise-grade-indicator.empty {
+            background: var(--darker-bg);
+            color: #64748b;
+        }
+
+        /* ============== PRINT STYLES ============== */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            body {
+                background: white !important;
+                color: #1f2937 !important;
+                font-size: 10pt;
+            }
+
+            .header {
+                position: relative !important;
+                background: #1e293b !important;
+                color: white !important;
+                padding: 0.5cm !important;
+            }
+
+            .header-actions {
+                display: none !important;
+            }
+
+            .nav-tabs, .code-actions, .btn, .topic-card:hover {
+                display: none !important;
+            }
+
+            .section {
+                display: block !important;
+                page-break-inside: avoid;
+                margin-bottom: 20pt;
+            }
+
+            .section:not(:first-child) {
+                page-break-before: always;
+            }
+
+            .card, .exercise {
+                box-shadow: none !important;
+                border: 1pt solid #ccc !important;
+                background: white !important;
+                page-break-inside: avoid;
+                margin-bottom: 15pt;
+            }
+
+            .code-editor, .notes-area {
+                border: 1pt solid #999 !important;
+                min-height: 340pt !important;
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+                background: #fafafa !important;
+                color: #1f2937 !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                resize: none !important;
+                page-break-inside: avoid !important;
+            }
+
+            .code-editor.large {
+                min-height: 400pt !important;
+            }
+
+            .code-editor.xlarge {
+                min-height: 500pt !important;
+            }
+
+            .print-content {
+                display: block !important;
+                border: 1pt solid #999 !important;
+                padding: 10pt !important;
+                min-height: 340pt !important;
+                height: auto !important;
+                background: #fafafa !important;
+                color: #1f2937 !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+                font-size: 9pt !important;
+                line-height: 1.4 !important;
+                page-break-inside: avoid !important;
+            }
+
+            .print-content.large {
+                min-height: 400pt !important;
+            }
+
+            .print-content.xlarge {
+                min-height: 500pt !important;
+            }
+
+            .code-editor.printing, .notes-area.printing {
+                display: none !important;
+            }
+
+            .starter-code {
+                background: #f1f5f9 !important;
+                color: #1e293b !important;
+                border: 1pt solid #ccc !important;
+                font-size: 8pt;
+            }
+
+            .code-label {
+                background: #334155 !important;
+                color: white !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0.5cm !important;
+            }
+
+            .cover-hero {
+                background: #1e293b !important;
+                color: white !important;
+                padding: 1.5cm !important;
+            }
+
+            .cover-hero h2 {
+                color: #10b981 !important;
+            }
+
+            .topics-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+
+            .topic-card {
+                border: 1pt solid #10b981 !important;
+                background: #ecfdf5 !important;
+                color: #1f2937 !important;
+            }
+
+            .concept-box {
+                background: #f0fdf4 !important;
+                border-left: 3pt solid #10b981 !important;
+                color: #1f2937 !important;
+            }
+
+            .comparison-table th, .summary-table th {
+                background: #10b981 !important;
+                color: white !important;
+            }
+
+            .comparison-table td, .summary-table td {
+                background: white !important;
+                color: #1f2937 !important;
+            }
+
+            .mistakes-box {
+                background: #fef2f2 !important;
+                border: 1pt solid #fecaca !important;
+                color: #1f2937 !important;
+            }
+
+            .hint {
+                background: #fffbeb !important;
+                border-left: 3pt solid #f59e0b !important;
+                color: #92400e !important;
+            }
+
+            .exercise-number {
+                background: #10b981 !important;
+                color: white !important;
+            }
+
+            .card-icon {
+                border: 1pt solid #ccc;
+            }
+
+            .progress-container, .progress-bar, .footer, 
+            .grade-modal, .feedback-modal, .login-modal,
+            .exercise-grade-indicator, #gradeBtn {
+                display: none !important;
+            }
+
+            .card-title, .exercise-title {
+                color: #1f2937 !important;
+            }
+
+            .card-subtitle, .exercise-description {
+                color: #4b5563 !important;
+            }
+
+            h2, h3, h4 {
+                page-break-after: avoid;
+            }
+
+            .exercise {
+                page-break-inside: avoid;
+                page-break-before: always;
+            }
+
+            .exercise:first-of-type {
+                page-break-before: auto;
+            }
+
+            @page {
+                margin: 1.5cm;
+                size: letter;
+            }
+
+            @page :first {
+                margin-top: 1cm;
+            }
+        }
+
+        /* ============== RESPONSIVE ============== */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .nav-tabs {
+                padding: 0.5rem;
+            }
+
+            .nav-tab {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .cover-hero h2 {
+                font-size: 1.75rem;
+            }
+
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+
+            .operator-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ============== HEADER ============== -->
+    <header class="header">
+        <div class="header-content">
+            <h1>$&gt; <span>MAC125 - Lab 3</span></h1>
+            <div class="header-info">
+                <span>👨‍🏫 Prof. Khalid Kassou</span>
+                <span>🏫 LaGuardia Community College</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="saveProgress()">💾 Save</button>
+                <button class="btn btn-grade-header" id="gradeBtn" onclick="instructorLogin()">📊 Grade Lab</button>
+                <button class="btn btn-primary" onclick="printLab()">📄 PDF</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============== NAVIGATION ============== -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="showSection('cover')">[COVER]</button>
+        <button class="nav-tab" onclick="showSection('operators')">[OPERATORS]</button>
+        <button class="nav-tab" onclick="showSection('friends')">[FRIENDS]</button>
+        <button class="nav-tab" onclick="showSection('pointers')">[POINTERS]</button>
+        <button class="nav-tab" onclick="showSection('challenges')">[CHALLENGES]</button>
+        <button class="nav-tab" onclick="showSection('summary')">[SUMMARY]</button>
+    </nav>
+
+    <main class="container">
+        <!-- ============== COVER SECTION ============== -->
+        <section id="cover" class="section active">
+            <div class="cover-hero">
+                <h2>$&gt; Master C++ Core Concepts</h2>
+                <p>Operators • Friends • Pointers</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">📚</div>
+                    <div>
+                        <h3 class="card-title">Modules Covered in This Lab</h3>
+                        <p class="card-subtitle">Deep dive into essential C++ programming concepts</p>
+                    </div>
+                </div>
+
+                <div class="topics-grid">
+                    <div class="topic-card" onclick="showSection('operators')">
+                        <div class="icon">⚡</div>
+                        <h4>Module 01: Operators</h4>
+                        <p>Operator Overloading</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('friends')">
+                        <div class="icon">🔗</div>
+                        <h4>Module 02: Friends</h4>
+                        <p>Friend Functions & Classes</p>
+                    </div>
+                    <div class="topic-card" onclick="showSection('pointers')">
+                        <div class="icon">📍</div>
+                        <h4>Module 03: Pointers</h4>
+                        <p>Memory & Dynamic Allocation</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon cyan">👤</div>
+                    <div>
+                        <h3 class="card-title">Student Information</h3>
+                        <p class="card-subtitle">Fill in your details below</p>
+                    </div>
+                </div>
+
+                <div class="student-form">
+                    <div class="form-group">
+                        <label for="studentName">Student Name</label>
+                        <input type="text" id="studentName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentDate">Date</label>
+                        <input type="date" id="studentDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentSection">Section</label>
+                        <input type="text" id="studentSection" placeholder="e.g., MAC125-01">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">🎯</div>
+                    <div>
+                        <h3 class="card-title">Learning Objectives</h3>
+                        <p class="card-subtitle">By completing this lab, you will be able to:</p>
+                    </div>
+                </div>
+
+                <ul class="objectives-list">
+                    <li>Overload arithmetic, comparison, and stream operators for custom classes</li>
+                    <li>Implement prefix and postfix increment/decrement operators</li>
+                    <li>Create safe array access with subscript operator overloading</li>
+                    <li>Use friend functions to access private class members</li>
+                    <li>Implement friend classes for cross-class access patterns</li>
+                    <li>Master pointer basics: address-of, dereference, and null pointers</li>
+                    <li>Apply pointer arithmetic to navigate arrays</li>
+                    <li>Manage dynamic memory with new and delete operators</li>
+                    <li>Use function pointers for callback patterns</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-bottom: 1rem; color: var(--primary-green);">$&gt; Progress_Tracker</h4>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+                <p class="progress-text"><span id="progressText">0</span> of 12 exercises completed</p>
+            </div>
+        </section>
+
+        <!-- ============== OPERATORS SECTION ============== -->
+        <section id="operators" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">⚡</div>
+                    <div>
+                        <h3 class="card-title">Module 01: Operator Overloading</h3>
+                        <p class="card-subtitle">Define custom behavior for C++ operators with your own classes</p>
+                    </div>
+                </div>
+
+                <div class="concept-box green">
+                    <h4>$ Key Concepts</h4>
+                    <ul>
+                        <li><strong>Operator Overloading:</strong> Define how operators work with user-defined types</li>
+                        <li><strong>Member Function:</strong> <code>T operator+(const T& other) const</code></li>
+                        <li><strong>Return by value</strong> for arithmetic operators (+, -, *, /)</li>
+                        <li><strong>Return by reference</strong> for assignment operators (=, +=, -=)</li>
+                        <li><strong>Use const</strong> for operators that don't modify the object</li>
+                        <li><strong>Cannot overload:</strong> <code>::</code> <code>.</code> <code>.*</code> <code>?:</code> <code>sizeof</code></li>
+                    </ul>
+                </div>
+
+                <h4 style="color: var(--primary-green); margin-bottom: 1rem;">Overloadable Operators</h4>
+                <div class="operator-grid">
+                    <div class="operator-item"><div class="op">+</div><div class="label">Add</div></div>
+                    <div class="operator-item"><div class="op">-</div><div class="label">Sub</div></div>
+                    <div class="operator-item"><div class="op">*</div><div class="label">Mul</div></div>
+                    <div class="operator-item"><div class="op">/</div><div class="label">Div</div></div>
+                    <div class="operator-item"><div class="op">%</div><div class="label">Mod</div></div>
+                    <div class="operator-item"><div class="op">==</div><div class="label">Eq</div></div>
+                    <div class="operator-item"><div class="op">!=</div><div class="label">Neq</div></div>
+                    <div class="operator-item"><div class="op">&lt;</div><div class="label">Lt</div></div>
+                    <div class="operator-item"><div class="op">&gt;</div><div class="label">Gt</div></div>
+                    <div class="operator-item"><div class="op">++</div><div class="label">Inc</div></div>
+                    <div class="operator-item"><div class="op">--</div><div class="label">Dec</div></div>
+                    <div class="operator-item"><div class="op">[]</div><div class="label">Idx</div></div>
+                    <div class="operator-item"><div class="op">()</div><div class="label">Call</div></div>
+                    <div class="operator-item"><div class="op">&lt;&lt;</div><div class="label">Out</div></div>
+                    <div class="operator-item"><div class="op">&gt;&gt;</div><div class="label">In</div></div>
+                    <div class="operator-item"><div class="op">=</div><div class="label">Asgn</div></div>
+                </div>
+            </div>
+
+            <!-- Exercise 1.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.1</span>
+                    <h4 class="exercise-title">Fraction Class with Arithmetic Operators</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Fraction</code> class with numerator and denominator. Overload the 
+                    <code>+</code>, <code>-</code>, <code>*</code>, and <code>==</code> operators.
+                    Remember: a/b + c/d = (ad + bc) / bd
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>$ fraction.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">[COPY]</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">#include &lt;iostream&gt;
+using namespace std;
+
+class Fraction {
+private:
+    int num, den;  // numerator, denominator
+
+public:
+    Fraction(int n = 0, int d = 1) : num(n), den(d) {}
+    
+    // TODO: Overload + operator
+    // Fraction operator+(const Fraction& other) const { }
+    
+    // TODO: Overload - operator
+    
+    // TODO: Overload * operator  (a/b * c/d = ac/bd)
+    
+    // TODO: Overload == operator
+    
+    void print() const {
+        cout &lt;&lt; num &lt;&lt; "/" &lt;&lt; den;
+    }
+};
+
+int main() {
+    Fraction f1(1, 2);  // 1/2
+    Fraction f2(1, 3);  // 1/3
+    
+    cout &lt;&lt; "f1 = "; f1.print(); cout &lt;&lt; endl;
+    cout &lt;&lt; "f2 = "; f2.print(); cout &lt;&lt; endl;
+    
+    Fraction sum = f1 + f2;
+    cout &lt;&lt; "f1 + f2 = "; sum.print(); cout &lt;&lt; endl;  // 5/6
+    
+    Fraction prod = f1 * f2;
+    cout &lt;&lt; "f1 * f2 = "; prod.print(); cout &lt;&lt; endl;  // 1/6
+    
+    return 0;
+}</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="1.1" placeholder="// Write your complete Fraction class with operator overloading..."></textarea>
+            </div>
+
+            <!-- Exercise 1.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.2</span>
+                    <h4 class="exercise-title">Prefix and Postfix Increment</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Counter</code> class and implement both <strong>prefix</strong> (<code>++counter</code>) 
+                    and <strong>postfix</strong> (<code>counter++</code>) increment operators. 
+                    Remember: postfix uses a dummy <code>int</code> parameter and returns a copy.
+                </p>
+
+                <div class="hint">
+                    <span>$</span>
+                    <span>Prefix: <code>Counter& operator++()</code> | Postfix: <code>Counter operator++(int)</code></span>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="1.2" placeholder="// Write your Counter class with prefix and postfix ++ operators..."></textarea>
+            </div>
+
+            <!-- Exercise 1.3 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.3</span>
+                    <h4 class="exercise-title">Subscript Operator with Bounds Checking</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>SafeArray</code> class that wraps a dynamic integer array. Overload the 
+                    <code>[]</code> operator to provide bounds-checked access. Print an error message for out-of-bounds access.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>$ safe_array.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">[COPY]</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">class SafeArray {
+private:
+    int* data;
+    int size;
+
+public:
+    SafeArray(int s) : size(s) {
+        data = new int[size]();
+    }
+    
+    ~SafeArray() { 
+        delete[] data; 
+    }
+    
+    // TODO: Overload [] operator with bounds checking
+    // Return reference so it can be used for read AND write
+    int& operator[](int idx) {
+        // Check bounds, print error if invalid
+        // Return data[idx] or data[0] as fallback
+    }
+    
+    int length() const { return size; }
+};</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="1.3" placeholder="// Write your SafeArray class with bounds-checked [] operator..."></textarea>
+            </div>
+
+            <!-- Exercise 1.4 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">1.4</span>
+                    <h4 class="exercise-title">Comparison Operators</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Date</code> class with day, month, year. Overload <code>&lt;</code>, <code>&gt;</code>, 
+                    <code>==</code>, and <code>!=</code> operators to compare dates chronologically.
+                </p>
+
+                <textarea class="code-editor xlarge" data-exercise="1.4" placeholder="// Write your Date class with comparison operators..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== FRIENDS SECTION ============== -->
+        <section id="friends" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">🔗</div>
+                    <div>
+                        <h3 class="card-title">Module 02: Friend Functions & Classes</h3>
+                        <p class="card-subtitle">Grant special access to private members for external functions and classes</p>
+                    </div>
+                </div>
+
+                <div class="concept-box purple">
+                    <h4>$ Key Concepts</h4>
+                    <ul>
+                        <li><strong>Friend Function:</strong> Non-member function with access to private members</li>
+                        <li><strong>Friend Class:</strong> Entire class gains access to another class's private members</li>
+                        <li>Declare inside class: <code>friend return_type function_name(params);</code></li>
+                        <li>Define outside class (no <code>ClassName::</code> prefix)</li>
+                        <li><strong>Common use:</strong> Stream operators <code>&lt;&lt;</code> and <code>&gt;&gt;</code></li>
+                        <li><strong>NOT symmetric:</strong> A→B does NOT mean B→A</li>
+                        <li><strong>NOT transitive:</strong> A→B→C does NOT mean A→C</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Why Friend?</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Stream operators</td>
+                            <td>Left operand is ostream</td>
+                            <td><code>cout &lt;&lt; obj</code></td>
+                        </tr>
+                        <tr>
+                            <td>Symmetric operations</td>
+                            <td>Equal treatment both sides</td>
+                            <td><code>5 + obj</code></td>
+                        </tr>
+                        <tr>
+                            <td>Multi-class access</td>
+                            <td>Needs both privates</td>
+                            <td><code>compare(a, b)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Exercise 2.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">2.1</span>
+                    <h4 class="exercise-title">Friend Function for Stream Output</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Point</code> class with private x, y coordinates. Implement the <code>&lt;&lt;</code> 
+                    operator as a <strong>friend function</strong> to output in format <code>(x, y)</code>.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>$ point.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">[COPY]</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">#include &lt;iostream&gt;
+using namespace std;
+
+class Point {
+private:
+    double x, y;
+
+public:
+    Point(double x = 0, double y = 0) : x(x), y(y) {}
+    
+    // TODO: Declare friend operator&lt;&lt;
+    // friend ostream& operator&lt;&lt;(ostream& os, const Point& p);
+};
+
+// TODO: Define friend operator&lt;&lt; outside class
+// ostream& operator&lt;&lt;(ostream& os, const Point& p) { }
+
+int main() {
+    Point p1(3.5, 4.2);
+    Point p2(-1, 7);
+    
+    cout &lt;&lt; "Point 1: " &lt;&lt; p1 &lt;&lt; endl;
+    cout &lt;&lt; "Point 2: " &lt;&lt; p2 &lt;&lt; endl;
+    
+    return 0;
+}</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="2.1" placeholder="// Write your Point class with friend operator<< ..."></textarea>
+            </div>
+
+            <!-- Exercise 2.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">2.2</span>
+                    <h4 class="exercise-title">Friend Function for Distance Calculation</h4>
+                </div>
+                <p class="exercise-description">
+                    Extend the <code>Point</code> class with a friend function <code>distance()</code> that calculates 
+                    the Euclidean distance between two points. The function needs access to private x, y of both points.
+                </p>
+
+                <div class="hint">
+                    <span>$</span>
+                    <span>Distance formula: <code>sqrt((x2-x1)² + (y2-y1)²)</code> — include <code>&lt;cmath&gt;</code></span>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="2.2" placeholder="// Write Point class with friend distance() function..."></textarea>
+            </div>
+
+            <!-- Exercise 2.3 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">2.3</span>
+                    <h4 class="exercise-title">Friend Class</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>BankAccount</code> class with private balance. Create a <code>BankManager</code> class 
+                    that is a <strong>friend</strong> of BankAccount and can directly access and modify the balance 
+                    (e.g., for deposits, withdrawals, and auditing).
+                </p>
+
+                <textarea class="code-editor xlarge" data-exercise="2.3" placeholder="// Write BankAccount with friend class BankManager..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== POINTERS SECTION ============== -->
+        <section id="pointers" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon cyan">📍</div>
+                    <div>
+                        <h3 class="card-title">Module 03: Pointers Deep Dive</h3>
+                        <p class="card-subtitle">Master memory addresses, dynamic allocation, and pointer techniques</p>
+                    </div>
+                </div>
+
+                <div class="concept-box">
+                    <h4>$ Key Concepts</h4>
+                    <ul>
+                        <li><strong>&amp; (Address-of):</strong> Get memory address of a variable</li>
+                        <li><strong>* (Dereference):</strong> Get value at a memory address</li>
+                        <li><strong>Pointer declaration:</strong> <code>int* ptr;</code> — ptr holds address of an int</li>
+                        <li><strong>nullptr:</strong> Null pointer constant (C++11), safer than NULL</li>
+                        <li><strong>Pointer arithmetic:</strong> <code>ptr + 1</code> moves by sizeof(type) bytes</li>
+                        <li><strong>Dynamic memory:</strong> <code>new</code> allocates, <code>delete</code> deallocates</li>
+                        <li><strong>Arrays:</strong> <code>new int[n]</code> allocates, <code>delete[]</code> deallocates</li>
+                        <li><strong>Object access:</strong> Use <code>-&gt;</code> for pointer to object members</li>
+                    </ul>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Syntax</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Declare pointer</td>
+                            <td><code>int* ptr;</code></td>
+                            <td>Pointer to int</td>
+                        </tr>
+                        <tr>
+                            <td>Get address</td>
+                            <td><code>ptr = &x;</code></td>
+                            <td>ptr holds address of x</td>
+                        </tr>
+                        <tr>
+                            <td>Dereference</td>
+                            <td><code>*ptr</code></td>
+                            <td>Value at address</td>
+                        </tr>
+                        <tr>
+                            <td>Null pointer</td>
+                            <td><code>ptr = nullptr;</code></td>
+                            <td>Points to nothing</td>
+                        </tr>
+                        <tr>
+                            <td>Dynamic alloc</td>
+                            <td><code>ptr = new int;</code></td>
+                            <td>Heap allocation</td>
+                        </tr>
+                        <tr>
+                            <td>Free memory</td>
+                            <td><code>delete ptr;</code></td>
+                            <td>Release memory</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Exercise 3.1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">3.1</span>
+                    <h4 class="exercise-title">Pointer Basics</h4>
+                </div>
+                <p class="exercise-description">
+                    Write a program that demonstrates pointer basics: declare an int variable, create a pointer to it,
+                    print the address and value through the pointer, modify the value through the pointer, and use nullptr.
+                </p>
+
+                <textarea class="code-editor large" data-exercise="3.1" placeholder="// Demonstrate pointer basics: &, *, nullptr..."></textarea>
+            </div>
+
+            <!-- Exercise 3.2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">3.2</span>
+                    <h4 class="exercise-title">Pointer Arithmetic with Arrays</h4>
+                </div>
+                <p class="exercise-description">
+                    Create an array of 5 integers. Use pointer arithmetic (not array indexing) to:
+                    (1) print all elements, (2) find the sum, (3) find the maximum value.
+                </p>
+
+                <div class="hint">
+                    <span>$</span>
+                    <span>Array decays to pointer: <code>int* p = arr;</code> | Access: <code>*(p + i)</code></span>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="3.2" placeholder="// Use pointer arithmetic to traverse an array..."></textarea>
+            </div>
+
+            <!-- Exercise 3.3 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">3.3</span>
+                    <h4 class="exercise-title">Dynamic Memory Allocation</h4>
+                </div>
+                <p class="exercise-description">
+                    Write a program that: (1) dynamically allocates a single integer, (2) dynamically allocates an array 
+                    of n integers (ask user for n), (3) fills the array with values, (4) properly deallocates all memory.
+                </p>
+
+                <div class="code-section">
+                    <div class="code-label">
+                        <span>$ dynamic_mem.cpp</span>
+                        <div class="code-actions">
+                            <button class="code-btn" onclick="copyCode(this)">[COPY]</button>
+                        </div>
+                    </div>
+                    <pre class="starter-code">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    // TODO: Allocate single int with new
+    int* single = new int(42);
+    cout &lt;&lt; "*single = " &lt;&lt; *single &lt;&lt; endl;
+    
+    // TODO: Ask user for array size
+    int n;
+    cout &lt;&lt; "Enter array size: ";
+    cin &gt;&gt; n;
+    
+    // TODO: Allocate array with new[]
+    
+    // TODO: Fill array with values (e.g., i * 10)
+    
+    // TODO: Print array
+    
+    // TODO: Deallocate with delete and delete[]
+    
+    return 0;
+}</pre>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="3.3" placeholder="// Complete the dynamic memory allocation program..."></textarea>
+            </div>
+
+            <!-- Exercise 3.4 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">3.4</span>
+                    <h4 class="exercise-title">Pointers to Objects</h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Student</code> class with name and grade. Dynamically create a Student object using 
+                    <code>new</code>, access its members using <code>-&gt;</code> operator, and properly delete it.
+                    Also create an array of Student pointers.
+                </p>
+
+                <textarea class="code-editor xlarge" data-exercise="3.4" placeholder="// Create Student class and use pointers to objects..."></textarea>
+            </div>
+
+            <!-- Exercise 3.5 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">3.5</span>
+                    <h4 class="exercise-title">Function Pointers</h4>
+                </div>
+                <p class="exercise-description">
+                    Create three functions: <code>add(int, int)</code>, <code>subtract(int, int)</code>, <code>multiply(int, int)</code>.
+                    Use a function pointer to call each one. Then create an array of function pointers and loop through them.
+                </p>
+
+                <div class="hint">
+                    <span>$</span>
+                    <span>Syntax: <code>int (*fp)(int, int) = add;</code> | Call: <code>fp(5, 3)</code></span>
+                </div>
+
+                <textarea class="code-editor large" data-exercise="3.5" placeholder="// Demonstrate function pointers..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== CHALLENGES SECTION ============== -->
+        <section id="challenges" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">🏆</div>
+                    <div>
+                        <h3 class="card-title">Challenge Exercises</h3>
+                        <p class="card-subtitle">Test your mastery of all core C++ concepts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Challenge 1 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">C1</span>
+                    <h4 class="exercise-title">Matrix Class with Operators <span class="challenge-badge">CHALLENGE</span></h4>
+                </div>
+                <p class="exercise-description">
+                    Create a <code>Matrix</code> class for 2D matrices with:
+                </p>
+                <ul style="margin: 1rem 0 1rem 2rem; color: #94a3b8;">
+                    <li>Dynamic 2D array storage (pointer to pointer)</li>
+                    <li>Constructor taking rows and cols</li>
+                    <li>Destructor that properly frees memory</li>
+                    <li>Overloaded <code>+</code> operator for matrix addition</li>
+                    <li>Overloaded <code>[]</code> operator for row access</li>
+                    <li>Friend <code>&lt;&lt;</code> operator for output</li>
+                </ul>
+
+                <textarea class="code-editor xlarge" data-exercise="C1" placeholder="// Write your complete Matrix class..."></textarea>
+            </div>
+
+            <!-- Challenge 2 -->
+            <div class="exercise">
+                <div class="exercise-header">
+                    <span class="exercise-number">C2</span>
+                    <h4 class="exercise-title">String Class Implementation <span class="challenge-badge">CHALLENGE</span></h4>
+                </div>
+                <p class="exercise-description">
+                    Create a simplified <code>MyString</code> class with:
+                </p>
+                <ul style="margin: 1rem 0 1rem 2rem; color: #94a3b8;">
+                    <li>Private char* data and int length</li>
+                    <li>Constructor from C-string (<code>const char*</code>)</li>
+                    <li>Copy constructor (deep copy)</li>
+                    <li>Destructor</li>
+                    <li>Overloaded <code>+</code> for concatenation</li>
+                    <li>Overloaded <code>[]</code> for character access</li>
+                    <li>Overloaded <code>==</code> for comparison</li>
+                    <li>Friend <code>&lt;&lt;</code> for output</li>
+                </ul>
+
+                <textarea class="code-editor xlarge" data-exercise="C2" placeholder="// Write your complete MyString class..."></textarea>
+            </div>
+        </section>
+
+        <!-- ============== SUMMARY SECTION ============== -->
+        <section id="summary" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">📝</div>
+                    <div>
+                        <h3 class="card-title">Quick Reference Summary</h3>
+                        <p class="card-subtitle">Key syntax and concepts at a glance</p>
+                    </div>
+                </div>
+
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Concept</th>
+                            <th>Syntax</th>
+                            <th>Key Point</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Operator+</strong></td>
+                            <td>T operator+(const T& o) const</td>
+                            <td>Return by value</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Operator+=</strong></td>
+                            <td>T& operator+=(const T& o)</td>
+                            <td>Return by reference</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Prefix ++</strong></td>
+                            <td>T& operator++()</td>
+                            <td>No parameter</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Postfix ++</strong></td>
+                            <td>T operator++(int)</td>
+                            <td>Dummy int param</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Subscript</strong></td>
+                            <td>T& operator[](int i)</td>
+                            <td>Return reference</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stream out</strong></td>
+                            <td>friend ostream& operator&lt;&lt;</td>
+                            <td>Friend function</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Friend func</strong></td>
+                            <td>friend void func(Class&);</td>
+                            <td>Declare in class</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Friend class</strong></td>
+                            <td>friend class OtherClass;</td>
+                            <td>Full access granted</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Address-of</strong></td>
+                            <td>int* p = &x;</td>
+                            <td>Get address</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dereference</strong></td>
+                            <td>*p = 10;</td>
+                            <td>Access value</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ptr arithmetic</strong></td>
+                            <td>*(p + i)</td>
+                            <td>Move by sizeof</td>
+                        </tr>
+                        <tr>
+                            <td><strong>new / delete</strong></td>
+                            <td>int* p = new int; delete p;</td>
+                            <td>Single object</td>
+                        </tr>
+                        <tr>
+                            <td><strong>new[] / delete[]</strong></td>
+                            <td>int* a = new int[n]; delete[] a;</td>
+                            <td>Array allocation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Object pointer</strong></td>
+                            <td>obj->member</td>
+                            <td>Arrow operator</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Function ptr</strong></td>
+                            <td>int (*fp)(int, int) = func;</td>
+                            <td>Pointer to function</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mistakes-box">
+                <h4>⚠️ Common Mistakes to Avoid</h4>
+                <ul>
+                    <li>Forgetting <code>const</code> on operators that don't modify the object</li>
+                    <li>Returning reference from operators that should return by value (+, -, *)</li>
+                    <li>Confusing prefix (no param) and postfix (int param) increment</li>
+                    <li>Forgetting to return <code>*this</code> from assignment operators</li>
+                    <li>Not making stream operators as friend functions</li>
+                    <li>Using uninitialized pointers</li>
+                    <li>Forgetting to delete dynamically allocated memory</li>
+                    <li>Using <code>delete</code> instead of <code>delete[]</code> for arrays</li>
+                    <li>Dereferencing nullptr or dangling pointers</li>
+                    <li>Memory leaks from missing delete in destructors</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">📌</div>
+                    <div>
+                        <h3 class="card-title">Notes</h3>
+                        <p class="card-subtitle">Write any additional notes or questions here</p>
+                    </div>
+                </div>
+                <textarea class="notes-area" id="notesArea" placeholder="// Type your notes here..."></textarea>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>MAC125 - C++ Core Concepts Lab | LaGuardia Community College | MEC Department</p>
+        <p style="margin-top: 0.5rem;">Prof. Khalid Kassou © 2026</p>
+    </footer>
+
+    <script>
+        // ============== LOCAL STORAGE ============== 
+        let labSaved = false;
+        const INSTRUCTOR_PASSWORD = 'mac125';
+
+        function saveProgress() {
+            const data = {
+                studentName: document.getElementById('studentName').value,
+                studentDate: document.getElementById('studentDate').value,
+                studentSection: document.getElementById('studentSection').value,
+                notes: document.getElementById('notesArea').value,
+                exercises: {}
+            };
+            
+            document.querySelectorAll('.code-editor').forEach(editor => {
+                const exerciseId = editor.dataset.exercise;
+                data.exercises[exerciseId] = editor.value;
+            });
+            
+            localStorage.setItem('mac125_core_concepts_lab', JSON.stringify(data));
+            labSaved = true;
+            
+            const btn = document.querySelector('.btn-secondary');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✓ Saved!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('mac125_core_concepts_lab');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                if (data.studentName) document.getElementById('studentName').value = data.studentName;
+                if (data.studentDate) document.getElementById('studentDate').value = data.studentDate;
+                if (data.studentSection) document.getElementById('studentSection').value = data.studentSection;
+                if (data.notes) document.getElementById('notesArea').value = data.notes;
+                
+                if (data.exercises) {
+                    document.querySelectorAll('.code-editor').forEach(editor => {
+                        const exerciseId = editor.dataset.exercise;
+                        if (data.exercises[exerciseId]) {
+                            editor.value = data.exercises[exerciseId];
+                        }
+                    });
+                }
+                
+                labSaved = true;
+                
+                updateProgress();
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.code-editor').forEach(editor => {
+                        updateExerciseIndicator(editor);
+                    });
+                }, 100);
+            }
+        }
+
+        // ============== INSTRUCTOR AUTHENTICATION ==============
+        function instructorLogin() {
+            showLoginModal();
+        }
+
+        function showLoginModal() {
+            const modal = document.createElement('div');
+            modal.className = 'login-modal';
+            modal.innerHTML = `
+                <div class="login-modal-content">
+                    <h3>🔐 Instructor Access</h3>
+                    <p>Enter the instructor password to access grading:</p>
+                    <input type="password" id="instructorPassword" placeholder="Enter password" class="login-input" onkeypress="if(event.key==='Enter') verifyPassword()">
+                    <div class="login-actions">
+                        <button class="btn btn-grade" onclick="verifyPassword()">Verify</button>
+                        <button class="btn btn-secondary-grade" onclick="closeLoginModal()">Cancel</button>
+                    </div>
+                    <p class="login-hint">Contact your instructor for the grading password.</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('instructorPassword').focus();
+        }
+
+        function verifyPassword() {
+            const password = document.getElementById('instructorPassword').value;
+            if (password === INSTRUCTOR_PASSWORD) {
+                closeLoginModal();
+                showGradeModal();
+            } else {
+                const input = document.getElementById('instructorPassword');
+                input.style.borderColor = '#ef4444';
+                input.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    input.style.animation = '';
+                    input.style.borderColor = '';
+                }, 500);
+            }
+        }
+
+        function closeLoginModal() {
+            document.querySelector('.login-modal')?.remove();
+        }
+
+        // ============== PRINT FUNCTION ============== 
+        function printLab() {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('active');
+            });
+            
+            document.querySelectorAll('.code-editor, .notes-area').forEach(textarea => {
+                const content = textarea.value || '(No answer provided)';
+                const printDiv = document.createElement('div');
+                printDiv.className = 'print-content';
+                
+                if (textarea.classList.contains('large')) {
+                    printDiv.classList.add('large');
+                } else if (textarea.classList.contains('xlarge')) {
+                    printDiv.classList.add('xlarge');
+                }
+                
+                printDiv.textContent = content;
+                textarea.classList.add('printing');
+                textarea.parentNode.insertBefore(printDiv, textarea.nextSibling);
+            });
+            
+            setTimeout(() => {
+                window.print();
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.print-content').forEach(div => div.remove());
+                    document.querySelectorAll('.code-editor.printing, .notes-area.printing').forEach(ta => {
+                        ta.classList.remove('printing');
+                    });
+                    
+                    document.querySelectorAll('.section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById('cover').classList.add('active');
+                    
+                    document.querySelectorAll('.nav-tab').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    document.querySelector('.nav-tab').classList.add('active');
+                }, 500);
+            }, 100);
+        }
+
+        // ============== AUTO-GRADING SYSTEM ==============
+        const exerciseCriteria = {
+            '1.1': {
+                title: 'Fraction Class with Operators',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Fraction/, message: 'Define Fraction class', points: 1 },
+                    { pattern: /int\s+num|int\s+den|numerator|denominator/, message: 'num/den members', points: 1 },
+                    { pattern: /Fraction\s+operator\s*\+\s*\(/, message: 'Overload + operator', points: 3 },
+                    { pattern: /Fraction\s+operator\s*-\s*\(/, message: 'Overload - operator', points: 3 },
+                    { pattern: /Fraction\s+operator\s*\*\s*\(/, message: 'Overload * operator', points: 3 },
+                    { pattern: /bool\s+operator\s*==\s*\(/, message: 'Overload == operator', points: 2 },
+                    { pattern: /const\s+Fraction\s*&|Fraction\s+const\s*&/, message: 'Use const reference', points: 1 },
+                    { pattern: /\)\s*const/, message: 'Method is const', points: 1 }
+                ]
+            },
+            '1.2': {
+                title: 'Prefix and Postfix Increment',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Counter/, message: 'Define Counter class', points: 1 },
+                    { pattern: /Counter\s*&\s*operator\s*\+\+\s*\(\s*\)/, message: 'Prefix ++ (no param)', points: 4 },
+                    { pattern: /Counter\s+operator\s*\+\+\s*\(\s*int\s*\)/, message: 'Postfix ++ (int param)', points: 4 },
+                    { pattern: /return\s+\*\s*this/, message: 'Return *this in prefix', points: 3 },
+                    { pattern: /Counter\s+old|Counter\s+temp|Counter\s+copy/, message: 'Save old value in postfix', points: 3 }
+                ]
+            },
+            '1.3': {
+                title: 'Subscript Operator',
+                points: 15,
+                required: [
+                    { pattern: /class\s+SafeArray/, message: 'Define SafeArray class', points: 1 },
+                    { pattern: /int\s*\*\s*data/, message: 'Dynamic array member', points: 2 },
+                    { pattern: /int\s*&\s*operator\s*\[\s*\]\s*\(/, message: 'operator[] returns reference', points: 4 },
+                    { pattern: /if\s*\(\s*idx\s*<\s*0|idx\s*>=\s*size|idx\s*>\s*=\s*size/, message: 'Bounds checking', points: 4 },
+                    { pattern: /new\s+int\s*\[/, message: 'Use new[] for allocation', points: 2 },
+                    { pattern: /delete\s*\[\s*\]\s*data/, message: 'Use delete[] in destructor', points: 2 }
+                ]
+            },
+            '1.4': {
+                title: 'Date Comparison Operators',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Date/, message: 'Define Date class', points: 1 },
+                    { pattern: /int\s+day|int\s+month|int\s+year/, message: 'day/month/year members', points: 2 },
+                    { pattern: /bool\s+operator\s*<\s*\(/, message: 'Overload < operator', points: 3 },
+                    { pattern: /bool\s+operator\s*>\s*\(/, message: 'Overload > operator', points: 3 },
+                    { pattern: /bool\s+operator\s*==\s*\(/, message: 'Overload == operator', points: 3 },
+                    { pattern: /bool\s+operator\s*!=\s*\(/, message: 'Overload != operator', points: 2 },
+                    { pattern: /\)\s*const/, message: 'Methods are const', points: 1 }
+                ]
+            },
+            '2.1': {
+                title: 'Friend Stream Output',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Point/, message: 'Define Point class', points: 1 },
+                    { pattern: /private\s*:[\s\S]*double\s+x|private\s*:[\s\S]*double\s+y/, message: 'Private x, y members', points: 2 },
+                    { pattern: /friend\s+ostream\s*&\s*operator\s*<</, message: 'Declare friend operator<<', points: 4 },
+                    { pattern: /ostream\s*&\s*operator\s*<<\s*\(\s*ostream\s*&/, message: 'Define operator<< outside', points: 4 },
+                    { pattern: /return\s+os/, message: 'Return ostream reference', points: 2 },
+                    { pattern: /p\.x|p\.y/, message: 'Access private members', points: 2 }
+                ]
+            },
+            '2.2': {
+                title: 'Friend Distance Function',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Point/, message: 'Define Point class', points: 1 },
+                    { pattern: /friend\s+double\s+distance/, message: 'Declare friend distance()', points: 4 },
+                    { pattern: /double\s+distance\s*\(\s*const\s+Point|Point\s+const/, message: 'distance() takes Points', points: 3 },
+                    { pattern: /sqrt\s*\(/, message: 'Use sqrt()', points: 3 },
+                    { pattern: /\.\s*x\s*-|\.\s*y\s*-/, message: 'Calculate differences', points: 2 },
+                    { pattern: /#include\s*<\s*cmath\s*>/, message: 'Include cmath', points: 2 }
+                ]
+            },
+            '2.3': {
+                title: 'Friend Class',
+                points: 15,
+                required: [
+                    { pattern: /class\s+BankAccount/, message: 'Define BankAccount class', points: 2 },
+                    { pattern: /class\s+BankManager/, message: 'Define BankManager class', points: 2 },
+                    { pattern: /private\s*:[\s\S]*balance/, message: 'Private balance member', points: 2 },
+                    { pattern: /friend\s+class\s+BankManager/, message: 'Declare friend class', points: 4 },
+                    { pattern: /BankManager[\s\S]*BankAccount\s*&/, message: 'BankManager methods take BankAccount', points: 3 },
+                    { pattern: /\.\s*balance\s*\+|\.\s*balance\s*-|\.\s*balance\s*=/, message: 'Direct balance access', points: 2 }
+                ]
+            },
+            '3.1': {
+                title: 'Pointer Basics',
+                points: 10,
+                required: [
+                    { pattern: /int\s*\*\s*\w+\s*=\s*&/, message: 'Create pointer with &', points: 2 },
+                    { pattern: /\*\s*\w+\s*=/, message: 'Modify through pointer', points: 2 },
+                    { pattern: /cout\s*<<\s*\*\w+|cout\s*<<\s*\*\s*\w+/, message: 'Print dereferenced value', points: 2 },
+                    { pattern: /nullptr/, message: 'Use nullptr', points: 2 },
+                    { pattern: /==\s*nullptr|!=\s*nullptr/, message: 'Check for nullptr', points: 2 }
+                ]
+            },
+            '3.2': {
+                title: 'Pointer Arithmetic',
+                points: 15,
+                required: [
+                    { pattern: /int\s+\w+\s*\[\s*5\s*\]|int\s+\w+\s*\[\s*\]\s*=/, message: 'Create array', points: 2 },
+                    { pattern: /int\s*\*\s*\w+\s*=\s*\w+/, message: 'Pointer to array', points: 2 },
+                    { pattern: /\*\s*\(\s*\w+\s*\+\s*\w+\s*\)/, message: 'Use *(p + i) syntax', points: 4 },
+                    { pattern: /sum\s*\+\=|\+\s*\*\s*\(/, message: 'Calculate sum', points: 3 },
+                    { pattern: /max|maximum|largest/, message: 'Find maximum', points: 2 },
+                    { pattern: /for\s*\(|while\s*\(/, message: 'Use loop', points: 2 }
+                ]
+            },
+            '3.3': {
+                title: 'Dynamic Memory',
+                points: 15,
+                required: [
+                    { pattern: /new\s+int\s*\(|new\s+int\s*;/, message: 'Allocate single int', points: 2 },
+                    { pattern: /new\s+int\s*\[\s*\w+\s*\]/, message: 'Allocate array with new[]', points: 3 },
+                    { pattern: /cin\s*>>\s*n|cin\s*>>\s*size/, message: 'Get size from user', points: 2 },
+                    { pattern: /for\s*\([^)]*\)[\s\S]*\[\s*\w+\s*\]\s*=/, message: 'Fill array with loop', points: 3 },
+                    { pattern: /delete\s+\w+\s*;/, message: 'delete single allocation', points: 2 },
+                    { pattern: /delete\s*\[\s*\]\s*\w+/, message: 'delete[] array', points: 3 }
+                ]
+            },
+            '3.4': {
+                title: 'Pointers to Objects',
+                points: 15,
+                required: [
+                    { pattern: /class\s+Student/, message: 'Define Student class', points: 2 },
+                    { pattern: /string\s+name|char\s*\*\s*name/, message: 'name member', points: 1 },
+                    { pattern: /Student\s*\*\s*\w+\s*=\s*new\s+Student/, message: 'new Student', points: 3 },
+                    { pattern: /->\s*name|->\s*grade/, message: 'Use -> operator', points: 4 },
+                    { pattern: /delete\s+\w+/, message: 'delete object', points: 2 },
+                    { pattern: /Student\s*\*\s*\w+\s*\[|Student\s*\*\*/, message: 'Array of pointers', points: 3 }
+                ]
+            },
+            '3.5': {
+                title: 'Function Pointers',
+                points: 15,
+                required: [
+                    { pattern: /int\s+add\s*\(\s*int|int\s+subtract\s*\(\s*int|int\s+multiply\s*\(\s*int/, message: 'Define functions', points: 3 },
+                    { pattern: /int\s*\(\s*\*\s*\w+\s*\)\s*\(\s*int\s*,\s*int\s*\)/, message: 'Function pointer syntax', points: 4 },
+                    { pattern: /\w+\s*=\s*add|\w+\s*=\s*subtract|\w+\s*=\s*multiply/, message: 'Assign function to pointer', points: 3 },
+                    { pattern: /\w+\s*\(\s*\d+\s*,\s*\d+\s*\)/, message: 'Call through pointer', points: 3 },
+                    { pattern: /\[\s*\d+\s*\]\s*\)\s*\(|\[\s*\w+\s*\]\s*\)\s*\(|for.*\[/, message: 'Array of function pointers', points: 2 }
+                ]
+            },
+            'C1': {
+                title: 'Matrix Class',
+                points: 20,
+                required: [
+                    { pattern: /class\s+Matrix/, message: 'Define Matrix class', points: 2 },
+                    { pattern: /int\s*\*\s*\*|double\s*\*\s*\*/, message: 'Pointer to pointer (2D)', points: 3 },
+                    { pattern: /new\s+\w+\s*\*\s*\[/, message: 'Allocate row pointers', points: 2 },
+                    { pattern: /~\s*Matrix/, message: 'Destructor', points: 2 },
+                    { pattern: /Matrix\s+operator\s*\+\s*\(/, message: 'operator+ for addition', points: 3 },
+                    { pattern: /\*\s*operator\s*\[\s*\]\s*\(|operator\s*\[\s*\]/, message: 'operator[] for row access', points: 3 },
+                    { pattern: /friend\s+ostream\s*&\s*operator\s*<</, message: 'friend operator<<', points: 3 },
+                    { pattern: /delete\s*\[\s*\]/, message: 'Proper cleanup with delete[]', points: 2 }
+                ]
+            },
+            'C2': {
+                title: 'MyString Class',
+                points: 20,
+                required: [
+                    { pattern: /class\s+MyString/, message: 'Define MyString class', points: 2 },
+                    { pattern: /char\s*\*\s*data/, message: 'char* data member', points: 2 },
+                    { pattern: /MyString\s*\(\s*const\s+char\s*\*/, message: 'Constructor from C-string', points: 2 },
+                    { pattern: /MyString\s*\(\s*const\s+MyString\s*&/, message: 'Copy constructor', points: 3 },
+                    { pattern: /~\s*MyString/, message: 'Destructor', points: 2 },
+                    { pattern: /MyString\s+operator\s*\+\s*\(/, message: 'operator+ for concatenation', points: 3 },
+                    { pattern: /char\s*&?\s*operator\s*\[\s*\]\s*\(/, message: 'operator[] for char access', points: 2 },
+                    { pattern: /bool\s+operator\s*==\s*\(/, message: 'operator== for comparison', points: 2 },
+                    { pattern: /friend\s+ostream\s*&\s*operator\s*<</, message: 'friend operator<<', points: 2 }
+                ]
+            }
+        };
+
+        function gradeExercise(exerciseId) {
+            const criteria = exerciseCriteria[exerciseId];
+            if (!criteria) return null;
+            
+            const editor = document.querySelector(`.code-editor[data-exercise="${exerciseId}"]`);
+            if (!editor) return null;
+            
+            const code = editor.value;
+            let earnedPoints = 0;
+            let feedback = [];
+            let passed = [];
+            
+            criteria.required.forEach(req => {
+                if (req.pattern.test(code)) {
+                    earnedPoints += req.points;
+                    passed.push({ message: req.message, points: req.points, status: 'pass' });
+                } else {
+                    feedback.push({ message: req.message, points: req.points, status: 'fail' });
+                }
+            });
+            
+            return {
+                exerciseId,
+                title: criteria.title,
+                maxPoints: criteria.points,
+                earnedPoints: Math.min(earnedPoints, criteria.points),
+                percentage: Math.round((earnedPoints / criteria.points) * 100),
+                passed,
+                feedback
+            };
+        }
+
+        function gradeAllExercises() {
+            const results = [];
+            let totalEarned = 0;
+            let totalMax = 0;
+            
+            Object.keys(exerciseCriteria).forEach(id => {
+                const result = gradeExercise(id);
+                if (result) {
+                    results.push(result);
+                    totalEarned += result.earnedPoints;
+                    totalMax += result.maxPoints;
+                }
+            });
+            
+            return {
+                exercises: results,
+                totalEarned,
+                totalMax,
+                percentage: Math.round((totalEarned / totalMax) * 100),
+                grade: calculateGrade(totalEarned / totalMax * 100)
+            };
+        }
+
+        function calculateGrade(percentage) {
+            if (percentage >= 90) return 'A';
+            if (percentage >= 80) return 'B';
+            if (percentage >= 70) return 'C';
+            if (percentage >= 60) return 'D';
+            return 'F';
+        }
+
+        function showGradeModal() {
+            const results = gradeAllExercises();
+            
+            let exerciseRows = results.exercises.map(ex => `
+                <tr class="${ex.percentage >= 70 ? 'grade-pass' : 'grade-fail'}">
+                    <td><strong>${ex.exerciseId}</strong></td>
+                    <td>${ex.title}</td>
+                    <td>${ex.earnedPoints.toFixed(1)} / ${ex.maxPoints}</td>
+                    <td>
+                        <div class="grade-bar">
+                            <div class="grade-fill" style="width: ${ex.percentage}%"></div>
+                        </div>
+                        ${ex.percentage}%
+                    </td>
+                    <td>
+                        <button class="feedback-btn" onclick="showFeedback('${ex.exerciseId}')">
+                            ${ex.feedback.length > 0 ? '⚠️ ' + ex.feedback.length + ' issues' : '✅ Complete'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            const modal = document.createElement('div');
+            modal.className = 'grade-modal';
+            modal.innerHTML = `
+                <div class="grade-modal-content">
+                    <div class="grade-header">
+                        <h2>📊 Lab Grading Results</h2>
+                        <button class="close-btn" onclick="closeGradeModal()">✕</button>
+                    </div>
+                    
+                    <div class="grade-summary">
+                        <div class="grade-circle ${results.grade === 'A' ? 'grade-a' : results.grade === 'B' ? 'grade-b' : results.grade === 'C' ? 'grade-c' : 'grade-low'}">
+                            <span class="grade-letter">${results.grade}</span>
+                            <span class="grade-percent">${results.percentage}%</span>
+                        </div>
+                        <div class="grade-details">
+                            <p><strong>Total Score:</strong> ${results.totalEarned.toFixed(1)} / ${results.totalMax} points</p>
+                            <p><strong>Exercises Completed:</strong> ${results.exercises.filter(e => e.percentage > 0).length} / ${results.exercises.length}</p>
+                            <p><strong>Student:</strong> ${document.getElementById('studentName').value || 'Not provided'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grade-table-container">
+                        <table class="grade-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Exercise</th>
+                                    <th>Score</th>
+                                    <th>Progress</th>
+                                    <th>Feedback</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${exerciseRows}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="grade-actions">
+                        <button class="btn btn-grade" onclick="exportGrades()">📥 Export Results</button>
+                        <button class="btn btn-secondary-grade" onclick="closeGradeModal()">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            window.gradingResults = results;
+        }
+
+        function showFeedback(exerciseId) {
+            const result = window.gradingResults.exercises.find(e => e.exerciseId === exerciseId);
+            if (!result) return;
+            
+            let feedbackHtml = '';
+            
+            if (result.passed.length > 0) {
+                feedbackHtml += '<h4 style="color: #10b981; margin-bottom: 0.5rem;">✅ Passed Checks:</h4><ul class="feedback-list pass">';
+                result.passed.forEach(f => {
+                    feedbackHtml += `<li>${f.message} <span class="points">+${f.points} pts</span></li>`;
+                });
+                feedbackHtml += '</ul>';
+            }
+            
+            if (result.feedback.length > 0) {
+                feedbackHtml += '<h4 style="color: #ef4444; margin: 1rem 0 0.5rem;">❌ Missing or Incorrect:</h4><ul class="feedback-list fail">';
+                result.feedback.forEach(f => {
+                    feedbackHtml += `<li>${f.message} <span class="points">-${f.points} pts</span></li>`;
+                });
+                feedbackHtml += '</ul>';
+            }
+            
+            const feedbackModal = document.createElement('div');
+            feedbackModal.className = 'feedback-modal';
+            feedbackModal.innerHTML = `
+                <div class="feedback-modal-content">
+                    <h3>Exercise ${exerciseId}: ${result.title}</h3>
+                    <p style="margin-bottom: 1rem;">Score: <strong>${result.earnedPoints.toFixed(1)} / ${result.maxPoints}</strong> (${result.percentage}%)</p>
+                    ${feedbackHtml}
+                    <button class="btn btn-secondary-grade" onclick="this.parentElement.parentElement.remove()" style="margin-top: 1rem;">Close</button>
+                </div>
+            `;
+            
+            document.body.appendChild(feedbackModal);
+        }
+
+        function closeGradeModal() {
+            document.querySelector('.grade-modal')?.remove();
+        }
+
+        function exportGrades() {
+            const results = window.gradingResults;
+            const studentName = document.getElementById('studentName').value || 'Unknown';
+            const date = document.getElementById('studentDate').value || new Date().toISOString().split('T')[0];
+            
+            let csv = 'MAC125 C++ Core Concepts Lab - Grading Report\n';
+            csv += `Student,${studentName}\n`;
+            csv += `Date,${date}\n`;
+            csv += `Total Score,${results.totalEarned.toFixed(1)}/${results.totalMax}\n`;
+            csv += `Percentage,${results.percentage}%\n`;
+            csv += `Grade,${results.grade}\n\n`;
+            csv += 'Exercise,Title,Earned,Max,Percentage\n';
+            
+            results.exercises.forEach(ex => {
+                csv += `${ex.exerciseId},"${ex.title}",${ex.earnedPoints.toFixed(1)},${ex.maxPoints},${ex.percentage}%\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MAC125_Core_Lab_Grades_${studentName.replace(/\s+/g, '_')}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ============== NAVIGATION ============== 
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(sectionId) || 
+                    (sectionId === 'cover' && tab.textContent.includes('COVER'))) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ============== CODE COPY ============== 
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-section').querySelector('.starter-code');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '[COPIED]';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // ============== PROGRESS TRACKING ============== 
+        function updateProgress() {
+            const editors = document.querySelectorAll('.code-editor');
+            let completed = 0;
+            
+            editors.forEach(editor => {
+                if (editor.value.trim().length > 50) {
+                    completed++;
+                }
+            });
+            
+            const total = editors.length;
+            const percentage = Math.round((completed / total) * 100);
+            
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = completed;
+        }
+
+        function updateExerciseIndicator(editor) {
+            const exerciseId = editor.dataset.exercise;
+            const indicator = document.getElementById(`indicator-${exerciseId}`);
+            if (!indicator) return;
+            
+            const result = gradeExercise(exerciseId);
+            if (!result) return;
+            
+            if (result.percentage === 0) {
+                indicator.className = 'exercise-grade-indicator empty';
+                indicator.innerHTML = '⏳ Not started';
+            } else if (result.percentage >= 70) {
+                indicator.className = 'exercise-grade-indicator good';
+                indicator.innerHTML = `✅ ${result.percentage}% (${result.earnedPoints.toFixed(1)}/${result.maxPoints} pts)`;
+            } else {
+                indicator.className = 'exercise-grade-indicator partial';
+                indicator.innerHTML = `⚠️ ${result.percentage}% (${result.earnedPoints.toFixed(1)}/${result.maxPoints} pts)`;
+            }
+        }
+
+        // ============== INITIALIZE ============== 
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('studentDate').valueAsDate = new Date();
+            
+            loadProgress();
+            
+            document.querySelectorAll('.code-editor').forEach(editor => {
+                const exerciseId = editor.dataset.exercise;
+                const header = editor.closest('.exercise')?.querySelector('.exercise-header');
+                
+                if (header && exerciseCriteria[exerciseId]) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'exercise-grade-indicator empty';
+                    indicator.id = `indicator-${exerciseId}`;
+                    indicator.innerHTML = '⏳ Not started';
+                    header.appendChild(indicator);
+                }
+            });
+            
+            document.querySelectorAll('.code-editor').forEach(editor => {
+                editor.addEventListener('input', () => {
+                    updateProgress();
+                    updateExerciseIndicator(editor);
+                });
+                updateExerciseIndicator(editor);
+            });
+            
+            setInterval(saveProgress, 30000);
+        });
+
+        // ============== KEYBOARD SHORTCUTS ============== 
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveProgress();
+            }
+        });
+    </script>
+</body>
+</html>
